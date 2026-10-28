@@ -116,6 +116,15 @@ npm run dev
 - **API Server & Health Check**: [http://localhost:5000/health](http://localhost:5000/health)
 - **OpenAPI / Swagger Docs**: [http://localhost:5000/api/docs](http://localhost:5000/api/docs)
 
+### 5. AI Health Assistant Configuration (Optional)
+To enable open-ended AI conversation powered by Google Gemini or OpenAI:
+1. Open `server/.env`
+2. Add your API key:
+```bash
+GEMINI_API_KEY=your_gemini_api_key_here
+```
+*(If no key is configured, the assistant automatically uses verified clinical continuity protocols.)*
+
 ---
 
 ## 📱 Offline-First & Sync Engine Architecture

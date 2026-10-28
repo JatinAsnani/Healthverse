@@ -29,6 +29,11 @@ const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/health
 export async function runSeed() {
   console.log('Connecting to MongoDB for seeding HealthVerse database...');
   await mongoose.connect(MONGODB_URI);
+  try {
+    await mongoose.connection.db.dropDatabase();
+  } catch (err) {
+    console.warn('Database drop error:', err);
+  }
   console.log('Connected to MongoDB. Clearing existing collections...');
 
   await Promise.all([

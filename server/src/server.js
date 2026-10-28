@@ -28,6 +28,7 @@ import eligibilityRoutes from './routes/eligibility.routes.js';
 import educationRoutes from './routes/education.routes.js';
 import notificationRoutes from './routes/notification.routes.js';
 import adminRoutes from './routes/admin.routes.js';
+import aiRoutes from './routes/ai.routes.js';
 
 dotenv.config();
 
@@ -95,6 +96,7 @@ app.use('/api/v1/eligibility', eligibilityRoutes);
 app.use('/api/v1/education', educationRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/admin', adminRoutes);
+app.use('/api/v1/ai', aiRoutes);
 
 // Error Handling
 app.use(notFound);

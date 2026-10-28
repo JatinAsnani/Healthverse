@@ -16,6 +16,7 @@ import HospitalAdminView from './pages/HospitalAdminView.jsx';
 import PmjayScreeningPage from './pages/PmjayScreeningPage.jsx';
 import ConsentManagementPage from './pages/ConsentManagementPage.jsx';
 import EducationLibrary from './pages/EducationLibrary.jsx';
+import AIChatBot from './components/AIChatBot.jsx';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -183,6 +184,7 @@ export function App() {
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>
+          <AIChatBot />
         </div>
       </BrowserRouter>
     </ErrorBoundary>
