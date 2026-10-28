@@ -21,7 +21,40 @@ SAFETY AND ETHICAL PRINCIPLES (MANDATORY):
    - Medication adherence (why not to skip maintenance medicines)
    - Explaining medical reports, vital signs (BP, SpO2, Pulse, Blood Sugar)
    - PM-JAY (Ayushman Bharat) government scheme eligibility and required documents
-   - Guiding the user on how to use HealthVerse (reporting symptoms, checking medicines, consent, CHW visits)`;
+   - Guiding the user on how to use HealthVerse (reporting symptoms, checking medicines, consent, CHW visits)
+7. PERSONALIZED PATIENT IDENTIFICATION & CONTINUITY:
+   - When Current Session Context specifies the verified logged-in patient (e.g. Name, Patient ID, Diagnosis):
+     * You KNOW THIS PATIENT! Greet them warmly and respectfully by their name (e.g. "Namaste Rajesh Verma ji!").
+     * If they ask "whats my name", "who am i", "mera naam kya hai", or "who is logged in", IMMEDIATELY state their full name, patient ID, and current recovery status!
+     * When booking appointments, confirm that the appointment is being booked directly for them under their patient record.`;
+
+/**
+ * Builds comprehensive session context note for Gemini and OpenAI prompts
+ */
+function buildSessionContextNote(context = {}) {
+  let note = '';
+  const patientName = context.patientName || context.userName;
+  const patientCode = context.patientCode || context.patientId;
+
+  if (patientName) {
+    note += `CURRENT VERIFIED LOGGED-IN PATIENT: Name="${patientName}", Patient ID="${patientCode || 'HV-PATIENT'}", Role="${context.role || 'patient'}". `;
+    note += `The person chatting with you IS ${patientName}. When they ask for their name ("whats my name", "who am i", "mera naam kya hai"), YOU MUST EXPLICITLY AND PROUDLY STATE THEIR REAL NAME (${patientName}) AND PATIENT ID (${patientCode || 'N/A'})! `;
+    note += `When booking an appointment, this appointment is scheduled directly for ${patientName}. `;
+  } else if (context.role) {
+    note += `User Role: ${context.role}. `;
+  }
+
+  if (context.diagnosis) {
+    note += `Patient Clinical Diagnosis / Condition: ${context.diagnosis}. `;
+  }
+  if (context.language) {
+    note += `Preferred Language: ${context.language}. `;
+  }
+  if (context.doctors && context.doctors.length > 0) {
+    note += `Available Hospital Doctors: ${context.doctors.map(d => `${d.name} (${d.specialization})`).join(', ')}. You have the capability to schedule and book appointments with them. `;
+  }
+  return note;
+}
 
 /**
  * Check whether a message indicates intent to book or schedule an appointment
@@ -116,15 +149,7 @@ async function callGemini(apiKey, message, history = [], context = {}) {
       const contents = [];
 
       // Add context note if provided
-      let contextNote = '';
-      if (context.role) contextNote += `User Role: ${context.role}. `;
-      if (context.diagnosis) contextNote += `Patient Diagnosis: ${context.diagnosis}. `;
-      if (context.language) contextNote += `Preferred Language: ${context.language}. `;
-
-      if (context.doctors && context.doctors.length > 0) {
-        contextNote += `Available Hospital Doctors: ${context.doctors.map(d => `${d.name} (${d.specialization})`).join(', ')}. You have the capability to schedule and book appointments with them. `;
-      }
-
+      const contextNote = buildSessionContextNote(context);
       const effectiveSystemPrompt = contextNote
         ? `${SYSTEM_PROMPT}\n\nCurrent Session Context: ${contextNote}`
         : SYSTEM_PROMPT;
@@ -188,15 +213,7 @@ async function callGemini(apiKey, message, history = [], context = {}) {
 async function callOpenAI(apiKey, message, history = [], context = {}, baseUrl = 'https://api.openai.com/v1') {
   const url = `${baseUrl}/chat/completions`;
 
-  let contextNote = '';
-  if (context.role) contextNote += `User Role: ${context.role}. `;
-  if (context.diagnosis) contextNote += `Patient Diagnosis: ${context.diagnosis}. `;
-  if (context.language) contextNote += `Preferred Language: ${context.language}. `;
-
-  if (context.doctors && context.doctors.length > 0) {
-    contextNote += `Available Hospital Doctors: ${context.doctors.map(d => `${d.name} (${d.specialization})`).join(', ')}. You have the capability to schedule and book appointments with them. `;
-  }
-
+  const contextNote = buildSessionContextNote(context);
   const effectiveSystemPrompt = contextNote
     ? `${SYSTEM_PROMPT}\n\nCurrent Session Context: ${contextNote}`
     : SYSTEM_PROMPT;
@@ -256,10 +273,19 @@ Your symptoms indicate a potentially serious medical emergency that requires imm
 *HealthVerse AI is an early-warning decision aid and does not replace emergency medical services.*`;
   }
 
+  const patientName = context.patientName || context.userName;
+
+  if (lower.includes('my name') || lower.includes('who am i') || lower.includes('mera naam') || lower.includes('who i am') || lower.includes('kon hu') || lower.includes('kaun hu')) {
+    if (patientName) {
+      return `Namaste **${patientName}** ji!\n\nYou are currently logged in as a verified patient on HealthVerse with Patient ID: **${context.patientCode || context.patientId || 'HV-PATIENT'}**${context.diagnosis ? `\n\nClinical Chart: *Recovering from ${context.diagnosis}*` : ''}.\n\nHow can I help you today? I can help you with your medications, check symptoms, or book an appointment directly with Dr. Ananya Sharma or Dr. Vikram Mehta.`;
+    }
+    return `You are currently logged in as a ${context.role || 'user'} on HealthVerse. If you'd like me to address you personally, please tell me your name!`;
+  }
+
   if (detectBookingIntent(lower)) {
     return `📅 **Appointment Booking Support**
 
-Ji haan, main aapki appointment book kar sakta hoon! 
+Ji haan ${patientName ? `${patientName} ji, ` : ''}main aapki appointment book kar sakta hoon! 
 
 Hamare hospital ke doctors:
 - **Dr. Ananya Sharma** (Internal Medicine)
@@ -360,7 +386,9 @@ export async function processAIChat({
       defaultDoctorId: defaultDoc.id || defaultDoc._id,
       defaultDoctorName: defaultDoc.name,
       doctors: doctorsList,
-      patientId: context.patientId || null
+      patientId: context.patientId || null,
+      patientName: context.patientName || context.userName || null,
+      patientCode: context.patientCode || null
     };
   }
 

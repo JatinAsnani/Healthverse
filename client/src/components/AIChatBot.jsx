@@ -20,7 +20,7 @@ import useAuthStore from '../store/useAuthStore';
 
 export const AIChatBot = () => {
   const navigate = useNavigate();
-  const { user } = useAuthStore();
+  const { user, profile } = useAuthStore();
 
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
@@ -36,6 +36,23 @@ export const AIChatBot = () => {
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
   ]);
+
+  // Personalize welcome greeting when patient profile is loaded
+  useEffect(() => {
+    if (profile?.name) {
+      setMessages((prev) => {
+        if (prev.length === 1 && prev[0].id === 'init-1') {
+          return [
+            {
+              ...prev[0],
+              text: `👋 **Namaste ${profile.name}! I am your HealthVerse AI Health Assistant.**\n\nI have loaded your patient profile (**${profile.patientId || 'Verified Patient'}**${profile.medicalHistory?.[0] ? ` • *${profile.medicalHistory[0]}*` : ''}).\n\nI can assist you with:\n- 📅 **Directly booking doctor appointments** with Dr. Ananya Sharma or Dr. Vikram Mehta\n- Understanding post-discharge recovery precautions\n- Explaining your medications & adherence importance\n- Checking PM-JAY (Ayushman Bharat) eligibility & required documents\n- Symptom triage guidance & warning signs\n\n*How can I help you today, ${profile.name.split(' ')[0]} ji?*`
+            }
+          ];
+        }
+        return prev;
+      });
+    }
+  }, [profile?.name]);
 
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -166,6 +183,8 @@ export const AIChatBot = () => {
     setIsBookingSubmitting(true);
     try {
       const selectedDocId = bookingDocId || bookingInfo?.defaultDoctorId || doctorsList[0]?._id;
+      const targetPatientId = bookingInfo?.patientId || profile?._id || user?._id;
+      const patientDisplayName = bookingInfo?.patientName || profile?.name || 'you';
 
       let timeStr = bookingTime;
       if (timeStr.includes('AM') || timeStr.includes('PM')) {
@@ -183,10 +202,10 @@ export const AIChatBot = () => {
         credentials: 'include',
         body: JSON.stringify({
           doctorId: selectedDocId,
-          patientId: bookingInfo?.patientId || undefined,
+          patientId: targetPatientId,
           scheduledAt: isoDate,
           type: bookingType,
-          notes: 'Appointment booked directly via HealthVerse AI Assistant'
+          notes: `Appointment booked directly via HealthVerse AI Assistant for ${patientDisplayName}`
         })
       });
 
@@ -202,6 +221,7 @@ export const AIChatBot = () => {
         ...prev,
         [messageId]: {
           doctorName,
+          patientName: patientDisplayName,
           date: bookingDate,
           time: bookingTime,
           type: bookingType
@@ -212,7 +232,7 @@ export const AIChatBot = () => {
       const confirmMsg = {
         id: `ai-confirm-${Date.now()}`,
         sender: 'assistant',
-        text: `🎉 **Appointment Successfully Confirmed!**\n\n- **Doctor:** ${doctorName}\n- **Date:** ${new Date(isoDate).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}\n- **Time:** ${bookingTime}\n- **Mode:** ${bookingType === 'in_person' ? 'Hospital Visit' : 'Telephonic Consultation'}\n\nYour clinical team has been notified. You can review and manage this in your **Patient Follow-up Schedule**.`,
+        text: `🎉 **Appointment Confirmed for ${patientDisplayName}!**\n\n- **Patient:** ${patientDisplayName} (${bookingInfo?.patientCode || profile?.patientId || 'HV-PATIENT'})\n- **Doctor:** ${doctorName}\n- **Date:** ${new Date(isoDate).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}\n- **Time:** ${bookingTime}\n- **Mode:** ${bookingType === 'in_person' ? 'Hospital Visit' : 'Telephonic Consultation'}\n\nYour clinical team has been notified. You can review and manage this in your **Patient Follow-up Schedule**.`,
         suggestedActions: [
           { label: '📅 View Patient Dashboard', path: '/patient' }
         ],
@@ -258,9 +278,13 @@ export const AIChatBot = () => {
           message: textToSend.trim(),
           history,
           context: {
-            role: user?.role,
-            userName: user?.name,
-            language: user?.preferredLanguage || 'en',
+            role: user?.role || 'patient',
+            userName: profile?.name || user?.name || user?.phone,
+            patientName: profile?.name,
+            patientId: profile?._id,
+            patientCode: profile?.patientId,
+            diagnosis: profile?.medicalHistory?.[0] || profile?.diagnosis,
+            language: user?.preferredLanguage || profile?.language || 'en',
             doctors: doctorsList
           }
         })
@@ -392,16 +416,23 @@ export const AIChatBot = () => {
                   {/* Interactive Doctor Appointment Booking Card */}
                   {m.appointmentBooking && (
                     <div className="mt-3 p-3 rounded-xl bg-teal-50/90 dark:bg-slate-900 border border-teal-200 dark:border-teal-800/80 text-slate-800 dark:text-slate-100 space-y-2.5 shadow-sm">
-                      <div className="flex items-center gap-2 text-teal-800 dark:text-teal-300 font-bold text-xs pb-1 border-b border-teal-200/60 dark:border-teal-900/60">
-                        <Calendar className="w-4 h-4 text-teal-600 dark:text-teal-400" />
-                        <span>Book Doctor Appointment</span>
+                      <div className="flex items-center justify-between pb-1 border-b border-teal-200/60 dark:border-teal-900/60">
+                        <div className="flex items-center gap-2 text-teal-800 dark:text-teal-300 font-bold text-xs">
+                          <Calendar className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+                          <span>Book Doctor Appointment</span>
+                        </div>
+                        {(m.appointmentBooking.patientName || profile?.name) && (
+                          <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-teal-100 dark:bg-teal-900/60 text-teal-800 dark:text-teal-200">
+                            Patient: {m.appointmentBooking.patientName || profile?.name}
+                          </span>
+                        )}
                       </div>
 
                       {bookedAppointments[m.id] ? (
                         <div className="p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs flex items-center gap-2">
                           <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
                           <div>
-                            <p className="font-bold">Appointment Confirmed!</p>
+                            <p className="font-bold">Appointment Confirmed for {bookedAppointments[m.id].patientName || 'Patient'}!</p>
                             <p className="text-[11px] opacity-90">
                               With {bookedAppointments[m.id].doctorName} on {bookedAppointments[m.id].date} at {bookedAppointments[m.id].time} ({bookedAppointments[m.id].type === 'in_person' ? 'Hospital Visit' : 'Telephonic'})
                             </p>
