@@ -2,10 +2,119 @@ import express from 'express';
 import { body, validationResult } from 'express-validator';
 import { authenticate } from '../middleware/auth.js';
 import { requireRole, requirePatientAccess } from '../middleware/rbac.js';
-import { Followup, Discharge } from '../models/index.js';
+import { Followup, Discharge, Staff, Patient } from '../models/index.js';
 import { logAuditEvent } from '../utils/auditLogger.js';
 
 const router = express.Router();
+
+/**
+ * @route GET /api/v1/followups/doctors
+ * @desc Get all active doctors available for appointment booking
+ */
+router.get('/doctors', async (req, res, next) => {
+  try {
+    const doctors = await Staff.find({ role: 'doctor', active: true })
+      .select('name specialization phone hospital')
+      .populate('hospital', 'name facilityCode address');
+
+    res.json({ success: true, count: doctors.length, data: doctors });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/**
+ * @route POST /api/v1/followups/book
+ * @desc Book an appointment with a chosen doctor (Accessible by Patient, Caregiver, or Staff)
+ */
+router.post(
+  '/book',
+  authenticate,
+  [
+    body('scheduledAt').notEmpty().withMessage('Scheduled date and time is required')
+  ],
+  async (req, res, next) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ success: false, errors: errors.array() });
+      }
+
+      const { doctorId, patientId, dischargeId, scheduledAt, type = 'in_person', notes } = req.body;
+
+      // Resolve target patient
+      let targetPatientId = patientId;
+      if (!targetPatientId) {
+        if (req.patient?._id) {
+          targetPatientId = req.patient._id;
+        } else if (req.user?.role === 'patient') {
+          const p = await Patient.findOne({ user: req.user._id });
+          if (p) targetPatientId = p._id;
+        }
+      }
+
+      // If still not resolved and user is caregiver, check their first patient
+      if (!targetPatientId && req.user?.role === 'caregiver') {
+        const p = await Patient.findOne();
+        if (p) targetPatientId = p._id;
+      }
+
+      if (!targetPatientId) {
+        return res.status(400).json({
+          success: false,
+          message: 'Unable to resolve patient account. Please provide patientId.'
+        });
+      }
+
+      // Resolve doctor/staff
+      let assignedStaffId = doctorId;
+      if (!assignedStaffId) {
+        const defaultDoctor = await Staff.findOne({ role: 'doctor', active: true });
+        if (defaultDoctor) assignedStaffId = defaultDoctor._id;
+      }
+
+      // Resolve discharge if available
+      let targetDischargeId = dischargeId;
+      if (!targetDischargeId) {
+        const latestDischarge = await Discharge.findOne({ patient: targetPatientId }).sort({ dischargeDate: -1 });
+        if (latestDischarge) targetDischargeId = latestDischarge._id;
+      }
+
+      const followup = await Followup.create({
+        discharge: targetDischargeId || null,
+        patient: targetPatientId,
+        staff: assignedStaffId || null,
+        scheduledAt: new Date(scheduledAt),
+        type,
+        notes: notes?.trim() || 'Booked via patient appointment portal',
+        syncStatus: 'synced'
+      });
+
+      const populated = await Followup.findById(followup._id)
+        .populate('staff', 'name specialization phone role')
+        .populate('discharge', 'diagnosis dischargeDate');
+
+      await logAuditEvent({
+        userId: req.user._id,
+        action: 'create',
+        resourceType: 'Followup',
+        resourceId: followup._id,
+        patientId: targetPatientId,
+        ip: req.ip,
+        userAgent: req.headers['user-agent'],
+        details: `Appointment booked for ${new Date(scheduledAt).toLocaleString()} with doctor ${populated.staff?.name || 'Assigned Doctor'}`
+      });
+
+      res.status(201).json({
+        success: true,
+        message: 'Appointment booked successfully',
+        data: populated
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
 
 /**
  * @route GET /api/v1/followups/patient/:patientId

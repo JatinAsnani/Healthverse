@@ -1,19 +1,18 @@
 import { Router } from 'express';
 import { processAIChat } from '../services/aiChatService.js';
 import { authenticate } from '../middleware/auth.js';
+import { Staff, Patient, Followup, Discharge } from '../models/index.js';
 
 const router = Router();
 
 /**
- * Optional authentication middleware - attaches user if present without rejecting guests
+ * Optional authentication middleware - attaches user/patient/staff if present without rejecting guests
  */
 function optionalAuth(req, res, next) {
-  const token = req.cookies?.hv_token || req.headers.authorization?.split(' ')[1];
+  const token = req.cookies?.accessToken || req.cookies?.refreshToken || req.headers.authorization;
   if (!token) return next();
 
   try {
-    const jwt = req.app.get('jwt') || null;
-    // Handled gracefully if auth middleware helper is used
     authenticate(req, res, () => next());
   } catch {
     next();
@@ -54,11 +53,21 @@ router.post('/chat', optionalAuth, async (req, res, next) => {
       return res.status(400).json({ error: 'Message text is required.' });
     }
 
+    // Retrieve active doctors for context
+    const doctors = await Staff.find({ role: 'doctor', active: true })
+      .select('name specialization phone');
+
     // Merge session context if user is logged in
     const sessionContext = {
       ...context,
       role: req.user?.role || context.role,
-      userName: req.user?.name || context.userName
+      userName: req.patient?.name || req.user?.name || context.userName,
+      patientId: req.patient?._id || context.patientId,
+      doctors: doctors.map(d => ({
+        id: d._id.toString(),
+        name: d.name,
+        specialization: d.specialization
+      }))
     };
 
     // Client can also pass apiKey in header x-ai-api-key

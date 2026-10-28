@@ -82,29 +82,31 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-slate-50 flex flex-col justify-center py-10 sm:px-6 lg:px-8">
+    <div className="min-h-[calc(100vh-4rem)] bg-slate-50 dark:bg-slate-950 flex flex-col justify-center py-10 sm:px-6 lg:px-8 transition-colors duration-200">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-teal-600 to-emerald-500 flex items-center justify-center text-white shadow-lg shadow-teal-600/30">
             <HeartPulse className="w-8 h-8" />
           </div>
         </div>
-        <h2 className="mt-4 text-center text-3xl font-extrabold text-slate-900 tracking-tight">
+        <h2 className="mt-4 text-center text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
           {t('appName')}
         </h2>
-        <p className="mt-1 text-center text-sm font-medium text-slate-600">
+        <p className="mt-1 text-center text-sm font-medium text-slate-600 dark:text-slate-400">
           {t('appTagline')}
         </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-xl">
-        <div className="bg-white py-8 px-4 shadow-xl shadow-slate-200/50 sm:rounded-3xl sm:px-10 border border-slate-200/80">
+        <div className="bg-white dark:bg-slate-900/95 py-8 px-4 shadow-xl shadow-slate-200/50 dark:shadow-slate-950/70 sm:rounded-3xl sm:px-10 border border-slate-200/80 dark:border-slate-800 transition-colors">
           {/* Tabs */}
-          <div className="flex rounded-xl bg-slate-100 p-1 mb-6">
+          <div className="flex rounded-xl bg-slate-100 dark:bg-slate-800/80 p-1 mb-6 border border-transparent dark:border-slate-700/60">
             <button
               onClick={() => setActiveTab('login')}
               className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
-                activeTab === 'login' ? 'bg-white text-teal-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+                activeTab === 'login'
+                  ? 'bg-white dark:bg-slate-700 text-teal-700 dark:text-teal-300 shadow-sm'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
               Sign In
@@ -112,7 +114,9 @@ export function LoginPage() {
             <button
               onClick={() => setActiveTab('register')}
               className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
-                activeTab === 'register' ? 'bg-white text-teal-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+                activeTab === 'register'
+                  ? 'bg-white dark:bg-slate-700 text-teal-700 dark:text-teal-300 shadow-sm'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
               New Registration (Patient / Caregiver)
@@ -120,8 +124,8 @@ export function LoginPage() {
           </div>
 
           {error && (
-            <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-center gap-2">
-              <ShieldAlert className="w-4 h-4 flex-shrink-0" />
+            <div className="mb-4 p-3 rounded-xl bg-rose-50 dark:bg-rose-950/70 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-xs font-semibold flex items-center gap-2">
+              <ShieldAlert className="w-4 h-4 flex-shrink-0 text-rose-600 dark:text-rose-400" />
               <span>{error}</span>
             </div>
           )}
@@ -130,7 +134,7 @@ export function LoginPage() {
             <div>
               <form onSubmit={handleLoginSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
                     Phone Number or Email
                   </label>
                   <input
@@ -138,13 +142,13 @@ export function LoginPage() {
                     required
                     value={identifier}
                     onChange={(e) => setIdentifier(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 font-medium text-slate-900 text-sm"
+                    className="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/90 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 font-medium text-slate-900 dark:text-slate-100 text-sm"
                     placeholder="e.g. 9800000002"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
                     Password
                   </label>
                   <input
@@ -152,7 +156,7 @@ export function LoginPage() {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 font-medium text-slate-900 text-sm"
+                    className="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/90 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 font-medium text-slate-900 dark:text-slate-100 text-sm"
                     placeholder="Enter password"
                   />
                 </div>
@@ -168,12 +172,12 @@ export function LoginPage() {
               </form>
 
               {/* 1-Click Quick Demo Accounts */}
-              <div className="mt-8 pt-6 border-t border-slate-200">
+              <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                     1-Click Demo Accounts (All Roles)
                   </span>
-                  <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">
+                  <span className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 px-2 py-0.5 rounded font-mono">
                     pass: password123
                   </span>
                 </div>
@@ -181,90 +185,90 @@ export function LoginPage() {
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   <button
                     onClick={() => handleQuickLogin('9800000002')}
-                    className="p-2.5 rounded-xl border border-teal-200 bg-teal-50/50 hover:bg-teal-100/60 text-left transition-colors"
+                    className="p-2.5 rounded-xl border border-teal-200 dark:border-teal-900/60 bg-teal-50/50 dark:bg-teal-950/40 hover:bg-teal-100/60 dark:hover:bg-teal-900/40 text-left transition-colors"
                   >
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-teal-800">
-                      <Stethoscope className="w-3.5 h-3.5 text-teal-600" />
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-teal-800 dark:text-teal-300">
+                      <Stethoscope className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
                       <span>Doctor 1</span>
                     </div>
-                    <div className="text-[10px] text-teal-700 font-medium">Dr. Ananya (Medicine)</div>
+                    <div className="text-[10px] text-teal-700 dark:text-teal-400 font-medium">Dr. Ananya (Medicine)</div>
                   </button>
 
                   <button
                     onClick={() => handleQuickLogin('9800000003')}
-                    className="p-2.5 rounded-xl border border-teal-200 bg-teal-50/50 hover:bg-teal-100/60 text-left transition-colors"
+                    className="p-2.5 rounded-xl border border-teal-200 dark:border-teal-900/60 bg-teal-50/50 dark:bg-teal-950/40 hover:bg-teal-100/60 dark:hover:bg-teal-900/40 text-left transition-colors"
                   >
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-teal-800">
-                      <Stethoscope className="w-3.5 h-3.5 text-teal-600" />
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-teal-800 dark:text-teal-300">
+                      <Stethoscope className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
                       <span>Doctor 2</span>
                     </div>
-                    <div className="text-[10px] text-teal-700 font-medium">Dr. Vikram (Surgery)</div>
+                    <div className="text-[10px] text-teal-700 dark:text-teal-400 font-medium">Dr. Vikram (Surgery)</div>
                   </button>
 
                   <button
                     onClick={() => handleQuickLogin('9800000004')}
-                    className="p-2.5 rounded-xl border border-sky-200 bg-sky-50/50 hover:bg-sky-100/60 text-left transition-colors"
+                    className="p-2.5 rounded-xl border border-sky-200 dark:border-sky-900/60 bg-sky-50/50 dark:bg-sky-950/40 hover:bg-sky-100/60 dark:hover:bg-sky-900/40 text-left transition-colors"
                   >
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-sky-800">
-                      <UserCheck className="w-3.5 h-3.5 text-sky-600" />
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-sky-800 dark:text-sky-300">
+                      <UserCheck className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
                       <span>Nurse 1</span>
                     </div>
-                    <div className="text-[10px] text-sky-700 font-medium">Sister Priya (Ward)</div>
+                    <div className="text-[10px] text-sky-700 dark:text-sky-400 font-medium">Sister Priya (Ward)</div>
                   </button>
 
                   <button
                     onClick={() => handleQuickLogin('9800000006')}
-                    className="p-2.5 rounded-xl border border-purple-200 bg-purple-50/50 hover:bg-purple-100/60 text-left transition-colors"
+                    className="p-2.5 rounded-xl border border-purple-200 dark:border-purple-900/60 bg-purple-50/50 dark:bg-purple-950/40 hover:bg-purple-100/60 dark:hover:bg-purple-900/40 text-left transition-colors"
                   >
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-purple-800">
-                      <HeartHandshake className="w-3.5 h-3.5 text-purple-600" />
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-purple-800 dark:text-purple-300">
+                      <HeartHandshake className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
                       <span>CHW / ASHA</span>
                     </div>
-                    <div className="text-[10px] text-purple-700 font-medium">Sunita Devi (Field)</div>
+                    <div className="text-[10px] text-purple-700 dark:text-purple-400 font-medium">Sunita Devi (Field)</div>
                   </button>
 
                   <button
                     onClick={() => handleQuickLogin('9800000015')}
-                    className="p-2.5 rounded-xl border border-rose-200 bg-rose-50/50 hover:bg-rose-100/60 text-left transition-colors"
+                    className="p-2.5 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50/50 dark:bg-rose-950/40 hover:bg-rose-100/60 dark:hover:bg-rose-900/40 text-left transition-colors"
                   >
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-rose-800">
-                      <ShieldAlert className="w-3.5 h-3.5 text-rose-600 animate-pulse" />
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-rose-800 dark:text-rose-300">
+                      <ShieldAlert className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400 animate-pulse" />
                       <span>Patient 5</span>
                     </div>
-                    <div className="text-[10px] text-rose-700 font-medium">Devendra (Critical Alert)</div>
+                    <div className="text-[10px] text-rose-700 dark:text-rose-400 font-medium">Devendra (Critical Alert)</div>
                   </button>
 
                   <button
                     onClick={() => handleQuickLogin('9800000011')}
-                    className="p-2.5 rounded-xl border border-orange-200 bg-orange-50/50 hover:bg-orange-100/60 text-left transition-colors"
+                    className="p-2.5 rounded-xl border border-orange-200 dark:border-orange-900/60 bg-orange-50/50 dark:bg-orange-950/40 hover:bg-orange-100/60 dark:hover:bg-orange-900/40 text-left transition-colors"
                   >
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-orange-800">
-                      <User className="w-3.5 h-3.5 text-orange-600" />
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-orange-800 dark:text-orange-300">
+                      <User className="w-3.5 h-3.5 text-orange-600 dark:text-orange-400" />
                       <span>Patient 1</span>
                     </div>
-                    <div className="text-[10px] text-orange-700 font-medium">Rajesh (High Alert)</div>
+                    <div className="text-[10px] text-orange-700 dark:text-orange-400 font-medium">Rajesh (High Alert)</div>
                   </button>
 
                   <button
                     onClick={() => handleQuickLogin('9800000001')}
-                    className="p-2.5 rounded-xl border border-slate-300 bg-slate-50 hover:bg-slate-100 text-left transition-colors"
+                    className="p-2.5 rounded-xl border border-slate-300 dark:border-slate-750 bg-slate-50 dark:bg-slate-800/70 hover:bg-slate-100 dark:hover:bg-slate-800 text-left transition-colors"
                   >
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800">
-                      <UserCog className="w-3.5 h-3.5 text-slate-600" />
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-200">
+                      <UserCog className="w-3.5 h-3.5 text-slate-600 dark:text-slate-400" />
                       <span>Admin</span>
                     </div>
-                    <div className="text-[10px] text-slate-600 font-medium">Hospital Analytics</div>
+                    <div className="text-[10px] text-slate-600 dark:text-slate-400 font-medium">Hospital Analytics</div>
                   </button>
 
                   <button
                     onClick={() => handleQuickLogin('9800000020')}
-                    className="p-2.5 rounded-xl border border-amber-200 bg-amber-50/50 hover:bg-amber-100/60 text-left transition-colors"
+                    className="p-2.5 rounded-xl border border-amber-200 dark:border-amber-900/60 bg-amber-50/50 dark:bg-amber-950/40 hover:bg-amber-100/60 dark:hover:bg-amber-900/40 text-left transition-colors"
                   >
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-amber-800">
-                      <HeartHandshake className="w-3.5 h-3.5 text-amber-600" />
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-amber-800 dark:text-amber-300">
+                      <HeartHandshake className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
                       <span>Caregiver 1</span>
                     </div>
-                    <div className="text-[10px] text-amber-700 font-medium">Amit (Linked to P1)</div>
+                    <div className="text-[10px] text-amber-700 dark:text-amber-400 font-medium">Amit (Linked to P1)</div>
                   </button>
                 </div>
               </div>
@@ -272,7 +276,7 @@ export function LoginPage() {
           ) : (
             <form onSubmit={handleRegisterSubmit} className="space-y-3">
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
                   Full Name
                 </label>
                 <input
@@ -280,14 +284,14 @@ export function LoginPage() {
                   required
                   value={regData.name}
                   onChange={(e) => setRegData({ ...regData, name: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-slate-100 text-sm"
                   placeholder="e.g. Ramesh Kumar"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
                     Phone Number
                   </label>
                   <input
@@ -295,28 +299,28 @@ export function LoginPage() {
                     required
                     value={regData.phone}
                     onChange={(e) => setRegData({ ...regData, phone: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-slate-100 text-sm"
                     placeholder="9876543210"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
                     Account Role
                   </label>
                   <select
                     value={regData.role}
                     onChange={(e) => setRegData({ ...regData, role: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm bg-white"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm"
                   >
-                    <option value="patient">Patient</option>
-                    <option value="caregiver">Caregiver</option>
+                    <option value="patient" className="dark:bg-slate-800">Patient</option>
+                    <option value="caregiver" className="dark:bg-slate-800">Caregiver</option>
                   </select>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
                     Date of Birth
                   </label>
                   <input
@@ -324,34 +328,34 @@ export function LoginPage() {
                     required
                     value={regData.dob}
                     onChange={(e) => setRegData({ ...regData, dob: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-slate-100 text-sm"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
                     Gender
                   </label>
                   <select
                     value={regData.gender}
                     onChange={(e) => setRegData({ ...regData, gender: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm bg-white"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm"
                   >
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
+                    <option value="male" className="dark:bg-slate-800">Male</option>
+                    <option value="female" className="dark:bg-slate-800">Female</option>
+                    <option value="other" className="dark:bg-slate-800">Other</option>
                   </select>
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
                   Residential Village / Address
                 </label>
                 <input
                   type="text"
                   value={regData.address}
                   onChange={(e) => setRegData({ ...regData, address: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-slate-100 text-sm"
                   placeholder="Village / Ward name"
                 />
               </div>

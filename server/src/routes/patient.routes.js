@@ -145,7 +145,7 @@ router.get('/:id', authenticate, requirePatientAccess('id'), async (req, res, ne
     ] = await Promise.all([
       Discharge.find({ patient: patient._id }).populate('treatingDoctor', 'name').sort({ dischargeDate: -1 }),
       Prescription.find({ patient: patient._id }).sort({ startDate: -1 }),
-      Followup.find({ patient: patient._id }).populate('staff', 'name role').sort({ scheduledAt: 1 }),
+      Followup.find({ patient: patient._id }).populate('staff', 'name role specialization phone').sort({ scheduledAt: 1 }),
       Investigation.find({ patient: patient._id }).sort({ orderedDate: -1 }),
       SymptomReport.find({ patient: patient._id }).sort({ reportedAt: -1 }).limit(15),
       RiskAssessment.find({ patient: patient._id }).sort({ createdAt: -1 }).limit(10),

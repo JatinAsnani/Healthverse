@@ -4,7 +4,7 @@ const followupSchema = new mongoose.Schema({
   discharge: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Discharge',
-    required: true
+    required: false
   },
   patient: {
     type: mongoose.Schema.Types.ObjectId,

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import useAuthStore from './store/useAuthStore.js';
+import useThemeStore from './store/useThemeStore.js';
 import { initAutoSync } from './services/syncEngine.js';
 
 // Components & Pages
@@ -99,16 +100,18 @@ function ProtectedRoute({ children, allowedRoles }) {
 
 export function App() {
   const { checkAuth } = useAuthStore();
+  const { initTheme } = useThemeStore();
 
   useEffect(() => {
+    initTheme();
     checkAuth();
     initAutoSync();
-  }, []);
+  }, [initTheme, checkAuth]);
 
   return (
     <ErrorBoundary>
       <BrowserRouter>
-        <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900">
+        <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200">
           <SafetyBanner />
           <Navbar />
 

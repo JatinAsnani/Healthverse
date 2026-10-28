@@ -3,19 +3,38 @@ import logger from '../config/logger.js';
 const SYSTEM_PROMPT = `You are HealthVerse AI, an intelligent, empathetic continuity-of-care medical assistant designed for patients, caregivers, community health workers (CHWs), and clinicians in rural and community settings.
 
 SAFETY AND ETHICAL PRINCIPLES (MANDATORY):
-1. You are a DECISION-SUPPORT and EARLY-WARNING assistant only. You are NOT a doctor and must never make a definitive medical diagnosis or prescribe new drug dosages.
+1. You are a DECISION-SUPPORT and EARLY-WARNING assistant. You do not make definitive medical diagnoses or prescribe new drug dosages without clinician oversight.
 2. If the user mentions any RED-FLAG or CRITICAL symptoms (such as severe crushing chest pain, breathlessness, coughing blood, black stools, stroke symptoms like slurred speech or facial droop, high fever >101°F with infected wound, or SpO2 < 90%):
    - Immediately and prominently instruct them to CALL 108 AMBULANCE or visit the nearest emergency hospital immediately.
    - Advise them not to wait for private transport.
 3. Be clear, warm, and speak in simple language avoiding difficult medical jargon.
-4. If asked in Hindi, Gujarati, or Marathi, respond fluently and naturally in that language (using Devanagari or Gujarati script).
-5. You can assist with:
+4. If asked in Hindi, Hinglish, Gujarati, or Marathi, respond fluently and naturally in that language (using Devanagari, Gujarati, or Latin script as appropriate).
+5. YOU HAVE DIRECT ACCESS TO BOOK DOCTOR APPOINTMENTS & FOLLOW-UPS:
+   - When a patient or clinician asks you to book an appointment (e.g. "tu book kr", "book an appointment", "schedule follow-up", "doctor se milna hai", "appointment book karo"), YOU CAN AND WILL BOOK IT!
+   - You have access to our hospital doctors:
+     * Dr. Ananya Sharma (Internal Medicine)
+     * Dr. Vikram Mehta (General Surgery & Critical Care)
+   - Enthusiastically confirm that you can schedule it right here in HealthVerse, let them know which doctor you recommend or is available, and explain that an interactive booking card has been loaded for them to confirm their date & time slot with 1 tap.
+6. You can assist with:
+   - Direct appointment booking & scheduling with hospital doctors
    - Post-discharge recovery precautions (wound care, diet, light activity)
    - Medication adherence (why not to skip maintenance medicines)
    - Explaining medical reports, vital signs (BP, SpO2, Pulse, Blood Sugar)
    - PM-JAY (Ayushman Bharat) government scheme eligibility and required documents
-   - Guiding the user on how to use HealthVerse (reporting symptoms, checking medicines, consent, CHW visits)
-6. Whenever you suggest an action the user can do in HealthVerse, mention it clearly (e.g., "You can report this symptom in the Symptom Report tab" or "You can check PM-JAY eligibility in the Schemes tab").`;
+   - Guiding the user on how to use HealthVerse (reporting symptoms, checking medicines, consent, CHW visits)`;
+
+/**
+ * Check whether a message indicates intent to book or schedule an appointment
+ */
+export function detectBookingIntent(text = '') {
+  const lower = text.toLowerCase();
+  const bookingKeywords = [
+    'book', 'booking', 'appointment', 'schedule', 'followup', 'follow-up', 'milna',
+    'apointment', 'appotiment', 'tu book', 'kr do book', 'doctor dekhna', 'डॉक्टर',
+    'अपॉइंटमेंट', 'બુક', 'તારીખ', 'मुलाकात'
+  ];
+  return bookingKeywords.some(k => lower.includes(k));
+}
 
 /**
  * Check whether a message contains critical emergency red flags
@@ -56,6 +75,9 @@ function extractSuggestedActions(text = '', userMessage = '') {
   const actions = [];
   const combined = (text + ' ' + userMessage).toLowerCase();
 
+  if (detectBookingIntent(combined)) {
+    actions.push({ label: '📅 Book Doctor Appointment', action: 'book_appointment' });
+  }
   if (combined.includes('symptom') || combined.includes('pain') || combined.includes('fever') || combined.includes('लक्षण')) {
     actions.push({ label: '📝 Report Symptoms', path: '/symptoms/report' });
   }
@@ -98,6 +120,10 @@ async function callGemini(apiKey, message, history = [], context = {}) {
       if (context.role) contextNote += `User Role: ${context.role}. `;
       if (context.diagnosis) contextNote += `Patient Diagnosis: ${context.diagnosis}. `;
       if (context.language) contextNote += `Preferred Language: ${context.language}. `;
+
+      if (context.doctors && context.doctors.length > 0) {
+        contextNote += `Available Hospital Doctors: ${context.doctors.map(d => `${d.name} (${d.specialization})`).join(', ')}. You have the capability to schedule and book appointments with them. `;
+      }
 
       const effectiveSystemPrompt = contextNote
         ? `${SYSTEM_PROMPT}\n\nCurrent Session Context: ${contextNote}`
@@ -167,6 +193,10 @@ async function callOpenAI(apiKey, message, history = [], context = {}, baseUrl =
   if (context.diagnosis) contextNote += `Patient Diagnosis: ${context.diagnosis}. `;
   if (context.language) contextNote += `Preferred Language: ${context.language}. `;
 
+  if (context.doctors && context.doctors.length > 0) {
+    contextNote += `Available Hospital Doctors: ${context.doctors.map(d => `${d.name} (${d.specialization})`).join(', ')}. You have the capability to schedule and book appointments with them. `;
+  }
+
   const effectiveSystemPrompt = contextNote
     ? `${SYSTEM_PROMPT}\n\nCurrent Session Context: ${contextNote}`
     : SYSTEM_PROMPT;
@@ -226,6 +256,18 @@ Your symptoms indicate a potentially serious medical emergency that requires imm
 *HealthVerse AI is an early-warning decision aid and does not replace emergency medical services.*`;
   }
 
+  if (detectBookingIntent(lower)) {
+    return `📅 **Appointment Booking Support**
+
+Ji haan, main aapki appointment book kar sakta hoon! 
+
+Hamare hospital ke doctors:
+- **Dr. Ananya Sharma** (Internal Medicine)
+- **Dr. Vikram Mehta** (General Surgery & Critical Care)
+
+Maine aapke liye niche **Appointment Booking Card** open kar diya hai. Aap apna manpasand doctor aur time chun kar **"Confirm Appointment"** par tap karein, aur aapka follow-up schedule ho jayega!`;
+  }
+
   if (lower.includes('pmjay') || lower.includes('pm-jay') || lower.includes('ayushman') || lower.includes('scheme') || lower.includes('ration') || lower.includes('योजना')) {
     return `📋 **Ayushman Bharat PM-JAY Scheme Guidance**
 
@@ -263,11 +305,11 @@ If any red flags appear, record them in the **Symptom Report** tab and contact y
     return `👋 **Namaste! I am your HealthVerse AI Health Assistant.**
 
 I can help you with:
+- Booking doctor appointments and clinic follow-ups
 - Explaining your discharge instructions and medication schedules
 - Answering questions about post-surgical recovery, wound care, and diet
 - Checking eligibility and documents for PM-JAY (Ayushman Bharat)
 - Symptom triage and warning sign awareness
-- Guiding you through HealthVerse features
 
 How can I help you today?`;
   }
@@ -275,8 +317,9 @@ How can I help you today?`;
   return `I understand your query: "${message}".
 
 Here is guidance from HealthVerse clinical continuity protocols:
+- You can book an appointment with our hospital doctors directly in this chat or via your Home timeline.
 - Ensure you monitor your vital signs (BP, pulse, oxygen) and take prescribed medications as directed.
-- If you are experiencing uncomfortable symptoms, click **Report Symptoms** below so your hospital doctor and nurse can review your case.
+- If you are experiencing uncomfortable symptoms, click **Report Symptoms** below so your care team can review your case.
 - For emergency symptoms (chest tightness, severe breathing difficulty, sudden weakness), call **108** immediately.`;
 }
 
@@ -295,6 +338,31 @@ export async function processAIChat({
   }
 
   const isEmergency = detectEmergencyRedFlags(message);
+  const isBooking = detectBookingIntent(message);
+
+  // Setup appointment booking data if booking intent detected
+  let appointmentBooking = null;
+  if (isBooking) {
+    const doctorsList = (context.doctors && context.doctors.length > 0) ? context.doctors : [
+      { id: '6ae19a8e4da8f1c7c8827f9e', name: 'Dr. Vikram Mehta', specialization: 'General Surgery & Critical Care' },
+      { id: '6ae19a8e4da8f1c7c8827f9a', name: 'Dr. Ananya Sharma', specialization: 'Internal Medicine' }
+    ];
+
+    let defaultDoc = doctorsList[0];
+    if (message.toLowerCase().includes('ananya')) {
+      defaultDoc = doctorsList.find(d => d.name.toLowerCase().includes('ananya')) || defaultDoc;
+    } else if (message.toLowerCase().includes('vikram')) {
+      defaultDoc = doctorsList.find(d => d.name.toLowerCase().includes('vikram')) || defaultDoc;
+    }
+
+    appointmentBooking = {
+      open: true,
+      defaultDoctorId: defaultDoc.id || defaultDoc._id,
+      defaultDoctorName: defaultDoc.name,
+      doctors: doctorsList,
+      patientId: context.patientId || null
+    };
+  }
 
   // Determine effective API key
   const effectiveKey = apiKey || process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY || process.env.AI_API_KEY;
@@ -333,6 +401,8 @@ export async function processAIChat({
     reply,
     suggestedActions,
     emergencyDetected: isEmergency,
+    bookingIntent: isBooking,
+    appointmentBooking,
     provider: usedProvider,
     timestamp: new Date().toISOString()
   };

@@ -14,7 +14,11 @@ import {
   FileText,
   UserCheck,
   Sparkles,
-  PhoneCall
+  PhoneCall,
+  X,
+  Clock,
+  Plus,
+  RefreshCw
 } from 'lucide-react';
 import useAuthStore from '../store/useAuthStore.js';
 import { RiskBadge, SyncStatusBadge } from '../components/RiskBadge.jsx';
@@ -30,10 +34,39 @@ export function PatientHome() {
   const [loggedDoses, setLoggedDoses] = useState({});
   const [actionNotice, setActionNotice] = useState(null);
 
+  // Appointment Booking State
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [doctors, setDoctors] = useState([
+    { _id: '6ae19a8e4da8f1c7c8827f9a', name: 'Dr. Ananya Sharma', specialization: 'Internal Medicine' },
+    { _id: '6ae19a8e4da8f1c7c8827f9e', name: 'Dr. Vikram Mehta', specialization: 'General Surgery & Critical Care' }
+  ]);
+  const [selectedDoctorId, setSelectedDoctorId] = useState('6ae19a8e4da8f1c7c8827f9a');
+  const [bookingDate, setBookingDate] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    return d.toISOString().split('T')[0];
+  });
+  const [bookingTime, setBookingTime] = useState('10:30 AM');
+  const [bookingType, setBookingType] = useState('in_person');
+  const [bookingNotes, setBookingNotes] = useState('');
+  const [isSubmittingBooking, setIsSubmittingBooking] = useState(false);
+  const [bookingNotice, setBookingNotice] = useState(null);
+
   const patientId = profile?.patientId || profile?._id;
 
   useEffect(() => {
     fetchPatientData();
+
+    // Fetch active doctors from backend
+    fetch('/api/v1/followups/doctors')
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.success && json.data?.length > 0) {
+          setDoctors(json.data);
+          setSelectedDoctorId(json.data[0]._id);
+        }
+      })
+      .catch((err) => console.warn('Could not fetch doctors:', err));
   }, [profile]);
 
   const fetchPatientData = async () => {
@@ -105,9 +138,62 @@ export function PatientHome() {
     }
   };
 
+  const handleBookAppointment = async (e) => {
+    e.preventDefault();
+    if (!selectedDoctorId || !bookingDate || !bookingTime) return;
+
+    setIsSubmittingBooking(true);
+    setBookingNotice(null);
+
+    try {
+      let timeStr = bookingTime;
+      if (timeStr.includes('AM') || timeStr.includes('PM')) {
+        const [timePart, meridiem] = timeStr.split(' ');
+        let [hours, minutes] = timePart.split(':').map(Number);
+        if (meridiem === 'PM' && hours < 12) hours += 12;
+        if (meridiem === 'AM' && hours === 12) hours = 0;
+        timeStr = `${String(hours).padStart(2, '0')}:${String(minutes || 0).padStart(2, '0')}:00`;
+      }
+      const isoDate = new Date(`${bookingDate}T${timeStr}`).toISOString();
+
+      const res = await fetch('/api/v1/followups/book', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          doctorId: selectedDoctorId,
+          patientId: profile?._id,
+          scheduledAt: isoDate,
+          type: bookingType,
+          notes: bookingNotes.trim() || 'Booked via Patient Portal'
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message || data.errors?.[0]?.msg || 'Failed to schedule appointment');
+      }
+
+      setBookingNotice({
+        type: 'success',
+        message: `Appointment scheduled successfully with ${data.data?.staff?.name || 'Doctor'}!`
+      });
+      setIsBookingModalOpen(false);
+      setBookingNotes('');
+      await fetchPatientData();
+    } catch (err) {
+      setBookingNotice({
+        type: 'error',
+        message: err.message || 'Error booking appointment'
+      });
+    } finally {
+      setIsSubmittingBooking(false);
+    }
+  };
+
   const activeDischarge = patientData?.discharges?.[0];
   const prescriptions = patientData?.prescriptions || [];
-  const nextFollowup = patientData?.followups?.find(f => f.status === 'scheduled');
+  const scheduledFollowups = patientData?.followups?.filter(f => f.status === 'scheduled') || [];
   const pendingTests = patientData?.investigations?.filter(i => i.status !== 'resulted') || [];
   const latestRisk = patientData?.riskAssessments?.[0];
 
@@ -252,34 +338,91 @@ export function PatientHome() {
 
           {/* Section: Next Follow-Up Appointment */}
           <div className="card-premium p-6">
-            <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-              <div className="w-9 h-9 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center">
-                <Calendar className="w-5 h-5" />
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-2">
+                <div className="w-9 h-9 rounded-xl bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 flex items-center justify-center">
+                  <Calendar className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">{t('patientHome.nextFollowup')}</h2>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">Doctor consultations & recovery check-ups</p>
+                </div>
               </div>
-              <h2 className="text-lg font-bold text-slate-900">{t('patientHome.nextFollowup')}</h2>
+
+              <button
+                onClick={() => setIsBookingModalOpen(true)}
+                className="btn-touch bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-sm flex items-center gap-1.5 transition-all"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Book Appointment</span>
+              </button>
             </div>
 
-            {nextFollowup ? (
-              <div className="mt-4 p-4 rounded-xl bg-sky-50/60 border border-sky-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div>
-                  <div className="text-base font-bold text-sky-900">
-                    {new Date(nextFollowup.scheduledAt).toLocaleDateString(undefined, {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
+            {bookingNotice && (
+              <div className={`mt-3 p-3 rounded-xl text-xs flex items-center justify-between ${
+                bookingNotice.type === 'success'
+                  ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800'
+                  : 'bg-rose-50 dark:bg-rose-950/60 text-rose-800 dark:text-rose-200 border border-rose-200 dark:border-rose-800'
+              }`}>
+                <span>{bookingNotice.message}</span>
+                <button onClick={() => setBookingNotice(null)} className="text-slate-400 hover:text-slate-600">
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
+
+            {scheduledFollowups.length > 0 ? (
+              <div className="space-y-3 mt-4">
+                {scheduledFollowups.map((f) => (
+                  <div
+                    key={f._id}
+                    className="p-4 rounded-xl bg-sky-50/70 dark:bg-slate-800/80 border border-sky-100 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm"
+                  >
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-extrabold text-slate-900 dark:text-slate-100">
+                          {f.staff?.name || 'Assigned Doctor'}
+                        </span>
+                        {f.staff?.specialization && (
+                          <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-teal-100 dark:bg-teal-900/60 text-teal-800 dark:text-teal-300">
+                            {f.staff.specialization}
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-xs text-sky-900 dark:text-sky-200 flex items-center gap-2">
+                        <Clock className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
+                        <span>
+                          {new Date(f.scheduledAt).toLocaleDateString(undefined, {
+                            weekday: 'short',
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                          })}{' '}
+                          at{' '}
+                          {new Date(f.scheduledAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
+                      <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                        Mode: <strong className="capitalize text-slate-700 dark:text-slate-200">{f.type?.replace('_', ' ')}</strong> &bull; Note: {f.notes || 'Routine clinical recovery review'}
+                      </div>
+                    </div>
+                    <span className="self-start sm:self-center px-3 py-1 rounded-full text-xs font-bold bg-sky-100 dark:bg-sky-900/80 text-sky-800 dark:text-sky-200 border border-sky-200 dark:border-sky-700">
+                      Scheduled
+                    </span>
                   </div>
-                  <div className="text-xs text-sky-700 mt-0.5">
-                    Mode: <strong className="capitalize">{nextFollowup.type?.replace('_', ' ')}</strong> &bull; Note: {nextFollowup.notes || 'Routine recovery review'}
-                  </div>
-                </div>
-                <span className="px-3 py-1 rounded-full text-xs font-bold bg-sky-200 text-sky-800">
-                  Scheduled
-                </span>
+                ))}
               </div>
             ) : (
-              <p className="mt-4 text-xs text-slate-500">{t('patientHome.noUpcomingFollowup')}</p>
+              <div className="mt-4 p-5 rounded-xl border border-dashed border-slate-200 dark:border-slate-700 text-center space-y-2">
+                <p className="text-xs text-slate-500 dark:text-slate-400">{t('patientHome.noUpcomingFollowup')}</p>
+                <button
+                  onClick={() => setIsBookingModalOpen(true)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg bg-teal-50 dark:bg-teal-950/80 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-800 hover:bg-teal-100"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Schedule Doctor Visit</span>
+                </button>
+              </div>
             )}
           </div>
         </div>
@@ -347,16 +490,16 @@ export function PatientHome() {
 
           {/* Privacy & Caregiver Consent */}
           <div className="card-premium p-6">
-            <h3 className="font-bold text-sm text-slate-900 mb-2 flex items-center gap-2">
-              <UserCheck className="w-4 h-4 text-teal-600" />
+            <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100 mb-2 flex items-center gap-2">
+              <UserCheck className="w-4 h-4 text-teal-600 dark:text-teal-400" />
               <span>DPDP Privacy & Caregivers</span>
             </h3>
-            <p className="text-xs text-slate-600 mb-3">
+            <p className="text-xs text-slate-600 dark:text-slate-400 mb-3">
               Manage family caregiver access and exercise your right to withdraw consent at any time.
             </p>
             <Link
               to="/consent"
-              className="text-xs font-bold text-teal-700 hover:text-teal-800 flex items-center gap-1"
+              className="text-xs font-bold text-teal-700 dark:text-teal-300 hover:text-teal-800 flex items-center gap-1"
             >
               <span>Manage Consents & Permissions</span>
               <ChevronRight className="w-3.5 h-3.5" />
@@ -364,6 +507,174 @@ export function PatientHome() {
           </div>
         </div>
       </div>
+
+      {/* Appointment Booking Modal with Doctor Selection */}
+      {isBookingModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-150">
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-teal-700 via-teal-800 to-emerald-800 text-white p-5 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center border border-white/20">
+                  <Calendar className="w-5 h-5 text-teal-200" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-base">Book Doctor Appointment</h3>
+                  <p className="text-xs text-teal-100/90">Select doctor, date, and consultation format</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsBookingModalOpen(false)}
+                className="p-1.5 rounded-lg text-teal-100 hover:text-white hover:bg-white/10 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Form */}
+            <form onSubmit={handleBookAppointment} className="p-6 space-y-4 text-xs">
+              {/* Doctor Selector */}
+              <div>
+                <label className="block font-bold text-slate-800 dark:text-slate-200 mb-1.5 text-xs">
+                  Select Doctor:
+                </label>
+                <select
+                  value={selectedDoctorId}
+                  onChange={(e) => setSelectedDoctorId(e.target.value)}
+                  className="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-xs font-semibold focus:ring-2 focus:ring-teal-500/30 focus:border-teal-600"
+                  required
+                >
+                  {doctors.map((doc) => (
+                    <option key={doc._id} value={doc._id}>
+                      {doc.name} &bull; {doc.specialization} {doc.hospital?.name ? `(${doc.hospital.name})` : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Date & Time Slot */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-800 dark:text-slate-200 mb-1.5 text-xs">
+                    Appointment Date:
+                  </label>
+                  <input
+                    type="date"
+                    min={new Date().toISOString().split('T')[0]}
+                    value={bookingDate}
+                    onChange={(e) => setBookingDate(e.target.value)}
+                    required
+                    className="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-teal-500/30 focus:border-teal-600"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-800 dark:text-slate-200 mb-1.5 text-xs">
+                    Time Slot:
+                  </label>
+                  <select
+                    value={bookingTime}
+                    onChange={(e) => setBookingTime(e.target.value)}
+                    className="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-teal-500/30 focus:border-teal-600"
+                  >
+                    <option value="09:00 AM">09:00 AM</option>
+                    <option value="10:00 AM">10:00 AM</option>
+                    <option value="10:30 AM">10:30 AM</option>
+                    <option value="11:30 AM">11:30 AM</option>
+                    <option value="02:00 PM">02:00 PM</option>
+                    <option value="03:30 PM">03:30 PM</option>
+                    <option value="05:00 PM">05:00 PM</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Consultation Type */}
+              <div>
+                <label className="block font-bold text-slate-800 dark:text-slate-200 mb-1.5 text-xs">
+                  Consultation Mode:
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <label
+                    className={`p-3 rounded-xl border flex items-center gap-2 cursor-pointer transition-all ${
+                      bookingType === 'in_person'
+                        ? 'bg-teal-50 dark:bg-teal-950/60 border-teal-500 text-teal-900 dark:text-teal-200 font-bold'
+                        : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="bookingType"
+                      value="in_person"
+                      checked={bookingType === 'in_person'}
+                      onChange={() => setBookingType('in_person')}
+                      className="text-teal-600 focus:ring-teal-500"
+                    />
+                    <span>🏥 Hospital Visit</span>
+                  </label>
+                  <label
+                    className={`p-3 rounded-xl border flex items-center gap-2 cursor-pointer transition-all ${
+                      bookingType === 'telephonic'
+                        ? 'bg-teal-50 dark:bg-teal-950/60 border-teal-500 text-teal-900 dark:text-teal-200 font-bold'
+                        : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="bookingType"
+                      value="telephonic"
+                      checked={bookingType === 'telephonic'}
+                      onChange={() => setBookingType('telephonic')}
+                      className="text-teal-600 focus:ring-teal-500"
+                    />
+                    <span>📞 Telephonic Call</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Notes / Reason */}
+              <div>
+                <label className="block font-bold text-slate-800 dark:text-slate-200 mb-1.5 text-xs">
+                  Reason for Visit / Symptoms (Optional):
+                </label>
+                <textarea
+                  rows={2}
+                  value={bookingNotes}
+                  onChange={(e) => setBookingNotes(e.target.value)}
+                  placeholder="e.g. Routine wound recovery follow-up, BP review, medication discussion..."
+                  className="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-teal-500/30 focus:border-teal-600 resize-none"
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100 dark:border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setIsBookingModalOpen(false)}
+                  className="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingBooking}
+                  className="px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-2 disabled:opacity-50"
+                >
+                  {isSubmittingBooking ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      <span>Scheduling...</span>
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle className="w-4 h-4" />
+                      <span>Confirm & Schedule</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
