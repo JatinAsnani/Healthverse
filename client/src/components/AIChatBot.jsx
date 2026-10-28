@@ -16,7 +16,101 @@ import {
   CheckCircle2,
   Clock
 } from 'lucide-react';
-import useAuthStore from '../store/useAuthStore';
+// Helper to extract appointment date/time from natural language in English, Hindi & Hinglish
+function extractDateFromText(text = '') {
+  const lower = text.toLowerCase();
+  const now = new Date();
+  let targetDate = null;
+  let targetTime = null;
+  let targetType = null;
+
+  if (lower.includes('parso') || lower.includes('parson') || lower.includes('day after tomorrow')) {
+    const d = new Date(now);
+    d.setDate(d.getDate() + 2);
+    targetDate = d.toISOString().split('T')[0];
+  } else if (lower.includes('kal') || lower.includes('tomorrow')) {
+    const d = new Date(now);
+    d.setDate(d.getDate() + 1);
+    targetDate = d.toISOString().split('T')[0];
+  } else if (lower.includes('aaj') || lower.includes('today')) {
+    targetDate = now.toISOString().split('T')[0];
+  }
+
+  const dayMonthMatch = lower.match(/\b(\d{1,2})(?:st|nd|rd|th)?\s+(?:of\s+)?(jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*/i);
+  const monthDayMatch = lower.match(/\b(jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\s+(\d{1,2})(?:st|nd|rd|th)?/i);
+  const slashMatch = lower.match(/\b(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?\b/);
+
+  const monthsMap = {
+    jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6,
+    jul: 7, aug: 8, sep: 9, sept: 9, oct: 10, nov: 11, dec: 12
+  };
+
+  if (dayMonthMatch) {
+    const day = parseInt(dayMonthMatch[1], 10);
+    const month = monthsMap[dayMonthMatch[2].slice(0, 3)];
+    if (month && day >= 1 && day <= 31) {
+      targetDate = `${now.getFullYear()}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    }
+  } else if (monthDayMatch) {
+    const month = monthsMap[monthDayMatch[1].slice(0, 3)];
+    const day = parseInt(monthDayMatch[2], 10);
+    if (month && day >= 1 && day <= 31) {
+      targetDate = `${now.getFullYear()}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    }
+  } else if (slashMatch) {
+    const day = parseInt(slashMatch[1], 10);
+    const month = parseInt(slashMatch[2], 10);
+    const year = slashMatch[3] ? (slashMatch[3].length === 2 ? 2000 + parseInt(slashMatch[3], 10) : parseInt(slashMatch[3], 10)) : now.getFullYear();
+    if (month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+      targetDate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    }
+  }
+
+  const tarikhMatch = lower.match(/\b(\d{1,2})\s*(?:tarikh|tareekh|taarikh|तारीख|તારીખ)\b/i);
+  if (tarikhMatch && !targetDate) {
+    const day = parseInt(tarikhMatch[1], 10);
+    if (day >= 1 && day <= 31) {
+      let month = now.getMonth() + 1;
+      if (day < now.getDate()) month += 1;
+      targetDate = `${now.getFullYear()}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    }
+  }
+
+  if (lower.includes('morning') || lower.includes('subah') || lower.includes('savare') || lower.includes('सुबह')) {
+    targetTime = '09:30 AM';
+  } else if (lower.includes('afternoon') || lower.includes('dopahar') || lower.includes('दुपहर')) {
+    targetTime = '02:00 PM';
+  } else if (lower.includes('evening') || lower.includes('shaam') || lower.includes('sanje') || lower.includes('शाम')) {
+    targetTime = '05:00 PM';
+  }
+
+  const explicitTimeMatch = lower.match(/\b(1[0-2]|0?[1-9])(?::([0-5][0-9]))?\s*(am|pm|baje|बजे)\b/i);
+  const colonTimeMatch = lower.match(/\b(1[0-2]|0?[1-9]):([0-5][0-9])\b/);
+
+  if (explicitTimeMatch) {
+    let hour = parseInt(explicitTimeMatch[1], 10);
+    let min = explicitTimeMatch[2] || '00';
+    let unit = explicitTimeMatch[3].toLowerCase();
+    let meridiem = 'AM';
+    if (unit === 'pm') meridiem = 'PM';
+    else if (unit === 'am') meridiem = 'AM';
+    else if (unit === 'baje' || unit === 'बजे') meridiem = (hour < 8 || hour === 12) ? 'PM' : 'AM';
+    targetTime = `${String(hour).padStart(2, '0')}:${min} ${meridiem}`;
+  } else if (colonTimeMatch) {
+    let hour = parseInt(colonTimeMatch[1], 10);
+    let min = colonTimeMatch[2];
+    let meridiem = hour < 8 ? 'PM' : 'AM';
+    targetTime = `${String(hour).padStart(2, '0')}:${min} ${meridiem}`;
+  }
+
+  if (lower.includes('phone') || lower.includes('call') || lower.includes('telephonic') || lower.includes('ghar se') || lower.includes('online')) {
+    targetType = 'telephonic';
+  } else if (lower.includes('hospital') || lower.includes('visit') || lower.includes('clinic') || lower.includes('aakar') || lower.includes('aake')) {
+    targetType = 'in_person';
+  }
+
+  return { targetDate, targetTime, targetType };
+}
 
 export const AIChatBot = () => {
   const navigate = useNavigate();
@@ -251,6 +345,18 @@ export const AIChatBot = () => {
     const textToSend = typeof customText === 'string' ? customText : inputMessage;
     if (!textToSend.trim() || isLoading) return;
 
+    // Instantly detect user-specified appointment date/time/mode
+    const localParsed = extractDateFromText(textToSend);
+    if (localParsed.targetDate) {
+      setBookingDate(localParsed.targetDate);
+    }
+    if (localParsed.targetTime) {
+      setBookingTime(localParsed.targetTime);
+    }
+    if (localParsed.targetType) {
+      setBookingType(localParsed.targetType);
+    }
+
     const userMsg = {
       id: `user-${Date.now()}`,
       sender: 'user',
@@ -285,7 +391,10 @@ export const AIChatBot = () => {
             patientCode: profile?.patientId,
             diagnosis: profile?.medicalHistory?.[0] || profile?.diagnosis,
             language: user?.preferredLanguage || profile?.language || 'en',
-            doctors: doctorsList
+            doctors: doctorsList,
+            requestedDate: localParsed.targetDate || undefined,
+            requestedTime: localParsed.targetTime || undefined,
+            requestedType: localParsed.targetType || undefined
           }
         })
       });
@@ -307,8 +416,19 @@ export const AIChatBot = () => {
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
 
-      if (data.appointmentBooking?.defaultDoctorId) {
-        setBookingDocId(data.appointmentBooking.defaultDoctorId);
+      if (data.appointmentBooking) {
+        if (data.appointmentBooking.defaultDoctorId) {
+          setBookingDocId(data.appointmentBooking.defaultDoctorId);
+        }
+        if (data.appointmentBooking.requestedDate) {
+          setBookingDate(data.appointmentBooking.requestedDate);
+        }
+        if (data.appointmentBooking.requestedTime) {
+          setBookingTime(data.appointmentBooking.requestedTime);
+        }
+        if (data.appointmentBooking.requestedType) {
+          setBookingType(data.appointmentBooking.requestedType);
+        }
       }
 
       setMessages((prev) => [...prev, aiMsg]);

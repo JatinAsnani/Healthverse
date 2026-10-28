@@ -26,7 +26,127 @@ SAFETY AND ETHICAL PRINCIPLES (MANDATORY):
    - When Current Session Context specifies the verified logged-in patient (e.g. Name, Patient ID, Diagnosis):
      * You KNOW THIS PATIENT! Greet them warmly and respectfully by their name (e.g. "Namaste Rajesh Verma ji!").
      * If they ask "whats my name", "who am i", "mera naam kya hai", or "who is logged in", IMMEDIATELY state their full name, patient ID, and current recovery status!
-     * When booking appointments, confirm that the appointment is being booked directly for them under their patient record.`;
+     * When booking appointments, confirm that the appointment is being booked directly for them under their patient record.
+8. APPOINTMENT DATES AND TIMINGS (STRICT):
+   - When the user asks to book an appointment on a specific date (e.g. "30 oct", "30 october", "30 tarikh", "kal", "parso"):
+     * Always confirm and respect THAT EXACT DATE in your reply (e.g. "Bilkul, main 30 October 2026 ke liye aapki appointment set kar raha hoon.").
+     * NEVER mention or default to a different date when the user specifically requested one!`;
+
+/**
+ * Extract requested date, time, and consultation mode from natural language message
+ */
+export function extractAppointmentDateTime(text = '') {
+  const lower = text.toLowerCase();
+  const now = new Date();
+  let targetDate = null;
+  let targetTime = null;
+  let targetType = null;
+
+  // 1. Day after tomorrow ('parso', 'parson', 'day after tomorrow')
+  if (lower.includes('parso') || lower.includes('parson') || lower.includes('day after tomorrow')) {
+    const d = new Date(now);
+    d.setDate(d.getDate() + 2);
+    targetDate = d.toISOString().split('T')[0];
+  }
+  // 2. Tomorrow ('kal', 'tomorrow')
+  else if (lower.includes('kal') || lower.includes('tomorrow')) {
+    const d = new Date(now);
+    d.setDate(d.getDate() + 1);
+    targetDate = d.toISOString().split('T')[0];
+  }
+  // 3. Today ('aaj', 'today')
+  else if (lower.includes('aaj') || lower.includes('today')) {
+    targetDate = now.toISOString().split('T')[0];
+  }
+
+  // 4. Pattern: [1-31] (st|nd|rd|th)? (of)? (jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*
+  const dayMonthMatch = lower.match(/\b(\d{1,2})(?:st|nd|rd|th)?\s+(?:of\s+)?(jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*/i);
+  // Pattern: (jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\s+(\d{1,2})
+  const monthDayMatch = lower.match(/\b(jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\s+(\d{1,2})(?:st|nd|rd|th)?/i);
+  // Pattern: DD/MM or DD-MM
+  const slashMatch = lower.match(/\b(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?\b/);
+
+  const monthsMap = {
+    jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6,
+    jul: 7, aug: 8, sep: 9, sept: 9, oct: 10, nov: 11, dec: 12
+  };
+
+  if (dayMonthMatch) {
+    const day = parseInt(dayMonthMatch[1], 10);
+    const month = monthsMap[dayMonthMatch[2].slice(0, 3)];
+    if (month && day >= 1 && day <= 31) {
+      const year = now.getFullYear();
+      targetDate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    }
+  } else if (monthDayMatch) {
+    const month = monthsMap[monthDayMatch[1].slice(0, 3)];
+    const day = parseInt(monthDayMatch[2], 10);
+    if (month && day >= 1 && day <= 31) {
+      const year = now.getFullYear();
+      targetDate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    }
+  } else if (slashMatch) {
+    const day = parseInt(slashMatch[1], 10);
+    const month = parseInt(slashMatch[2], 10);
+    const year = slashMatch[3] ? (slashMatch[3].length === 2 ? 2000 + parseInt(slashMatch[3], 10) : parseInt(slashMatch[3], 10)) : now.getFullYear();
+    if (month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+      targetDate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    }
+  }
+
+  // 5. Pattern: 30 tarikh / 30 tareekh / 30 तारीख / 30 તારીખ
+  const tarikhMatch = lower.match(/\b(\d{1,2})\s*(?:tarikh|tareekh|taarikh|तारीख|તારીખ)\b/i);
+  if (tarikhMatch && !targetDate) {
+    const day = parseInt(tarikhMatch[1], 10);
+    if (day >= 1 && day <= 31) {
+      const year = now.getFullYear();
+      let month = now.getMonth() + 1;
+      if (day < now.getDate()) month += 1;
+      targetDate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    }
+  }
+
+  // Times extraction
+  if (lower.includes('morning') || lower.includes('subah') || lower.includes('savare') || lower.includes('सुबह')) {
+    targetTime = '09:30 AM';
+  } else if (lower.includes('afternoon') || lower.includes('dopahar') || lower.includes('दुपहर')) {
+    targetTime = '02:00 PM';
+  } else if (lower.includes('evening') || lower.includes('shaam') || lower.includes('sanje') || lower.includes('शाम')) {
+    targetTime = '05:00 PM';
+  }
+
+  const explicitTimeMatch = lower.match(/\b(1[0-2]|0?[1-9])(?::([0-5][0-9]))?\s*(am|pm|baje|बजे)\b/i);
+  const colonTimeMatch = lower.match(/\b(1[0-2]|0?[1-9]):([0-5][0-9])\b/);
+
+  if (explicitTimeMatch) {
+    let hour = parseInt(explicitTimeMatch[1], 10);
+    let min = explicitTimeMatch[2] || '00';
+    let unit = explicitTimeMatch[3].toLowerCase();
+    let meridiem = 'AM';
+    if (unit === 'pm') {
+      meridiem = 'PM';
+    } else if (unit === 'am') {
+      meridiem = 'AM';
+    } else if (unit === 'baje' || unit === 'बजे') {
+      meridiem = (hour < 8 || hour === 12) ? 'PM' : 'AM';
+    }
+    targetTime = `${String(hour).padStart(2, '0')}:${min} ${meridiem}`;
+  } else if (colonTimeMatch) {
+    let hour = parseInt(colonTimeMatch[1], 10);
+    let min = colonTimeMatch[2];
+    let meridiem = hour < 8 ? 'PM' : 'AM';
+    targetTime = `${String(hour).padStart(2, '0')}:${min} ${meridiem}`;
+  }
+
+  // Consultation mode
+  if (lower.includes('phone') || lower.includes('call') || lower.includes('telephonic') || lower.includes('ghar se') || lower.includes('online')) {
+    targetType = 'telephonic';
+  } else if (lower.includes('hospital') || lower.includes('visit') || lower.includes('clinic') || lower.includes('aakar') || lower.includes('aake')) {
+    targetType = 'in_person';
+  }
+
+  return { targetDate, targetTime, targetType };
+}
 
 /**
  * Builds comprehensive session context note for Gemini and OpenAI prompts
@@ -42,6 +162,10 @@ function buildSessionContextNote(context = {}) {
     note += `When booking an appointment, this appointment is scheduled directly for ${patientName}. `;
   } else if (context.role) {
     note += `User Role: ${context.role}. `;
+  }
+
+  if (context.requestedDate) {
+    note += `USER HAS SPECIFICALLY REQUESTED APPOINTMENT DATE: "${context.requestedDate}"${context.requestedTime ? ` at "${context.requestedTime}"` : ''}. You MUST explicitly confirm THIS EXACT DATE (${context.requestedDate}) in your reply. Do NOT mention any other date! `;
   }
 
   if (context.diagnosis) {
@@ -366,6 +490,17 @@ export async function processAIChat({
   const isEmergency = detectEmergencyRedFlags(message);
   const isBooking = detectBookingIntent(message);
 
+  const parsedDateTime = extractAppointmentDateTime(message);
+  if (parsedDateTime.targetDate) {
+    context.requestedDate = parsedDateTime.targetDate;
+  }
+  if (parsedDateTime.targetTime) {
+    context.requestedTime = parsedDateTime.targetTime;
+  }
+  if (parsedDateTime.targetType) {
+    context.requestedType = parsedDateTime.targetType;
+  }
+
   // Setup appointment booking data if booking intent detected
   let appointmentBooking = null;
   if (isBooking) {
@@ -388,7 +523,10 @@ export async function processAIChat({
       doctors: doctorsList,
       patientId: context.patientId || null,
       patientName: context.patientName || context.userName || null,
-      patientCode: context.patientCode || null
+      patientCode: context.patientCode || null,
+      requestedDate: parsedDateTime.targetDate || context.requestedDate || null,
+      requestedTime: parsedDateTime.targetTime || context.requestedTime || null,
+      requestedType: parsedDateTime.targetType || context.requestedType || null
     };
   }
 
