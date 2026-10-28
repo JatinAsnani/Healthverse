@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: healthverse-mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=healthverse
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - healthverse-net
+
+  server:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    container_name: healthverse-server
+    restart: always
+    depends_on:
+      - mongodb
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongodb:27017/healthverse
+      - JWT_ACCESS_SECRET=healthverse_jwt_access_secret_super_secure_key_2026
+      - JWT_REFRESH_SECRET=healthverse_jwt_refresh_secret_super_secure_key_2026
+      - FIELD_ENCRYPTION_KEY=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+      - CLIENT_ORIGIN=http://localhost:5173
+      - SMS_PROVIDER=mock
+      - ESCALATION_CRITICAL_MINUTES=15
+      - ESCALATION_HIGH_MINUTES=60
+    networks:
+      - healthverse-net
+
+  client:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+    container_name: healthverse-client
+    restart: always
+    depends_on:
+      - server
+    ports:
+      - "5173:5173"
+    networks:
+      - healthverse-net
+
+networks:
+  healthverse-net:
+    driver: bridge
+
+volumes:
+  mongo-data:
+    driver: local

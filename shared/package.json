@@ -1,0 +1,10 @@
+{
+  "name": "@healthverse/shared",
+  "version": "1.0.0",
+  "main": "riskEngine.js",
+  "type": "module",
+  "exports": {
+    ".": "./riskEngine.js",
+    "./rules": "./rules/riskRules_v1.json"
+  }
+}

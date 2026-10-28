@@ -1,0 +1,179 @@
+{
+  "version": "1.0.0",
+  "name": "HealthVerse Post-Discharge Early Warning Ruleset",
+  "description": "Rule-based decision support logic for post-discharge continuous monitoring in rural and low-connectivity environments",
+  "disclaimer": "Decision-support and early-warning tool only. Does not diagnose or prescribe. High and critical alerts require clinician review.",
+  "rules": [
+    {
+      "id": "RULE_SPO2_CRITICAL",
+      "category": "vital",
+      "target": "spo2",
+      "condition": "less_than",
+      "threshold": 92,
+      "riskLevel": "critical",
+      "redFlag": "Severely low blood oxygen saturation (SpO2 < 92%)",
+      "explanation": "Oxygen saturation dropped below 92%, indicating severe respiratory compromise.",
+      "action": "Immediate emergency care required. Call 108 or transfer to nearest emergency center."
+    },
+    {
+      "id": "RULE_SPO2_WARNING",
+      "category": "vital",
+      "target": "spo2",
+      "condition": "range_inclusive",
+      "min": 92,
+      "max": 94,
+      "riskLevel": "high",
+      "redFlag": "Low blood oxygen saturation (SpO2 92-94%)",
+      "explanation": "Oxygen saturation is in the warning range (92-94%), requiring urgent clinician evaluation.",
+      "action": "Contact attending clinician immediately for respiratory assessment."
+    },
+    {
+      "id": "RULE_FEVER_CRITICAL",
+      "category": "vital",
+      "target": "temperature",
+      "condition": "greater_than",
+      "threshold": 38.5,
+      "riskLevel": "high",
+      "redFlag": "High post-discharge fever (> 38.5°C / 101.3°F)",
+      "explanation": "Body temperature exceeds 38.5°C, presenting risk of surgical site infection, sepsis, or acute complication.",
+      "action": "Urgent clinician evaluation needed. Check wound site and hydration."
+    },
+    {
+      "id": "RULE_CHEST_PAIN",
+      "category": "symptom",
+      "targetCode": "chest_pain",
+      "minSeverity": 1,
+      "riskLevel": "critical",
+      "redFlag": "Acute chest pain or tightness",
+      "explanation": "Post-discharge chest pain is a critical red flag for acute cardiovascular or pulmonary event.",
+      "action": "Call 108 emergency service or proceed to nearest ICU/emergency immediately."
+    },
+    {
+      "id": "RULE_SEVERE_BREATHLESSNESS",
+      "category": "symptom",
+      "targetCode": "breathlessness",
+      "minSeverity": 2,
+      "riskLevel": "critical",
+      "redFlag": "Severe breathlessness or respiratory distress",
+      "explanation": "Patient is experiencing moderate-to-severe shortness of breath at rest or minimal exertion.",
+      "action": "Urgent medical attention needed immediately. Position upright and call emergency services."
+    },
+    {
+      "id": "RULE_ACTIVE_BLEEDING",
+      "category": "symptom",
+      "targetCode": "bleeding",
+      "minSeverity": 1,
+      "riskLevel": "critical",
+      "redFlag": "Unexplained or excessive bleeding",
+      "explanation": "Active wound bleeding, hematemesis, or rectal bleeding observed.",
+      "action": "Immediate clinician review. Apply direct gentle pressure if external."
+    },
+    {
+      "id": "RULE_WOUND_DISCHARGE",
+      "category": "symptom",
+      "targetCode": "wound_discharge",
+      "minSeverity": 1,
+      "riskLevel": "high",
+      "redFlag": "Purulent wound discharge or site breakdown",
+      "explanation": "Discharge, spreading redness, or breakdown at surgical wound site.",
+      "action": "Clinician review required within 2-4 hours to evaluate wound infection."
+    },
+    {
+      "id": "RULE_CONFUSION_LETHARGY",
+      "category": "symptom",
+      "targetCode": "confusion",
+      "minSeverity": 1,
+      "riskLevel": "critical",
+      "redFlag": "Sudden confusion, altered mental status, or extreme drowsiness",
+      "explanation": "Acute changes in mental clarity can signal stroke, sepsis, or metabolic derangement.",
+      "action": "Emergency medical review. Call 108 or hospital emergency."
+    },
+    {
+      "id": "RULE_PERSISTENT_VOMITING",
+      "category": "symptom",
+      "targetCode": "persistent_vomiting",
+      "minSeverity": 1,
+      "riskLevel": "high",
+      "redFlag": "Persistent vomiting / unable to retain oral fluids or medicines",
+      "explanation": "Risk of severe dehydration and failure of oral medications.",
+      "action": "Contact clinician for IV fluid/antiemetic assessment."
+    },
+    {
+      "id": "RULE_REDUCED_URINE",
+      "category": "symptom",
+      "targetCode": "reduced_urine_output",
+      "minSeverity": 1,
+      "riskLevel": "high",
+      "redFlag": "Reduced urine output (< 500ml/day or no urination for > 12 hours)",
+      "explanation": "Indicates acute kidney injury, severe volume depletion, or urinary obstruction.",
+      "action": "Urgent clinician review required today."
+    },
+    {
+      "id": "RULE_BP_HYPERTENSIVE_CRISIS",
+      "category": "vital",
+      "target": "bloodPressure",
+      "condition": "custom_bp_crisis",
+      "systolicThreshold": 180,
+      "diastolicThreshold": 110,
+      "riskLevel": "critical",
+      "redFlag": "Hypertensive crisis (Systolic ≥ 180 or Diastolic ≥ 110 mmHg)",
+      "explanation": "Critically elevated blood pressure carries immediate cardiovascular and cerebrovascular risk.",
+      "action": "Emergency clinical evaluation required."
+    },
+    {
+      "id": "RULE_BP_HYPOTENSION",
+      "category": "vital",
+      "target": "bloodPressure",
+      "condition": "custom_bp_hypo",
+      "systolicThreshold": 90,
+      "riskLevel": "high",
+      "redFlag": "Significant hypotension (Systolic < 90 mmHg)",
+      "explanation": "Low blood pressure indicates possible sepsis, internal bleeding, or dehydration.",
+      "action": "Notify clinician immediately; keep patient recumbent."
+    },
+    {
+      "id": "RULE_PULSE_EXTREME",
+      "category": "vital",
+      "target": "pulse",
+      "condition": "custom_pulse",
+      "highThreshold": 125,
+      "lowThreshold": 48,
+      "riskLevel": "high",
+      "redFlag": "Abnormal heart rate (Pulse > 125 bpm or < 48 bpm)",
+      "explanation": "Severe tachycardia or bradycardia detected.",
+      "action": "Clinician assessment advised."
+    },
+    {
+      "id": "RULE_MISSED_CRITICAL_MEDS_3",
+      "category": "adherence",
+      "target": "missed_critical_count",
+      "condition": "greater_or_equal",
+      "threshold": 3,
+      "riskLevel": "critical",
+      "redFlag": "3 or more consecutive missed doses of critical medication",
+      "explanation": "Discontinuation of critical medications (e.g. anticoagulants, cardiac, insulin) poses acute relapse risk.",
+      "action": "Immediate clinician & CHW follow-up outreach required."
+    },
+    {
+      "id": "RULE_MISSED_CRITICAL_MEDS_2",
+      "category": "adherence",
+      "target": "missed_critical_count",
+      "condition": "equal_to",
+      "threshold": 2,
+      "riskLevel": "high",
+      "redFlag": "2 consecutive missed doses of critical medication",
+      "explanation": "Consecutive missed doses of critical medication detected.",
+      "action": "CHW / Caregiver prompt to assist patient with medication adherence."
+    },
+    {
+      "id": "RULE_MODERATE_SYMPTOM_CLUSTER",
+      "category": "symptom_cluster",
+      "minCount": 2,
+      "minSeverity": 2,
+      "riskLevel": "medium",
+      "redFlag": "Multiple moderate post-discharge symptoms reported",
+      "explanation": "Patient is experiencing 2 or more symptoms at moderate or higher intensity.",
+      "action": "Schedule a routine tele-check or in-person follow-up within 24-48 hours."
+    }
+  ]
+}
