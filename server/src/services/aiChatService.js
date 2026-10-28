@@ -76,8 +76,14 @@ function extractSuggestedActions(text = '', userMessage = '') {
  * Call Google Gemini API
  */
 async function callGemini(apiKey, message, history = [], context = {}) {
-  // Try gemini-1.5-flash first, fallback to gemini-2.0-flash or gemini-1.5-pro if needed
-  const models = ['gemini-1.5-flash', 'gemini-2.5-flash', 'gemini-1.5-pro'];
+  // Try active Gemini models with fallbacks
+  const models = [
+    'gemini-3.5-flash-lite',
+    'gemini-3-flash-preview',
+    'gemini-3.8-flash',
+    'gemini-2.5-flash',
+    'gemini-1.5-flash'
+  ];
 
   let lastError = null;
 
@@ -298,8 +304,8 @@ export async function processAIChat({
 
   if (effectiveKey) {
     try {
-      // If the key starts with AIza, it's a Gemini key
-      const isGeminiKey = effectiveKey.startsWith('AIza') || provider === 'gemini';
+      // If the key starts with AIza or AQ, or provider is gemini, treat as Gemini
+      const isGeminiKey = effectiveKey.startsWith('AIza') || effectiveKey.startsWith('AQ.') || provider === 'gemini';
 
       if (isGeminiKey) {
         reply = await callGemini(effectiveKey, message, history, context);
