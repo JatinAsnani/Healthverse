@@ -16,6 +16,8 @@ import {
   CheckCircle2,
   Clock
 } from 'lucide-react';
+import useAuthStore from '../store/useAuthStore.js';
+
 // Helper to extract appointment date/time from natural language in English, Hindi & Hinglish
 function extractDateFromText(text = '') {
   const lower = text.toLowerCase();
