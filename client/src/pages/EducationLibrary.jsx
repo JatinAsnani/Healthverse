@@ -98,7 +98,7 @@ export function EducationLibrary() {
 
       {/* Topics & Search Filters */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-        <div className="flex rounded-xl bg-slate-200/80 p-1 overflow-x-auto w-full sm:w-auto text-xs font-bold">
+        <div className="flex rounded-xl bg-slate-200/80 p-1 overflow-x-auto scrollbar-none whitespace-nowrap flex-nowrap w-full sm:w-auto text-xs font-bold">
           {[
             { id: 'all', label: 'All Topics' },
             { id: 'wound_care', label: 'Wound Care' },

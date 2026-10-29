@@ -101,7 +101,7 @@ export function HospitalAdminView() {
           </p>
         </div>
 
-        <div className="flex rounded-xl bg-slate-200/80 p-1 text-xs font-bold">
+        <div className="flex rounded-xl bg-slate-200/80 p-1 overflow-x-auto scrollbar-none whitespace-nowrap flex-nowrap w-full sm:w-auto text-xs font-bold">
           <button
             onClick={() => setActiveTab('analytics')}
             className={`px-3 py-1.5 rounded-lg transition-all ${
@@ -132,7 +132,7 @@ export function HospitalAdminView() {
       {activeTab === 'analytics' && analytics && (
         <div className="space-y-6">
           {/* Metrics Top Row */}
-          <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
             <div className="card-premium p-4">
               <span className="text-[11px] font-bold text-slate-500 uppercase block">Adherence Rate</span>
               <div className="text-2xl font-black text-teal-700 mt-1">{analytics.adherenceRate}%</div>

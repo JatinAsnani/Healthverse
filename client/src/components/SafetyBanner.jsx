@@ -15,9 +15,10 @@ export function SafetyBanner() {
             {t('safetyPrinciple')}
           </span>
         </div>
-        <div className="hidden lg:flex items-center gap-1.5 bg-black/20 px-2.5 py-1 rounded-full text-xs text-amber-100 flex-shrink-0">
-          <AlertCircle className="w-3.5 h-3.5" />
-          <span>Emergency: 108</span>
+        <div className="flex items-center gap-1.5 bg-black/20 px-2 sm:px-2.5 py-1 rounded-full text-[11px] sm:text-xs text-amber-100 flex-shrink-0">
+          <AlertCircle className="w-3.5 h-3.5 text-amber-300" />
+          <span className="hidden sm:inline">Emergency: </span>
+          <span className="font-extrabold text-amber-200">108</span>
         </div>
       </div>
     </div>

@@ -218,10 +218,10 @@ export function ClinicianDashboard() {
         </div>
 
         {/* View Switcher Tabs */}
-        <div className="flex rounded-xl bg-slate-200/80 dark:bg-slate-800 p-1">
+        <div className="flex rounded-xl bg-slate-200/80 dark:bg-slate-800 p-1 overflow-x-auto scrollbar-none whitespace-nowrap flex-nowrap w-full sm:w-auto max-w-full">
           <button
             onClick={() => setActiveTab('roster')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all ${
+            className={`flex-shrink-0 flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
               activeTab === 'roster' ? 'bg-white dark:bg-slate-700 text-teal-700 dark:text-teal-300 shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
@@ -231,7 +231,7 @@ export function ClinicianDashboard() {
 
           <button
             onClick={() => setActiveTab('appointments')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all relative ${
+            className={`flex-shrink-0 flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-lg text-xs font-bold transition-all relative whitespace-nowrap ${
               activeTab === 'appointments' ? 'bg-white dark:bg-slate-700 text-teal-700 dark:text-teal-300 shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
@@ -246,7 +246,7 @@ export function ClinicianDashboard() {
 
           <button
             onClick={() => setActiveTab('alerts')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all relative ${
+            className={`flex-shrink-0 flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-lg text-xs font-bold transition-all relative whitespace-nowrap ${
               activeTab === 'alerts' ? 'bg-white dark:bg-slate-700 text-teal-700 dark:text-teal-300 shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
@@ -265,11 +265,11 @@ export function ClinicianDashboard() {
         /* PATIENT APPOINTMENTS VIEW */
         <div className="space-y-6 animate-in fade-in duration-150">
           {/* Quick Metrics Bar */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="card-premium p-4 border-l-4 border-l-teal-600 flex items-center justify-between">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
+            <div className="card-premium p-3 sm:p-4 border-l-4 border-l-teal-600 flex items-center justify-between">
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Booked</p>
-                <p className="text-2xl font-extrabold text-slate-900 dark:text-slate-100 mt-0.5">{appointments.length}</p>
+                <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Booked</p>
+                <p className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-slate-100 mt-0.5">{appointments.length}</p>
               </div>
               <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/60 flex items-center justify-center text-teal-600 dark:text-teal-400">
                 <Calendar className="w-5 h-5" />

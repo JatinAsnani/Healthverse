@@ -460,11 +460,11 @@ export const AIChatBot = () => {
   return (
     <>
       {/* Floating Launcher Button */}
-      <div className="fixed bottom-6 right-6 z-40">
+      <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40">
         <button
           onClick={() => setIsOpen(!isOpen)}
           aria-label="Open HealthVerse AI Health Assistant"
-          className="relative group flex items-center gap-2.5 px-4 py-3 rounded-full bg-gradient-to-r from-teal-600 via-emerald-600 to-teal-700 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-teal-500/30"
+          className="relative group flex items-center gap-2 sm:gap-2.5 px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-full bg-gradient-to-r from-teal-600 via-emerald-600 to-teal-700 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-teal-500/30"
         >
           <div className="relative">
             <Bot className="w-5 h-5 text-white animate-pulse" />
@@ -478,7 +478,7 @@ export const AIChatBot = () => {
 
       {/* Chat Window Flyout */}
       {isOpen && (
-        <div className="fixed bottom-20 right-4 sm:right-6 w-[94vw] sm:w-[440px] h-[580px] max-h-[85vh] bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col z-50 overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200">
+        <div className="fixed bottom-16 sm:bottom-20 left-2 right-2 sm:left-auto sm:right-6 w-auto sm:w-[440px] h-[calc(100dvh-80px)] sm:h-[580px] max-h-[85vh] bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col z-50 overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200">
           {/* Header */}
           <div className="bg-gradient-to-r from-teal-700 via-emerald-700 to-teal-800 text-white p-3.5 sm:p-4 flex items-center justify-between shadow-sm">
             <div className="flex items-center gap-2.5">

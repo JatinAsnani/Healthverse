@@ -231,7 +231,7 @@ export function PatientDetailView() {
       </div>
 
       {/* Patient Profile Card */}
-      <div className="card-premium p-6 bg-white border border-slate-200">
+      <div className="card-premium p-4 sm:p-6 bg-white border border-slate-200">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
@@ -274,12 +274,12 @@ export function PatientDetailView() {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex rounded-xl bg-slate-200/80 p-1 overflow-x-auto text-xs font-bold">
+      <div className="flex rounded-xl bg-slate-200/80 p-1 overflow-x-auto scrollbar-none whitespace-nowrap flex-nowrap w-full text-xs font-bold">
         {['overview', 'medications', 'symptoms', 'investigations', 'followups'].map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 rounded-lg capitalize transition-all whitespace-nowrap ${
+            className={`flex-shrink-0 px-3.5 sm:px-4 py-2 rounded-lg capitalize transition-all whitespace-nowrap ${
               activeTab === tab ? 'bg-white text-teal-800 shadow-sm' : 'text-slate-600 hover:text-slate-900'
             }`}
           >

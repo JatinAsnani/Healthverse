@@ -82,7 +82,7 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-slate-50 dark:bg-slate-950 flex flex-col justify-center py-10 sm:px-6 lg:px-8 transition-colors duration-200">
+    <div className="min-h-[calc(100vh-4rem)] bg-slate-50 dark:bg-slate-950 flex flex-col justify-center py-6 sm:py-10 px-3 sm:px-6 lg:px-8 transition-colors duration-200">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-teal-600 to-emerald-500 flex items-center justify-center text-white shadow-lg shadow-teal-600/30">
@@ -98,7 +98,7 @@ export function LoginPage() {
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-xl">
-        <div className="bg-white dark:bg-slate-900/95 py-8 px-4 shadow-xl shadow-slate-200/50 dark:shadow-slate-950/70 sm:rounded-3xl sm:px-10 border border-slate-200/80 dark:border-slate-800 transition-colors">
+        <div className="bg-white dark:bg-slate-900/95 py-6 px-4 sm:py-8 sm:px-10 shadow-xl shadow-slate-200/50 dark:shadow-slate-950/70 rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-800 transition-colors">
           {/* Tabs */}
           <div className="flex rounded-xl bg-slate-100 dark:bg-slate-800/80 p-1 mb-6 border border-transparent dark:border-slate-700/60">
             <button
@@ -182,7 +182,7 @@ export function LoginPage() {
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
                   <button
                     onClick={() => handleQuickLogin('9800000002')}
                     className="p-2.5 rounded-xl border border-teal-200 dark:border-teal-900/60 bg-teal-50/50 dark:bg-teal-950/40 hover:bg-teal-100/60 dark:hover:bg-teal-900/40 text-left transition-colors"
@@ -289,7 +289,7 @@ export function LoginPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
                     Phone Number
@@ -318,7 +318,7 @@ export function LoginPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
                     Date of Birth
