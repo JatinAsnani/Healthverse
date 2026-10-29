@@ -83,10 +83,6 @@ export function PatientDetailView() {
   const handleAddMedSubmit = async (e) => {
     e.preventDefault();
     const activeDischarge = data?.discharges?.[0];
-    if (!activeDischarge) {
-      alert('Please ensure a discharge summary exists first');
-      return;
-    }
 
     try {
       const res = await fetch('/api/v1/prescriptions', {
@@ -94,28 +90,44 @@ export function PatientDetailView() {
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({
-          dischargeId: activeDischarge._id,
+          dischargeId: activeDischarge?._id || undefined,
           patientId: id,
           medicine: newMed.medicine,
           dosage: newMed.dosage,
           critical: newMed.critical,
           schedule: {
-            timesPerDay: Number(newMed.timesPerDay),
-            timings: [{ time: newMed.timingHour, label: newMed.timingLabel }],
-            foodTiming: newMed.foodTiming
+            timesPerDay: Number(newMed.timesPerDay) || 1,
+            timings: [{ time: newMed.timingHour || '09:00', label: newMed.timingLabel || 'Morning' }],
+            foodTiming: newMed.foodTiming || 'after_food'
           },
-          startDate: newMed.startDate,
-          endDate: newMed.endDate,
-          instructions: newMed.instructions
+          startDate: newMed.startDate || new Date().toISOString().split('T')[0],
+          endDate: newMed.endDate || new Date(Date.now() + 14 * 86400000).toISOString().split('T')[0],
+          instructions: newMed.instructions || 'Take as advised by doctor'
         })
       });
 
       if (res.ok) {
         setShowAddMedModal(false);
-        fetchPatientChart();
+        setNewMed({
+          medicine: '',
+          dosage: '',
+          critical: false,
+          timesPerDay: 1,
+          timingLabel: 'Morning',
+          timingHour: '09:00',
+          foodTiming: 'after_food',
+          startDate: new Date().toISOString().split('T')[0],
+          endDate: new Date(Date.now() + 14 * 86400000).toISOString().split('T')[0],
+          instructions: ''
+        });
+        await fetchPatientChart();
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        alert(errData.message || errData.errors?.[0]?.msg || 'Failed to add medication');
       }
     } catch (err) {
       console.error(err);
+      alert('Network error while adding medication');
     }
   };
 
@@ -129,7 +141,7 @@ export function PatientDetailView() {
         credentials: 'include',
         body: JSON.stringify({
           patientId: id,
-          dischargeId: activeDischarge?._id,
+          dischargeId: activeDischarge?._id || undefined,
           scheduledAt: newFollowup.scheduledAt,
           type: newFollowup.type,
           notes: newFollowup.notes
@@ -138,10 +150,14 @@ export function PatientDetailView() {
 
       if (res.ok) {
         setShowFollowupModal(false);
-        fetchPatientChart();
+        await fetchPatientChart();
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        alert(errData.message || errData.errors?.[0]?.msg || 'Failed to schedule visit');
       }
     } catch (err) {
       console.error(err);
+      alert('Network error while scheduling visit');
     }
   };
 
