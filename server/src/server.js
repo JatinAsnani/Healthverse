@@ -64,6 +64,17 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Apply rate limiting to all /api/v1 routes
 app.use('/api/v1', apiLimiter);
 
+// Root welcome endpoint
+app.get('/', (req, res) => {
+  res.json({
+    status: 'healthy',
+    message: 'HealthVerse API Server is live and running',
+    version: '1.0.0',
+    health: '/health',
+    docs: '/api/docs'
+  });
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({
