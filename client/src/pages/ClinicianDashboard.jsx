@@ -566,7 +566,7 @@ export function ClinicianDashboard() {
               <select
                 value={riskFilter}
                 onChange={(e) => setRiskFilter(e.target.value)}
-                className="text-xs font-semibold px-3 py-2 rounded-xl border border-slate-300 bg-white"
+                className="text-xs font-semibold px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
               >
                 <option value="all">All Risk Levels</option>
                 <option value="critical">Critical Only</option>
