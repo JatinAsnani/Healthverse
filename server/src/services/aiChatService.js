@@ -277,18 +277,26 @@ function extractSuggestedActions(text = '', userMessage = '') {
  * Call Google Gemini API
  */
 async function callGemini(apiKey, message, history = [], context = {}) {
-  const models = [
-    'gemini-2.0-flash',
-    'gemini-1.5-flash',
-    'gemini-2.5-flash',
-    'gemini-1.5-pro'
+  const cleanKey = (apiKey || '').trim();
+
+  // If the key is too short or clearly invalid, avoid wasteful network roundtrips
+  if (!cleanKey || cleanKey.length < 15) {
+    throw new Error('Invalid Gemini API Key provided.');
+  }
+
+  // Active production Google Gemini models with primary endpoints
+  const modelConfigs = [
+    { version: 'v1beta', model: 'gemini-1.5-flash' },
+    { version: 'v1beta', model: 'gemini-2.0-flash' },
+    { version: 'v1', model: 'gemini-1.5-flash' },
+    { version: 'v1beta', model: 'gemini-1.5-flash-8b' }
   ];
 
   let lastError = null;
 
-  for (const model of models) {
+  for (const { version, model } of modelConfigs) {
     try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      const url = `https://generativelanguage.googleapis.com/${version}/models/${model}:generateContent?key=${cleanKey}`;
 
       const contents = [];
 
@@ -311,14 +319,17 @@ async function callGemini(apiKey, message, history = [], context = {}) {
 
       const body = {
         contents,
-        systemInstruction: {
-          parts: [{ text: effectiveSystemPrompt }]
-        },
         generationConfig: {
           temperature: 0.3,
           maxOutputTokens: 900
         }
       };
+
+      if (effectiveSystemPrompt) {
+        body.systemInstruction = {
+          parts: [{ text: effectiveSystemPrompt }]
+        };
+      }
 
       const response = await fetch(url, {
         method: 'POST',
@@ -341,7 +352,7 @@ async function callGemini(apiKey, message, history = [], context = {}) {
       return reply;
     } catch (err) {
       lastError = err;
-      logger.warn(`Gemini model ${model} failed, trying next fallback: ${err.message}`);
+      logger.warn(`Gemini model ${model} (${version}) failed: ${err.message}`);
     }
   }
 
@@ -517,7 +528,21 @@ If any red flags appear, record them in the **Symptom Report** tab and contact y
 - **Log Your Adherence:** Mark your taken doses on the HealthVerse home screen to keep your care team informed.`;
   }
 
-  if (lower.includes('hi') || lower.includes('hello') || lower.includes('hey') || lower.includes('namaste') || lower.includes('kem cho')) {
+  // Handle warm conversational greetings: "kesa hai", "kaise ho", "how are you", "kya haal hai"
+  if (
+    lower.includes('kaise ho') ||
+    lower.includes('kaisa hai') ||
+    lower.includes('kesa hai') ||
+    lower.includes('kese ho') ||
+    lower.includes('how are you') ||
+    lower.includes('kya haal') ||
+    lower.includes('kem cho') ||
+    lower.includes('majama')
+  ) {
+    return `Namaste${patientName ? ` **${patientName}** ji` : ''}! Main bilkul theek hoon, aapki seva ke liye hamesha taiyar. 🙏\n\nAapki tabiyat ab kaisi hai? Kya aapko dawaiyon, recovery precautions, doctor appointment ya medical report se judi koi jaankari chahiye?`;
+  }
+
+  if (lower.includes('hi') || lower.includes('hello') || lower.includes('hey') || lower.includes('namaste')) {
     return `👋 **Namaste! I am your HealthVerse AI Health Assistant.**
 
 I can help you with:
@@ -617,10 +642,9 @@ export async function processAIChat({
         usedProvider = 'openai';
       }
     } catch (err) {
-      logger.error('Error invoking external AI model:', err.message);
-      // Fallback gracefully so the user always receives a safe, helpful response
-      const fallbackReply = getRuleBasedResponse(message, context);
-      reply = `${fallbackReply}\n\n*(Note: External AI API returned an error: "${err.message}". Falling back to verified clinical continuity rules.)*`;
+      logger.warn(`Error invoking external AI model (${err.message}). Falling back to verified clinical continuity rules.`);
+      // Fallback gracefully so the user always receives a safe, helpful, warm response without exposing internal errors
+      reply = getRuleBasedResponse(message, context);
       usedProvider = 'fallback';
     }
   } else {
