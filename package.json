@@ -4,6 +4,8 @@
   "description": "HealthVerse: AI-assisted continuity-of-care platform for hospital discharge in rural and low-connectivity settings",
   "private": true,
   "scripts": {
+    "build": "npm --prefix server install",
+    "start": "node server/src/server.js",
     "dev:server": "npm --prefix server run dev",
     "dev:client": "npm --prefix client run dev",
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
