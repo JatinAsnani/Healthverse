@@ -180,3 +180,4 @@ export function VitalsTrendChart({ trendData = [] }) {
 }
 
 export default VitalsTrendChart;
+

@@ -194,3 +194,4 @@ export function VitalsRow({ vitalsSummary }) {
 }
 
 export default VitalsRow;
+

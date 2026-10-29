@@ -217,3 +217,4 @@ export function ClinicalNotesPanel({
 }
 
 export default ClinicalNotesPanel;
+

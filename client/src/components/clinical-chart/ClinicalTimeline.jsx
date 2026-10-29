@@ -158,3 +158,4 @@ export function ClinicalTimeline({ events = [] }) {
 }
 
 export default ClinicalTimeline;
+

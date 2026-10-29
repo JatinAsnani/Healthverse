@@ -30,3 +30,4 @@ export function ChartBreadcrumb({ patientName = 'Patient' }) {
 }
 
 export default ChartBreadcrumb;
+
