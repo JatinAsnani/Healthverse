@@ -392,33 +392,33 @@ export function ClinicianDashboard() {
 
       {/* RESOLVE ALERT MODAL */}
       {resolvingAlert && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200">
-              <h3 className="font-extrabold text-lg text-slate-900">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-150">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+              <h3 className="font-extrabold text-lg text-slate-900 dark:text-slate-100">
                 Resolve Alert & Record Decision
               </h3>
               <button
                 onClick={() => setResolvingAlert(null)}
-                className="p-1 rounded-lg hover:bg-slate-100 text-slate-500"
+                className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="text-xs text-slate-600">
-              Patient: <strong className="text-slate-900">{resolvingAlert.patient?.name}</strong> ({resolvingAlert.patient?.patientId}) &bull; Alert Level: <strong className="text-red-700 uppercase">{resolvingAlert.riskLevel}</strong>
+            <div className="text-xs text-slate-600 dark:text-slate-400">
+              Patient: <strong className="text-slate-900 dark:text-slate-100">{resolvingAlert.patient?.name}</strong> ({resolvingAlert.patient?.patientId}) &bull; Alert Level: <strong className="text-red-700 dark:text-red-400 uppercase">{resolvingAlert.riskLevel}</strong>
             </div>
 
             <form onSubmit={handleResolveAlertSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
                   Clinical Action Taken
                 </label>
                 <select
                   value={actionTaken}
                   onChange={(e) => setActionTaken(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-xs font-bold bg-white"
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-xs font-bold bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
                 >
                   <option value="medication_adjusted">Medication Dosage Adjusted / Resumed</option>
                   <option value="emergency_transfer">Emergency Transfer to Hospital / ICU</option>
@@ -430,7 +430,7 @@ export function ClinicianDashboard() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
                   Clinician Decision & Advice Notes
                 </label>
                 <textarea
@@ -439,7 +439,7 @@ export function ClinicianDashboard() {
                   placeholder="Explain instructions given to patient, caregiver or visiting CHW..."
                   value={decisionNotes}
                   onChange={(e) => setDecisionNotes(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
                 />
               </div>
 
@@ -447,14 +447,14 @@ export function ClinicianDashboard() {
                 <button
                   type="button"
                   onClick={() => setResolvingAlert(null)}
-                  className="btn-touch bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2 px-4"
+                  className="btn-touch bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold py-2 px-4 rounded-xl transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingDecision}
-                  className="btn-touch bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold py-2 px-5 shadow"
+                  className="btn-touch bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold py-2 px-5 shadow rounded-xl"
                 >
                   {isSubmittingDecision ? 'Saving...' : 'Resolve Alert'}
                 </button>

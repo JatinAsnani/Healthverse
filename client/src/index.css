@@ -138,6 +138,16 @@
 .dark table tbody tr:hover {
   background-color: #1e293b !important;
 }
+/* Modal and dialog dark-mode safety enhancements */
+.dark .fixed > div > .bg-white,
+.dark .fixed .bg-white.rounded-3xl,
+.dark .fixed .bg-white.rounded-2xl {
+  background-color: #0f172a !important;
+  border: 1px solid #1e293b !important;
+  color: #f1f5f9 !important;
+}
 
-
-
+.dark .fixed .border-slate-200,
+.dark .fixed .border-slate-300 {
+  border-color: #1e293b !important;
+}

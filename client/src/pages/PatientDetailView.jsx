@@ -533,44 +533,53 @@ export function PatientDetailView() {
 
       {/* ADD MEDICATION MODAL */}
       {showAddMedModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-200">
-              <h3 className="font-extrabold text-base text-slate-900">Add Prescription</h3>
-              <button onClick={() => setShowAddMedModal(false)}><X className="w-5 h-5" /></button>
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-150">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+              <h3 className="font-extrabold text-base text-slate-900 dark:text-slate-100">Add Prescription</h3>
+              <button
+                onClick={() => setShowAddMedModal(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
-            <form onSubmit={handleAddMedSubmit} className="space-y-3 text-xs">
+            <form onSubmit={handleAddMedSubmit} className="space-y-4 text-xs">
               <div>
-                <label className="font-bold uppercase block mb-1">Medicine Name</label>
+                <label className="font-bold uppercase block mb-1 text-slate-700 dark:text-slate-300">
+                  Medicine Name
+                </label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Clopidogrel"
                   value={newMed.medicine}
                   onChange={(e) => setNewMed({ ...newMed, medicine: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-teal-500"
                 />
               </div>
               <div>
-                <label className="font-bold uppercase block mb-1">Dosage & Frequency</label>
+                <label className="font-bold uppercase block mb-1 text-slate-700 dark:text-slate-300">
+                  Dosage & Frequency
+                </label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. 75mg once daily"
                   value={newMed.dosage}
                   onChange={(e) => setNewMed({ ...newMed, dosage: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-teal-500"
                 />
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 p-3 rounded-xl bg-red-50/70 dark:bg-red-950/30 border border-red-200/60 dark:border-red-900/40">
                 <input
                   type="checkbox"
                   id="critCheck"
                   checked={newMed.critical}
                   onChange={(e) => setNewMed({ ...newMed, critical: e.target.checked })}
-                  className="w-4 h-4 rounded text-teal-600"
+                  className="w-4 h-4 rounded text-red-600 focus:ring-red-500"
                 />
-                <label htmlFor="critCheck" className="font-bold text-red-700 cursor-pointer">
+                <label htmlFor="critCheck" className="font-bold text-red-700 dark:text-red-400 cursor-pointer select-none">
                   Critical Medication (Triggers alerts if missed)
                 </label>
               </div>
@@ -578,13 +587,13 @@ export function PatientDetailView() {
                 <button
                   type="button"
                   onClick={() => setShowAddMedModal(false)}
-                  className="btn-touch bg-slate-100 py-1.5 px-3 font-bold"
+                  className="btn-touch bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 py-2 px-4 font-bold rounded-xl transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="btn-touch bg-teal-600 text-white py-1.5 px-4 font-bold"
+                  className="btn-touch bg-teal-600 hover:bg-teal-700 text-white py-2 px-4 font-bold rounded-xl shadow-md shadow-teal-600/30"
                 >
                   Save Prescription
                 </button>
@@ -596,29 +605,34 @@ export function PatientDetailView() {
 
       {/* SCHEDULE FOLLOWUP MODAL */}
       {showFollowupModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-200">
-              <h3 className="font-extrabold text-base text-slate-900">Schedule Follow-up Visit</h3>
-              <button onClick={() => setShowFollowupModal(false)}><X className="w-5 h-5" /></button>
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-150">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+              <h3 className="font-extrabold text-base text-slate-900 dark:text-slate-100">Schedule Follow-up Visit</h3>
+              <button
+                onClick={() => setShowFollowupModal(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
-            <form onSubmit={handleScheduleFollowupSubmit} className="space-y-3 text-xs">
+            <form onSubmit={handleScheduleFollowupSubmit} className="space-y-4 text-xs">
               <div>
-                <label className="font-bold uppercase block mb-1">Date & Time</label>
+                <label className="font-bold uppercase block mb-1 text-slate-700 dark:text-slate-300">Date & Time</label>
                 <input
                   type="datetime-local"
                   required
                   value={newFollowup.scheduledAt}
                   onChange={(e) => setNewFollowup({ ...newFollowup, scheduledAt: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-sky-500"
                 />
               </div>
               <div>
-                <label className="font-bold uppercase block mb-1">Visit Type</label>
+                <label className="font-bold uppercase block mb-1 text-slate-700 dark:text-slate-300">Visit Type</label>
                 <select
                   value={newFollowup.type}
                   onChange={(e) => setNewFollowup({ ...newFollowup, type: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-sky-500"
                 >
                   <option value="in_person">In-Person at Hospital</option>
                   <option value="home_visit_chw">Home Visit by CHW (ASHA)</option>
@@ -626,25 +640,25 @@ export function PatientDetailView() {
                 </select>
               </div>
               <div>
-                <label className="font-bold uppercase block mb-1">Notes</label>
+                <label className="font-bold uppercase block mb-1 text-slate-700 dark:text-slate-300">Notes</label>
                 <textarea
                   rows="2"
                   value={newFollowup.notes}
                   onChange={(e) => setNewFollowup({ ...newFollowup, notes: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-sky-500"
                 />
               </div>
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setShowFollowupModal(false)}
-                  className="btn-touch bg-slate-100 py-1.5 px-3 font-bold"
+                  className="btn-touch bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 py-2 px-4 font-bold rounded-xl transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="btn-touch bg-sky-600 text-white py-1.5 px-4 font-bold"
+                  className="btn-touch bg-sky-600 hover:bg-sky-700 text-white py-2 px-4 font-bold rounded-xl shadow-md shadow-sky-600/30"
                 >
                   Confirm Schedule
                 </button>
@@ -656,35 +670,40 @@ export function PatientDetailView() {
 
       {/* ENTER LAB RESULT MODAL */}
       {showResultModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-200">
-              <h3 className="font-extrabold text-base text-slate-900">Enter Lab Result: {showResultModal.testName}</h3>
-              <button onClick={() => setShowResultModal(null)}><X className="w-5 h-5" /></button>
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-150">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+              <h3 className="font-extrabold text-base text-slate-900 dark:text-slate-100">Enter Lab Result: {showResultModal.testName}</h3>
+              <button
+                onClick={() => setShowResultModal(null)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
-            <form onSubmit={handleSaveResultSubmit} className="space-y-3 text-xs">
+            <form onSubmit={handleSaveResultSubmit} className="space-y-4 text-xs">
               <div>
-                <label className="font-bold uppercase block mb-1">Result Summary / Text</label>
+                <label className="font-bold uppercase block mb-1 text-slate-700 dark:text-slate-300">Result Summary / Text</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Normal resolution / Hb 11.2 g/dL"
                   value={resultInput.result}
                   onChange={(e) => setResultInput({ ...resultInput, result: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-teal-500"
                 />
               </div>
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setShowResultModal(null)}
-                  className="btn-touch bg-slate-100 py-1.5 px-3 font-bold"
+                  className="btn-touch bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 py-2 px-4 font-bold rounded-xl transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="btn-touch bg-teal-600 text-white py-1.5 px-4 font-bold"
+                  className="btn-touch bg-teal-600 hover:bg-teal-700 text-white py-2 px-4 font-bold rounded-xl shadow-md shadow-teal-600/30"
                 >
                   Save Result & Notify Patient
                 </button>

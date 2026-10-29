@@ -296,42 +296,47 @@ export function HospitalAdminView() {
 
       {/* ADD STAFF MODAL */}
       {showAddStaffModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-200">
-              <h3 className="font-extrabold text-base text-slate-900">Add Staff Member</h3>
-              <button onClick={() => setShowAddStaffModal(false)}><X className="w-5 h-5" /></button>
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-150">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+              <h3 className="font-extrabold text-base text-slate-900 dark:text-slate-100">Add Staff Member</h3>
+              <button
+                onClick={() => setShowAddStaffModal(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
-            <form onSubmit={handleAddStaffSubmit} className="space-y-3 text-xs">
+            <form onSubmit={handleAddStaffSubmit} className="space-y-4 text-xs">
               <div>
-                <label className="font-bold uppercase block mb-1">Full Name</label>
+                <label className="font-bold uppercase block mb-1 text-slate-700 dark:text-slate-300">Full Name</label>
                 <input
                   type="text"
                   required
                   value={newStaff.name}
                   onChange={(e) => setNewStaff({ ...newStaff, name: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-medium"
                   placeholder="e.g. Dr. Harish Shah"
                 />
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="font-bold uppercase block mb-1">Phone</label>
+                  <label className="font-bold uppercase block mb-1 text-slate-700 dark:text-slate-300">Phone</label>
                   <input
                     type="tel"
                     required
                     value={newStaff.phone}
                     onChange={(e) => setNewStaff({ ...newStaff, phone: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-medium"
                     placeholder="9876500000"
                   />
                 </div>
                 <div>
-                  <label className="font-bold uppercase block mb-1">Role</label>
+                  <label className="font-bold uppercase block mb-1 text-slate-700 dark:text-slate-300">Role</label>
                   <select
                     value={newStaff.role}
                     onChange={(e) => setNewStaff({ ...newStaff, role: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-medium"
                   >
                     <option value="doctor">Doctor</option>
                     <option value="nurse">Nurse</option>
@@ -341,36 +346,36 @@ export function HospitalAdminView() {
                 </div>
               </div>
               <div>
-                <label className="font-bold uppercase block mb-1">Specialization / Department</label>
+                <label className="font-bold uppercase block mb-1 text-slate-700 dark:text-slate-300">Specialization / Department</label>
                 <input
                   type="text"
                   value={newStaff.specialization}
                   onChange={(e) => setNewStaff({ ...newStaff, specialization: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-medium"
                   placeholder="e.g. General Surgery"
                 />
               </div>
               <div>
-                <label className="font-bold uppercase block mb-1">Initial Password</label>
+                <label className="font-bold uppercase block mb-1 text-slate-700 dark:text-slate-300">Initial Password</label>
                 <input
                   type="password"
                   required
                   value={newStaff.password}
                   onChange={(e) => setNewStaff({ ...newStaff, password: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-medium"
                 />
               </div>
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setShowAddStaffModal(false)}
-                  className="btn-touch bg-slate-100 py-1.5 px-3 font-bold"
+                  className="btn-touch bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 py-2 px-4 font-bold rounded-xl transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="btn-touch bg-teal-600 text-white py-1.5 px-4 font-bold shadow"
+                  className="btn-touch bg-teal-600 hover:bg-teal-700 text-white py-2 px-4 font-bold rounded-xl shadow-md shadow-teal-600/30"
                 >
                   Register Staff
                 </button>

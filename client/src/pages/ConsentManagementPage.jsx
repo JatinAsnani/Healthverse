@@ -195,19 +195,24 @@ export function ConsentManagementPage() {
 
       {/* Grant Consent Modal */}
       {showGrantModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-200">
-              <h3 className="font-extrabold text-base text-slate-900">Grant Purpose Consent</h3>
-              <button onClick={() => setShowGrantModal(false)}><X className="w-5 h-5" /></button>
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-150">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+              <h3 className="font-extrabold text-base text-slate-900 dark:text-slate-100">Grant Purpose Consent</h3>
+              <button
+                onClick={() => setShowGrantModal(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
-            <form onSubmit={handleGrantConsentSubmit} className="space-y-3 text-xs">
+            <form onSubmit={handleGrantConsentSubmit} className="space-y-4 text-xs">
               <div>
-                <label className="font-bold uppercase block mb-1">Select Specific Purpose</label>
+                <label className="font-bold uppercase block mb-1 text-slate-700 dark:text-slate-300">Select Specific Purpose</label>
                 <select
                   value={newConsent.purpose}
                   onChange={(e) => setNewConsent({ ...newConsent, purpose: e.target.value })}
-                  className="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-white font-semibold"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-semibold"
                 >
                   <option value="caregiver_access">Caregiver Health Timeline & Alert Access</option>
                   <option value="chw_home_monitoring">CHW (ASHA) Home Visit Monitoring</option>
@@ -216,7 +221,7 @@ export function ConsentManagementPage() {
                 </select>
               </div>
 
-              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-600 leading-relaxed">
+              <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 leading-relaxed">
                 By clicking grant, you authorize HealthVerse to share only the necessary minimum health information required for this designated care purpose.
               </div>
 
@@ -224,13 +229,13 @@ export function ConsentManagementPage() {
                 <button
                   type="button"
                   onClick={() => setShowGrantModal(false)}
-                  className="btn-touch bg-slate-100 py-1.5 px-3 font-bold"
+                  className="btn-touch bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 py-2 px-4 font-bold rounded-xl transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="btn-touch bg-teal-600 text-white py-1.5 px-4 font-bold shadow"
+                  className="btn-touch bg-teal-600 hover:bg-teal-700 text-white py-2 px-4 font-bold rounded-xl shadow-md shadow-teal-600/30"
                 >
                   Confirm & Grant
                 </button>
