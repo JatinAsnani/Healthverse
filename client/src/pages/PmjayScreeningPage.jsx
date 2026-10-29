@@ -83,20 +83,20 @@ export function PmjayScreeningPage() {
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
       <button
         onClick={() => navigate(-1)}
-        className="flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-slate-900"
+        className="flex items-center gap-1.5 text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
         <span>Back to Timeline</span>
       </button>
 
       {/* Header Banner */}
-      <div className="card-premium p-6 bg-gradient-to-r from-emerald-800 to-teal-900 text-white">
+      <div className="card-premium p-6 bg-gradient-to-r from-emerald-800 to-teal-900 text-white shadow-lg">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center flex-shrink-0">
             <ShieldCheck className="w-7 h-7 text-emerald-200" />
           </div>
           <div>
-            <h1 className="text-2xl font-extrabold tracking-tight">
+            <h1 className="text-2xl font-extrabold tracking-tight text-white">
               {t('pmjay.title')}
             </h1>
             <p className="text-emerald-100 text-xs mt-1">
@@ -107,7 +107,7 @@ export function PmjayScreeningPage() {
 
         {/* Disclaimer Notice */}
         <div className="mt-4 p-3 rounded-xl bg-black/20 text-emerald-200 text-xs border border-emerald-500/30 flex items-start gap-2">
-          <Info className="w-4 h-4 flex-shrink-0 mt-0.5" />
+          <Info className="w-4 h-4 flex-shrink-0 mt-0.5 text-emerald-300" />
           <span>{t('pmjay.disclaimer')}</span>
         </div>
       </div>
@@ -116,19 +116,21 @@ export function PmjayScreeningPage() {
         <form onSubmit={handleScreenSubmit} className="space-y-6">
           {/* Question 1: Existing Card */}
           <div className="card-premium p-6">
-            <span className="text-xs font-bold uppercase text-teal-700 tracking-wider block mb-1">
+            <span className="text-xs font-bold uppercase text-teal-700 dark:text-teal-400 tracking-wider block mb-1">
               Step 1 of 4
             </span>
-            <h2 className="text-base font-extrabold text-slate-900 mb-3">
+            <h2 className="text-base font-extrabold text-slate-900 dark:text-slate-100 mb-3">
               Do you or any family member already hold an Ayushman Golden Card?
             </h2>
 
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3">
               <button
                 type="button"
                 onClick={() => setHasCard(true)}
                 className={`flex-1 py-3 px-4 rounded-xl text-xs font-bold border transition-all ${
-                  hasCard ? 'bg-teal-700 text-white border-teal-800 shadow-md' : 'bg-white text-slate-700 border-slate-300'
+                  hasCard
+                    ? 'bg-teal-700 dark:bg-teal-600 text-white border-teal-800 dark:border-teal-500 shadow-md ring-2 ring-teal-500/30'
+                    : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-750'
                 }`}
               >
                 Yes, Already Have Golden Card
@@ -137,7 +139,9 @@ export function PmjayScreeningPage() {
                 type="button"
                 onClick={() => setHasCard(false)}
                 className={`flex-1 py-3 px-4 rounded-xl text-xs font-bold border transition-all ${
-                  !hasCard ? 'bg-teal-700 text-white border-teal-800 shadow-md' : 'bg-white text-slate-700 border-slate-300'
+                  !hasCard
+                    ? 'bg-teal-700 dark:bg-teal-600 text-white border-teal-800 dark:border-teal-500 shadow-md ring-2 ring-teal-500/30'
+                    : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-750'
                 }`}
               >
                 No / Not Sure
@@ -147,10 +151,10 @@ export function PmjayScreeningPage() {
 
           {/* Question 2: Ration Card Category */}
           <div className="card-premium p-6">
-            <span className="text-xs font-bold uppercase text-teal-700 tracking-wider block mb-1">
+            <span className="text-xs font-bold uppercase text-teal-700 dark:text-teal-400 tracking-wider block mb-1">
               Step 2 of 4
             </span>
-            <h2 className="text-base font-extrabold text-slate-900 mb-3">
+            <h2 className="text-base font-extrabold text-slate-900 dark:text-slate-100 mb-3">
               What type of Ration Card does your family possess?
             </h2>
 
@@ -167,8 +171,8 @@ export function PmjayScreeningPage() {
                   onClick={() => setRationCardType(val)}
                   className={`p-3.5 rounded-xl border text-left font-bold transition-all ${
                     rationCardType === val
-                      ? 'border-teal-700 bg-teal-50 text-teal-900 ring-2 ring-teal-500/20'
-                      : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
+                      ? 'border-teal-700 dark:border-teal-500 bg-teal-50 dark:bg-teal-950/60 text-teal-900 dark:text-teal-200 ring-2 ring-teal-500/20 shadow-sm'
+                      : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-750'
                   }`}
                 >
                   {label}
@@ -179,13 +183,13 @@ export function PmjayScreeningPage() {
 
           {/* Question 3: Rural SECC Criteria */}
           <div className="card-premium p-6">
-            <span className="text-xs font-bold uppercase text-teal-700 tracking-wider block mb-1">
+            <span className="text-xs font-bold uppercase text-teal-700 dark:text-teal-400 tracking-wider block mb-1">
               Step 3 of 4
             </span>
-            <h2 className="text-base font-extrabold text-slate-900 mb-1">
+            <h2 className="text-base font-extrabold text-slate-900 dark:text-slate-100 mb-1">
               Rural Deprivation & Household Criteria
             </h2>
-            <p className="text-xs text-slate-500 mb-3">Select all conditions that apply to your living situation:</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">Select all conditions that apply to your living situation:</p>
 
             <div className="space-y-2 text-xs">
               {[
@@ -201,14 +205,18 @@ export function PmjayScreeningPage() {
                     type="button"
                     onClick={() => toggleRural(val)}
                     className={`w-full p-3 rounded-xl border text-left font-semibold flex items-center justify-between transition-colors ${
-                      checked ? 'border-teal-600 bg-teal-50 text-teal-900' : 'border-slate-200 bg-white text-slate-700'
+                      checked
+                        ? 'border-teal-600 dark:border-teal-500 bg-teal-50 dark:bg-teal-950/60 text-teal-900 dark:text-teal-200'
+                        : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-750'
                     }`}
                   >
                     <span>{label}</span>
-                    <span className={`w-5 h-5 rounded-md flex items-center justify-center border ${
-                      checked ? 'bg-teal-700 border-teal-700 text-white' : 'border-slate-300 bg-white'
+                    <span className={`w-5 h-5 rounded-md flex items-center justify-center border font-bold text-xs ${
+                      checked
+                        ? 'bg-teal-700 dark:bg-teal-600 border-teal-700 dark:border-teal-600 text-white'
+                        : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-transparent'
                     }`}>
-                      {checked && '✓'}
+                      ✓
                     </span>
                   </button>
                 );
@@ -218,22 +226,22 @@ export function PmjayScreeningPage() {
 
           {/* Question 4: Disqualifying exclusions */}
           <div className="card-premium p-6">
-            <span className="text-xs font-bold uppercase text-teal-700 tracking-wider block mb-1">
+            <span className="text-xs font-bold uppercase text-teal-700 dark:text-teal-400 tracking-wider block mb-1">
               Step 4 of 4
             </span>
-            <h2 className="text-base font-extrabold text-slate-900 mb-3">
+            <h2 className="text-base font-extrabold text-slate-900 dark:text-slate-100 mb-3">
               Government Employment & Tax Status
             </h2>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2.5">
               <input
                 type="checkbox"
                 id="govCheck"
                 checked={isGovEmployee}
                 onChange={(e) => setIsGovEmployee(e.target.checked)}
-                className="w-4 h-4 rounded text-teal-600"
+                className="w-4 h-4 rounded text-teal-600 border-slate-300 dark:border-slate-700 focus:ring-teal-500"
               />
-              <label htmlFor="govCheck" className="text-xs font-semibold text-slate-700 cursor-pointer">
+              <label htmlFor="govCheck" className="text-xs font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">
                 Household contains a regular government employee, motorized 4-wheeler, or income tax payer.
               </label>
             </div>
@@ -242,7 +250,7 @@ export function PmjayScreeningPage() {
           <button
             type="submit"
             disabled={isEvaluating}
-            className="w-full btn-touch bg-teal-700 hover:bg-teal-800 text-white font-extrabold text-sm shadow-lg shadow-teal-700/20"
+            className="w-full btn-touch bg-teal-700 hover:bg-teal-800 text-white font-extrabold text-sm shadow-lg shadow-teal-700/20 flex items-center justify-center gap-2"
           >
             {isEvaluating ? 'Evaluating PM-JAY Rules...' : 'Submit & Check Eligibility Guidance'}
             <Send className="w-4 h-4" />
@@ -251,23 +259,23 @@ export function PmjayScreeningPage() {
       ) : (
         /* Result Screen */
         <div className="card-premium p-8 space-y-6">
-          <div className="flex items-center justify-between pb-4 border-b border-slate-200">
+          <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-700">
             <div className="flex items-center gap-3">
               <span className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider ${
                 resultData.result === 'likely_eligible'
-                  ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                  ? 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800'
                   : resultData.result === 'needs_verification'
-                  ? 'bg-amber-100 text-amber-800 border border-amber-300'
-                  : 'bg-rose-100 text-rose-800 border border-rose-300'
+                  ? 'bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800'
+                  : 'bg-rose-100 dark:bg-rose-950/70 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-800'
               }`}>
                 {resultData.result.replace('_', ' ')}
               </span>
-              <span className="text-xs text-slate-500">Evaluated on {new Date(resultData.checkedAt).toLocaleDateString()}</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400">Evaluated on {new Date(resultData.checkedAt).toLocaleDateString()}</span>
             </div>
           </div>
 
           <div className="space-y-4">
-            <h2 className="text-xl font-extrabold text-slate-900">
+            <h2 className="text-xl font-extrabold text-slate-900 dark:text-slate-100">
               {resultData.result === 'likely_eligible'
                 ? 'Your Household is Likely Eligible for PM-JAY Scheme Benefits'
                 : resultData.result === 'needs_verification'
@@ -275,18 +283,18 @@ export function PmjayScreeningPage() {
                 : 'Not Eligible Under Standard PM-JAY Inclusion Criteria'}
             </h2>
 
-            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
-              <strong className="block text-xs uppercase font-bold text-slate-500">Reasons for Assessment:</strong>
-              <ul className="list-disc list-inside text-xs text-slate-700 space-y-1">
+            <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 space-y-2">
+              <strong className="block text-xs uppercase font-bold text-slate-600 dark:text-slate-300">Reasons for Assessment:</strong>
+              <ul className="list-disc list-inside text-xs text-slate-700 dark:text-slate-300 space-y-1">
                 {resultData.reasons.map((r, i) => (
                   <li key={i}>{r}</li>
                 ))}
               </ul>
             </div>
 
-            <div className="p-4 rounded-xl bg-teal-50 border border-teal-200 space-y-2">
-              <strong className="block text-xs uppercase font-bold text-teal-800">Recommended Next Steps:</strong>
-              <ul className="list-disc list-inside text-xs text-teal-900 space-y-1">
+            <div className="p-4 rounded-xl bg-teal-50 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-900/60 space-y-2">
+              <strong className="block text-xs uppercase font-bold text-teal-800 dark:text-teal-300">Recommended Next Steps:</strong>
+              <ul className="list-disc list-inside text-xs text-teal-900 dark:text-teal-200 space-y-1">
                 {resultData.nextSteps.map((step, i) => (
                   <li key={i}>{step}</li>
                 ))}
@@ -294,16 +302,16 @@ export function PmjayScreeningPage() {
             </div>
 
             {/* Official Disclaimer */}
-            <div className="p-3.5 rounded-xl bg-slate-100 text-slate-600 text-xs border border-slate-200 flex items-start gap-2">
-              <Info className="w-4 h-4 flex-shrink-0 text-slate-500 mt-0.5" />
+            <div className="p-3.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs border border-slate-200 dark:border-slate-700 flex items-start gap-2">
+              <Info className="w-4 h-4 flex-shrink-0 text-slate-500 dark:text-slate-400 mt-0.5" />
               <span>{resultData.disclaimer}</span>
             </div>
           </div>
 
-          <div className="pt-4 border-t border-slate-200 flex gap-3">
+          <div className="pt-4 border-t border-slate-200 dark:border-slate-700 flex gap-3">
             <button
               onClick={() => setResultData(null)}
-              className="btn-touch bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold"
+              className="btn-touch bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold border border-slate-200 dark:border-slate-700"
             >
               Re-take Questionnaire
             </button>

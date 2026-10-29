@@ -107,6 +107,23 @@
   color: #64748b;
 }
 
+/* High contrast safety: protect elements with explicit white or light backgrounds from text color inversion */
+.dark .bg-white:not([class*="dark:bg"]) {
+  background-color: #ffffff;
+  color: #0f172a !important;
+}
+.dark .bg-white:not([class*="dark:bg"]) .text-slate-900,
+.dark .bg-white:not([class*="dark:bg"]) .text-slate-800,
+.dark .bg-white:not([class*="dark:bg"]) .text-slate-700,
+.dark .bg-white:not([class*="dark:bg"]) span:not([class*="dark:text"]):not([class*="text-white"]):not([class*="text-teal"]):not([class*="bg-teal"]),
+.dark .bg-white:not([class*="dark:bg"]) p:not([class*="dark:text"]):not([class*="text-white"]) {
+  color: #0f172a !important;
+}
+.dark .bg-white:not([class*="dark:bg"]) .text-slate-600,
+.dark .bg-white:not([class*="dark:bg"]) .text-slate-500 {
+  color: #475569 !important;
+}
+
 .dark .card-premium {
   background-color: #0f172a;
   border-color: #1e293b;
@@ -156,6 +173,7 @@
 .dark table tbody tr:hover {
   background-color: #1e293b !important;
 }
+
 /* Modal and dialog dark-mode safety enhancements */
 .dark .fixed > div > .bg-white,
 .dark .fixed .bg-white.rounded-3xl,

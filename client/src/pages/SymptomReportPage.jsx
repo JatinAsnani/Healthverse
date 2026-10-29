@@ -172,7 +172,7 @@ export function SymptomReportPage() {
       <div className="flex items-center justify-between mb-6">
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-slate-900"
+          className="flex items-center gap-1.5 text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Home</span>
@@ -185,10 +185,10 @@ export function SymptomReportPage() {
       {!assessmentResult ? (
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="card-premium p-6">
-            <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+            <h1 className="text-2xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
               {t('symptoms.title')}
             </h1>
-            <p className="text-sm text-slate-600 mt-1">
+            <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
               {t('symptoms.subtitle')}
             </p>
 
@@ -203,8 +203,8 @@ export function SymptomReportPage() {
                     key={code}
                     className={`rounded-2xl border p-4 transition-all ${
                       isSelected
-                        ? 'border-teal-600 bg-teal-50/60 shadow-md ring-2 ring-teal-500/20'
-                        : 'border-slate-200 bg-white hover:border-slate-300'
+                        ? 'border-teal-600 dark:border-teal-500 bg-teal-50/80 dark:bg-teal-950/60 shadow-md ring-2 ring-teal-500/20'
+                        : 'border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/80 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800'
                     }`}
                   >
                     <button
@@ -212,16 +212,26 @@ export function SymptomReportPage() {
                       onClick={() => handleToggleSymptom(code)}
                       className="w-full flex items-start gap-3 text-left focus:outline-none"
                     >
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                        isSelected ? 'bg-teal-600 text-white' : 'bg-slate-100 text-slate-600'
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors ${
+                        isSelected
+                          ? 'bg-teal-600 text-white'
+                          : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
                       }`}>
                         <Icon className="w-5 h-5" />
                       </div>
                       <div className="flex-1">
-                        <span className="font-bold text-slate-900 text-sm block leading-tight">
+                        <span className={`font-bold text-sm block leading-tight ${
+                          isSelected
+                            ? 'text-teal-950 dark:text-teal-100'
+                            : 'text-slate-900 dark:text-slate-100'
+                        }`}>
                           {t(labelKey)}
                         </span>
-                        <span className="text-[11px] text-slate-500 mt-0.5 block">
+                        <span className={`text-[11px] mt-0.5 block ${
+                          isSelected
+                            ? 'text-teal-700 dark:text-teal-300 font-semibold'
+                            : 'text-slate-500 dark:text-slate-400'
+                        }`}>
                           {isSelected ? `Severity: ${t(`symptoms.severityLevels.${severity}`)}` : 'Tap to select'}
                         </span>
                       </div>
@@ -229,7 +239,7 @@ export function SymptomReportPage() {
 
                     {/* Severity Selector when selected */}
                     {isSelected && (
-                      <div className="mt-3 pt-3 border-t border-teal-200/60 flex items-center justify-between gap-1">
+                      <div className="mt-3 pt-3 border-t border-teal-200/60 dark:border-teal-800 flex items-center justify-between gap-1">
                         {[1, 2, 3].map((level) => (
                           <button
                             key={level}
@@ -237,8 +247,8 @@ export function SymptomReportPage() {
                             onClick={() => handleSetSeverity(code, level)}
                             className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-colors ${
                               severity === level
-                                ? 'bg-teal-700 text-white shadow-sm'
-                                : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                                ? 'bg-teal-700 dark:bg-teal-600 text-white shadow-sm'
+                                : 'bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-600 border border-slate-200 dark:border-slate-600'
                             }`}
                           >
                             {t(`symptoms.severityLevels.${level}`)}
@@ -254,17 +264,17 @@ export function SymptomReportPage() {
 
           {/* Vitals Input Card */}
           <div className="card-premium p-6">
-            <h2 className="text-lg font-bold text-slate-900 mb-1 flex items-center gap-2">
-              <Activity className="w-5 h-5 text-teal-600" />
+            <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-1 flex items-center gap-2">
+              <Activity className="w-5 h-5 text-teal-600 dark:text-teal-400" />
               <span>{t('symptoms.vitalsTitle')}</span>
             </h2>
-            <p className="text-xs text-slate-500 mb-4">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
               Enter any measurements taken today using home or clinic instruments.
             </p>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
                   Temp (°C)
                 </label>
                 <input
@@ -273,12 +283,12 @@ export function SymptomReportPage() {
                   placeholder="e.g. 37.0"
                   value={vitals.temperature}
                   onChange={(e) => setVitals({ ...vitals, temperature: e.target.value })}
-                  className="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold"
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm font-semibold"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
                   Oxygen SpO2 (%)
                 </label>
                 <input
@@ -286,12 +296,12 @@ export function SymptomReportPage() {
                   placeholder="e.g. 98"
                   value={vitals.spo2}
                   onChange={(e) => setVitals({ ...vitals, spo2: e.target.value })}
-                  className="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold"
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm font-semibold"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
                   Pulse (bpm)
                 </label>
                 <input
@@ -299,12 +309,12 @@ export function SymptomReportPage() {
                   placeholder="e.g. 74"
                   value={vitals.pulse}
                   onChange={(e) => setVitals({ ...vitals, pulse: e.target.value })}
-                  className="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold"
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm font-semibold"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
                   BP (Systolic / Dia)
                 </label>
                 <div className="flex items-center gap-1">
@@ -313,22 +323,22 @@ export function SymptomReportPage() {
                     placeholder="120"
                     value={vitals.systolicBP}
                     onChange={(e) => setVitals({ ...vitals, systolicBP: e.target.value })}
-                    className="w-1/2 px-2 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold text-center"
+                    className="w-1/2 px-2 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm font-semibold text-center"
                   />
-                  <span className="text-slate-400 font-bold">/</span>
+                  <span className="text-slate-400 dark:text-slate-500 font-bold">/</span>
                   <input
                     type="number"
                     placeholder="80"
                     value={vitals.diastolicBP}
                     onChange={(e) => setVitals({ ...vitals, diastolicBP: e.target.value })}
-                    className="w-1/2 px-2 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold text-center"
+                    className="w-1/2 px-2 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm font-semibold text-center"
                   />
                 </div>
               </div>
             </div>
 
             <div className="mt-4">
-              <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
                 Additional Notes (Optional)
               </label>
               <textarea
@@ -336,7 +346,7 @@ export function SymptomReportPage() {
                 placeholder="Describe any other sensations or specific times when symptoms began..."
                 value={symptomNotes}
                 onChange={(e) => setSymptomNotes(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm"
+                className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm"
               />
             </div>
           </div>
@@ -345,7 +355,7 @@ export function SymptomReportPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full btn-touch bg-teal-600 hover:bg-teal-700 text-white font-extrabold text-base shadow-lg shadow-teal-600/30"
+            className="w-full btn-touch bg-teal-600 hover:bg-teal-700 text-white font-extrabold text-base shadow-lg shadow-teal-600/30 transition-all"
           >
             {isSubmitting ? t('symptoms.evaluating') : t('symptoms.submitReport')}
           </button>
@@ -355,17 +365,17 @@ export function SymptomReportPage() {
         <div className="space-y-6">
           <div className={`card-premium p-8 border-2 ${
             assessmentResult.riskLevel === 'critical'
-              ? 'border-red-500 bg-red-50/50'
+              ? 'border-red-500 bg-red-50/50 dark:bg-red-950/40'
               : assessmentResult.riskLevel === 'high'
-              ? 'border-orange-500 bg-orange-50/50'
+              ? 'border-orange-500 bg-orange-50/50 dark:bg-orange-950/40'
               : assessmentResult.riskLevel === 'medium'
-              ? 'border-amber-500 bg-amber-50/50'
-              : 'border-emerald-500 bg-emerald-50/50'
+              ? 'border-amber-500 bg-amber-50/50 dark:bg-amber-950/40'
+              : 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/40'
           }`}>
-            <div className="flex items-center justify-between pb-4 border-b border-slate-200">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-700">
               <div className="flex items-center gap-3">
                 <RiskBadge level={assessmentResult.riskLevel} size="lg" />
-                <span className="text-xs text-slate-500 font-medium">
+                <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
                   Assessed on: {assessmentResult.assessedOn} &bull; Version 1.0.0
                 </span>
               </div>
@@ -373,21 +383,21 @@ export function SymptomReportPage() {
             </div>
 
             <div className="mt-6 space-y-4">
-              <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900">
+              <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-slate-100">
                 {assessmentResult.suggestedAction}
               </h2>
 
-              <div className="p-4 rounded-xl bg-white/80 border border-slate-200 text-sm text-slate-800 leading-relaxed">
-                <strong className="block text-xs uppercase font-bold text-slate-500 mb-1">Clinical Evaluation Summary:</strong>
+              <div className="p-4 rounded-xl bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-sm text-slate-800 dark:text-slate-200 leading-relaxed">
+                <strong className="block text-xs uppercase font-bold text-slate-500 dark:text-slate-400 mb-1">Clinical Evaluation Summary:</strong>
                 {assessmentResult.explanation}
               </div>
 
               {assessmentResult.redFlags && assessmentResult.redFlags.length > 0 && (
-                <div className="p-4 rounded-xl bg-white/80 border border-slate-200">
-                  <strong className="block text-xs uppercase font-bold text-red-700 mb-2">Red Flags Detected:</strong>
+                <div className="p-4 rounded-xl bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700">
+                  <strong className="block text-xs uppercase font-bold text-red-700 dark:text-red-400 mb-2">Red Flags Detected:</strong>
                   <ul className="space-y-1">
                     {assessmentResult.redFlags.map((flag, idx) => (
-                      <li key={idx} className="flex items-start gap-2 text-xs font-semibold text-slate-800">
+                      <li key={idx} className="flex items-start gap-2 text-xs font-semibold text-slate-800 dark:text-slate-200">
                         <AlertTriangle className="w-3.5 h-3.5 text-red-500 flex-shrink-0 mt-0.5" />
                         <span>{flag}</span>
                       </li>
@@ -416,19 +426,19 @@ export function SymptomReportPage() {
               )}
 
               {/* Safety principle reminder */}
-              <div className="p-3 rounded-xl bg-slate-100 text-slate-600 text-xs flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-teal-600 flex-shrink-0" />
+              <div className="p-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs flex items-center gap-2 border border-slate-200 dark:border-slate-700">
+                <ShieldCheck className="w-4 h-4 text-teal-600 dark:text-teal-400 flex-shrink-0" />
                 <span>{t('safetyPrinciple')}</span>
               </div>
             </div>
 
-            <div className="mt-6 pt-4 border-t border-slate-200 flex gap-3">
+            <div className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700 flex gap-3">
               <button
                 onClick={() => {
                   setAssessmentResult(null);
                   setSelectedSymptoms({});
                 }}
-                className="btn-touch bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 text-xs font-bold"
+                className="btn-touch bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 text-xs font-bold"
               >
                 Log Another Report
               </button>

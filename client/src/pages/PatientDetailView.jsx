@@ -274,13 +274,15 @@ export function PatientDetailView() {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex rounded-xl bg-slate-200/80 p-1 overflow-x-auto scrollbar-none whitespace-nowrap flex-nowrap w-full text-xs font-bold">
+      <div className="flex rounded-xl bg-slate-200/90 dark:bg-slate-800 p-1 overflow-x-auto scrollbar-none whitespace-nowrap flex-nowrap w-full text-xs font-bold border border-slate-300/80 dark:border-slate-700 shadow-sm">
         {['overview', 'medications', 'symptoms', 'investigations', 'followups'].map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`flex-shrink-0 px-3.5 sm:px-4 py-2 rounded-lg capitalize transition-all whitespace-nowrap ${
-              activeTab === tab ? 'bg-white text-teal-800 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+              activeTab === tab
+                ? 'bg-white dark:bg-slate-700 text-teal-800 dark:text-teal-300 font-extrabold shadow-sm'
+                : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-300/50 dark:hover:bg-slate-700/50'
             }`}
           >
             {tab}
