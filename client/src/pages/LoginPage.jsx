@@ -360,6 +360,24 @@ export function LoginPage() {
                 />
               </div>
 
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  required
+                  minLength={6}
+                  value={regData.password}
+                  onChange={(e) => setRegData({ ...regData, password: e.target.value })}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-slate-100 text-sm"
+                  placeholder="Create password (min 6 characters)"
+                />
+                <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block">
+                  Default: <span className="font-mono text-teal-600 dark:text-teal-400 font-semibold">password123</span> (or enter your custom password)
+                </span>
+              </div>
+
               <button
                 type="submit"
                 disabled={isLoading}
