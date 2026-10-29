@@ -24,6 +24,53 @@ router.get('/doctors', async (req, res, next) => {
 });
 
 /**
+ * @route GET /api/v1/followups
+ * @desc Get all follow-ups / appointments for clinician & hospital view
+ */
+router.get(
+  '/',
+  authenticate,
+  requireRole('doctor', 'nurse', 'chw', 'hospital_admin'),
+  async (req, res, next) => {
+    try {
+      const { status, type, doctorId, patientId } = req.query;
+      const query = {};
+
+      if (status && status !== 'all') {
+        query.status = status;
+      }
+      if (type && type !== 'all') {
+        query.type = type;
+      }
+      if (patientId) {
+        query.patient = patientId;
+      }
+      if (doctorId) {
+        if (doctorId === 'my' && req.staff?._id) {
+          query.staff = req.staff._id;
+        } else if (doctorId !== 'all') {
+          query.staff = doctorId;
+        }
+      }
+
+      const followups = await Followup.find(query)
+        .populate('patient', 'name patientId phone gender dob address hospital')
+        .populate('staff', 'name specialization phone role')
+        .populate('discharge', 'diagnosis dischargeDate hospital')
+        .sort({ scheduledAt: 1 });
+
+      res.json({
+        success: true,
+        count: followups.length,
+        data: followups
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+/**
  * @route POST /api/v1/followups/book
  * @desc Book an appointment with a chosen doctor (Accessible by Patient, Caregiver, or Staff)
  */
