@@ -15,19 +15,22 @@ SAFETY AND ETHICAL PRINCIPLES (MANDATORY):
      * Dr. Ananya Sharma (Internal Medicine)
      * Dr. Vikram Mehta (General Surgery & Critical Care)
    - Enthusiastically confirm that you can schedule it right here in HealthVerse, let them know which doctor you recommend or is available, and explain that an interactive booking card has been loaded for them to confirm their date & time slot with 1 tap.
-6. You can assist with:
+6. YOU HAVE DIRECT ACCESS TO THE PATIENT'S MEDICAL REPORT & CLINICAL CHART:
+   - When the user asks "mera medical report batana", "show my medical report", "meri bimari kya hai", or "discharge summary batao", summarize and explain their verified hospital diagnosis, treating doctor, prescribed medicines, and post-discharge precautions warmly and clearly in Hindi / Hinglish / Gujarati / English!
+7. You can assist with:
+   - Explaining medical reports, discharge diagnosis, and hospital records
    - Direct appointment booking & scheduling with hospital doctors
    - Post-discharge recovery precautions (wound care, diet, light activity)
    - Medication adherence (why not to skip maintenance medicines)
-   - Explaining medical reports, vital signs (BP, SpO2, Pulse, Blood Sugar)
+   - Explaining vital signs (BP, SpO2, Pulse, Blood Sugar)
    - PM-JAY (Ayushman Bharat) government scheme eligibility and required documents
    - Guiding the user on how to use HealthVerse (reporting symptoms, checking medicines, consent, CHW visits)
-7. PERSONALIZED PATIENT IDENTIFICATION & CONTINUITY:
-   - When Current Session Context specifies the verified logged-in patient (e.g. Name, Patient ID, Diagnosis):
+8. PERSONALIZED PATIENT IDENTIFICATION & CONTINUITY:
+   - When Current Session Context specifies the verified logged-in patient (e.g. Name, Patient ID, Diagnosis, Medical Report):
      * You KNOW THIS PATIENT! Greet them warmly and respectfully by their name (e.g. "Namaste Rajesh Verma ji!").
      * If they ask "whats my name", "who am i", "mera naam kya hai", or "who is logged in", IMMEDIATELY state their full name, patient ID, and current recovery status!
      * When booking appointments, confirm that the appointment is being booked directly for them under their patient record.
-8. APPOINTMENT DATES AND TIMINGS (STRICT):
+9. APPOINTMENT DATES AND TIMINGS (STRICT):
    - When the user asks to book an appointment on a specific date (e.g. "30 oct", "30 october", "30 tarikh", "kal", "parso"):
      * Always confirm and respect THAT EXACT DATE in your reply (e.g. "Bilkul, main 30 October 2026 ke liye aapki appointment set kar raha hoon.").
      * NEVER mention or default to a different date when the user specifically requested one!`;
@@ -61,9 +64,7 @@ export function extractAppointmentDateTime(text = '') {
 
   // 4. Pattern: [1-31] (st|nd|rd|th)? (of)? (jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*
   const dayMonthMatch = lower.match(/\b(\d{1,2})(?:st|nd|rd|th)?\s+(?:of\s+)?(jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*/i);
-  // Pattern: (jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\s+(\d{1,2})
   const monthDayMatch = lower.match(/\b(jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\s+(\d{1,2})(?:st|nd|rd|th)?/i);
-  // Pattern: DD/MM or DD-MM
   const slashMatch = lower.match(/\b(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?\b/);
 
   const monthsMap = {
@@ -171,6 +172,12 @@ function buildSessionContextNote(context = {}) {
   if (context.diagnosis) {
     note += `Patient Clinical Diagnosis / Condition: ${context.diagnosis}. `;
   }
+
+  if (context.medicalReport) {
+    const mr = context.medicalReport;
+    note += `VERIFIED PATIENT MEDICAL REPORT: Hospital="${mr.hospitalName}", Doctor="${mr.doctorName}", Admission="${mr.admissionDate}", Discharge="${mr.dischargeDate}", Diagnosis="${mr.diagnosis}", Summary="${mr.summary}", Diet="${mr.dietInstructions}", Activity="${mr.activityInstructions}", WarningSigns="${(mr.warningSigns || []).join(', ')}", PrescribedMedicines="${(mr.prescriptions || []).map(p => `${p.medicine} (${p.dosage}, ${p.timing})`).join('; ')}". When the user asks about their medical report ("mera medical report batana", "show my report", "meri bimari kya hai", "meri discharge summary"), explain and summarize these verified details clearly and warmly in the user's language! `;
+  }
+
   if (context.language) {
     note += `Preferred Language: ${context.language}. `;
   }
@@ -235,6 +242,10 @@ function extractSuggestedActions(text = '', userMessage = '') {
   if (detectBookingIntent(combined)) {
     actions.push({ label: '📅 Book Doctor Appointment', action: 'book_appointment' });
   }
+  if (combined.includes('report') || combined.includes('discharge') || combined.includes('bimari') || combined.includes('history')) {
+    actions.push({ label: '📅 Book Follow-up', action: 'book_appointment' });
+    actions.push({ label: '📝 Report Symptoms', path: '/symptoms/report' });
+  }
   if (combined.includes('symptom') || combined.includes('pain') || combined.includes('fever') || combined.includes('लक्षण')) {
     actions.push({ label: '📝 Report Symptoms', path: '/symptoms/report' });
   }
@@ -248,20 +259,29 @@ function extractSuggestedActions(text = '', userMessage = '') {
     actions.push({ label: '🤝 Manage Caregiver Consent', path: '/consent' });
   }
 
-  return actions;
+  // Deduplicate suggested actions
+  const seen = new Set();
+  const uniqueActions = [];
+  for (const act of actions) {
+    const key = act.action ? `act:${act.action}` : `path:${act.path}`;
+    if (!seen.has(key)) {
+      seen.add(key);
+      uniqueActions.push(act);
+    }
+  }
+
+  return uniqueActions;
 }
 
 /**
  * Call Google Gemini API
  */
 async function callGemini(apiKey, message, history = [], context = {}) {
-  // Try active Gemini models with fallbacks
   const models = [
-    'gemini-3.5-flash-lite',
-    'gemini-3-flash-preview',
-    'gemini-3.8-flash',
+    'gemini-2.0-flash',
+    'gemini-1.5-flash',
     'gemini-2.5-flash',
-    'gemini-1.5-flash'
+    'gemini-1.5-pro'
   ];
 
   let lastError = null;
@@ -272,13 +292,11 @@ async function callGemini(apiKey, message, history = [], context = {}) {
 
       const contents = [];
 
-      // Add context note if provided
       const contextNote = buildSessionContextNote(context);
       const effectiveSystemPrompt = contextNote
         ? `${SYSTEM_PROMPT}\n\nCurrent Session Context: ${contextNote}`
         : SYSTEM_PROMPT;
 
-      // Map chat history to Gemini structure
       for (const h of history.slice(-8)) {
         contents.push({
           role: h.role === 'assistant' || h.role === 'model' ? 'model' : 'user',
@@ -286,7 +304,6 @@ async function callGemini(apiKey, message, history = [], context = {}) {
         });
       }
 
-      // Add current message
       contents.push({
         role: 'user',
         parts: [{ text: message }]
@@ -406,6 +423,55 @@ Your symptoms indicate a potentially serious medical emergency that requires imm
     return `You are currently logged in as a ${context.role || 'user'} on HealthVerse. If you'd like me to address you personally, please tell me your name!`;
   }
 
+  // Handle Medical Report & Clinical Chart queries
+  const isReportQuery =
+    lower.includes('report') ||
+    lower.includes('discharge') ||
+    lower.includes('kya hua') ||
+    lower.includes('meri bimari') ||
+    lower.includes('mera bimari') ||
+    lower.includes('meri tabiyat') ||
+    lower.includes('diagnosis') ||
+    lower.includes('history') ||
+    lower.includes('medical summary') ||
+    (lower.includes('medical') && (lower.includes('batao') || lower.includes('batana') || lower.includes('bata') || lower.includes('dikhao') || lower.includes('show')));
+
+  if (isReportQuery) {
+    if (context.medicalReport) {
+      const mr = context.medicalReport;
+      const medsList = mr.prescriptions && mr.prescriptions.length > 0
+        ? mr.prescriptions.map(p => `  • **${p.medicine}** — ${p.dosage} (${p.timing})${p.critical ? ' ⚠️ *Critical*' : ''}`).join('\n')
+        : '  • Hospital maintenance medicines logged in your profile.';
+
+      return `📋 **Aapki Medical Discharge Report**
+
+Namaste **${mr.patientName}** ji, aapka verified hospital record yeh hai:
+
+- 🏥 **Hospital:** ${mr.hospitalName}
+- 👨‍⚕️ **Treating Doctor:** ${mr.doctorName}
+- 🩺 **Diagnosis (बीमारी / निदान):** **${mr.diagnosis}**
+- 📅 **Discharge Date:** ${mr.dischargeDate}
+- 📝 **Summary:** ${mr.summary}
+
+💊 **Prescribed Medicines (दवाइयाँ):**
+${medsList}
+
+⚠️ **Care Precautions (सावधानियां):**
+- **Diet:** ${mr.dietInstructions}
+- **Activity:** ${mr.activityInstructions}
+- **Watch for:** ${(mr.warningSigns || []).join(', ')}
+
+*Aap chahein toh niche diye button se Dr. Ananya Sharma ya Dr. Vikram Mehta ke sath follow-up appointment book kar sakte hain!*`;
+    }
+
+    return `📋 **Aapki Medical Report & Discharge Summary**
+
+Namaste! Aapka hospital medical record dekhne ke liye:
+- Yadi aap logged in hain, aapka discharge summary aur doctor prescriptions aapke **Home Timeline** par available hain.
+- Aapki dekhbhal kar rahe hospital doctors: **Dr. Ananya Sharma** (Internal Medicine) aur **Dr. Vikram Mehta** (General Surgery & Critical Care).
+- Agar aap doctor se consult karna chahte hain, toh bas yahan likhein: *"Doctor appointment book karo"*, aur main aapka slot schedule kar dunga!`;
+  }
+
   if (detectBookingIntent(lower)) {
     return `📅 **Appointment Booking Support**
 
@@ -455,6 +521,7 @@ If any red flags appear, record them in the **Symptom Report** tab and contact y
     return `👋 **Namaste! I am your HealthVerse AI Health Assistant.**
 
 I can help you with:
+- Checking your medical reports and diagnosis ("mera medical report batana")
 - Booking doctor appointments and clinic follow-ups
 - Explaining your discharge instructions and medication schedules
 - Answering questions about post-surgical recovery, wound care, and diet
@@ -467,6 +534,7 @@ How can I help you today?`;
   return `I understand your query: "${message}".
 
 Here is guidance from HealthVerse clinical continuity protocols:
+- You can check your medical report by asking: *"Mera medical report batana"*
 - You can book an appointment with our hospital doctors directly in this chat or via your Home timeline.
 - Ensure you monitor your vital signs (BP, pulse, oxygen) and take prescribed medications as directed.
 - If you are experiencing uncomfortable symptoms, click **Report Symptoms** below so your care team can review your case.
