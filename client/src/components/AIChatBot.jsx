@@ -132,11 +132,11 @@ export const AIChatBot = () => {
     {
       id: 'init-1',
       sender: 'assistant',
-      text: `**Namaste! I am your HealthVerse AI Health Assistant.**\n\nI can assist you with:\n- **Directly booking doctor appointments** with Dr. Ananya Sharma or Dr. Vikram Mehta\n- Understanding post-discharge recovery precautions\n- Explaining your medications & adherence importance\n- Checking PM-JAY (Ayushman Bharat) eligibility & required documents\n- Symptom triage guidance & warning signs\n\n*How can I help you today?*`,
+      text: `**Namaste!** How can I assist with your recovery, medicines, or appointment booking today?`,
       suggestedActions: [
-        { label: 'Book Appointment', action: 'book_appointment' },
-        { label: 'Check PM-JAY', path: '/pmjay' },
-        { label: 'Report Symptoms', path: '/symptoms/report' }
+        { label: 'Book Doctor', action: 'book_appointment' },
+        { label: 'Check Symptoms', path: '/symptoms/report' },
+        { label: 'PM-JAY Scheme', path: '/pmjay' }
       ],
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
@@ -150,7 +150,7 @@ export const AIChatBot = () => {
           return [
             {
               ...prev[0],
-              text: `**Namaste ${profile.name}! I am your HealthVerse AI Health Assistant.**\n\nI have loaded your patient profile (**${profile.patientId || 'Verified Patient'}**${profile.medicalHistory?.[0] ? ` • *${profile.medicalHistory[0]}*` : ''}).\n\nI can assist you with:\n- **Directly booking doctor appointments** with Dr. Ananya Sharma or Dr. Vikram Mehta\n- Understanding post-discharge recovery precautions\n- Explaining your medications & adherence importance\n- Checking PM-JAY (Ayushman Bharat) eligibility & required documents\n- Symptom triage guidance & warning signs\n\n*How can I help you today, ${profile.name.split(' ')[0]} ji?*`
+              text: `**Namaste ${profile.name}!** How can I assist with your recovery or doctor appointments today?`
             }
           ];
         }
@@ -483,59 +483,45 @@ export const AIChatBot = () => {
   return (
     <>
       {/* Floating Launcher Button */}
-      <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40">
+      <div className="fixed bottom-16 sm:bottom-6 right-4 sm:right-6 z-40">
         <button
           onClick={() => setIsOpen(!isOpen)}
           aria-label="Open HealthVerse AI Health Assistant"
-          className="relative group flex items-center gap-2 sm:gap-2.5 px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-full bg-gradient-to-r from-teal-600 via-emerald-600 to-teal-700 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-teal-500/30"
+          className="flex items-center gap-2 px-3 py-2 rounded-full bg-teal-600 hover:bg-teal-700 text-white shadow-lg transition-transform hover:scale-105 active:scale-95 text-xs font-bold"
         >
-          <div className="relative">
-            <Bot className="w-5 h-5 text-white animate-pulse" />
-            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-amber-400 rounded-full border-2 border-white animate-ping" />
-            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-amber-400 rounded-full border-2 border-white" />
-          </div>
-          <span className="font-bold text-xs tracking-wide">HealthVerse AI</span>
-          <Sparkles className="w-3.5 h-3.5 text-amber-300 opacity-90 group-hover:rotate-12 transition-transform" />
+          <Bot className="w-4 h-4" />
+          <span>AI Assistant</span>
         </button>
       </div>
 
       {/* Chat Window Flyout */}
       {isOpen && (
-        <div className="fixed bottom-16 sm:bottom-20 left-2 right-2 sm:left-auto sm:right-6 w-auto sm:w-[440px] h-[calc(100dvh-80px)] sm:h-[580px] max-h-[85vh] bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col z-50 overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200">
+        <div className="fixed bottom-16 sm:bottom-20 left-2 right-2 sm:left-auto sm:right-6 w-auto sm:w-[400px] h-[calc(100dvh-120px)] sm:h-[520px] max-h-[80vh] bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 flex flex-col z-50 overflow-hidden animate-in fade-in duration-150">
           {/* Header */}
-          <div className="bg-gradient-to-r from-teal-700 via-emerald-700 to-teal-800 text-white p-3.5 sm:p-4 flex items-center justify-between shadow-sm">
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
-                <Bot className="w-5 h-5 text-teal-200" />
+          <div className="bg-slate-900 text-white px-4 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-teal-500/20 text-teal-400 flex items-center justify-center">
+                <Bot className="w-4 h-4" />
               </div>
               <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="font-extrabold text-sm tracking-tight">HealthVerse AI</h3>
-                  <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500/30 text-emerald-100 border border-emerald-400/30">
-                    Online
-                  </span>
-                </div>
-                <p className="text-[10px] text-teal-100/90 font-medium">Continuity-of-Care & Clinical Triage Guide</p>
+                <h3 className="font-bold text-xs tracking-tight">HealthVerse AI</h3>
+                <span className="text-[10px] text-slate-400">Decision-Support Assistant</span>
               </div>
             </div>
 
-            <div className="flex items-center gap-1.5">
-              {/* Close Button */}
-              <button
-                onClick={() => setIsOpen(false)}
-                className="p-1.5 rounded-lg text-teal-100 hover:text-white hover:bg-white/10 transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
+            <button
+              onClick={() => setIsOpen(false)}
+              className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+              aria-label="Close chat"
+            >
+              <X className="w-4 h-4" />
+            </button>
           </div>
 
           {/* Safety Disclaimer Banner */}
-          <div className="bg-amber-50 dark:bg-amber-950/70 px-3.5 py-2 border-b border-amber-200 dark:border-amber-900/60 flex items-center gap-2 text-amber-900 dark:text-amber-200 text-[11px] leading-tight">
-            <ShieldAlert className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
-            <span>
-              Decision-support aid only. <strong>For medical emergencies, call 108 immediately.</strong>
-            </span>
+          <div className="bg-amber-500/10 dark:bg-amber-500/15 px-3 py-1.5 border-b border-amber-500/20 flex items-center gap-1.5 text-amber-900 dark:text-amber-200 text-[10px]">
+            <ShieldAlert className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+            <span>Decision aid only &bull; Emergency: <strong>Call 108</strong></span>
           </div>
 
           {/* Messages Feed */}
