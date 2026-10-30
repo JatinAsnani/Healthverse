@@ -5,6 +5,7 @@ import { getPendingSyncCount } from '../db/offlineDb.js';
 export const useAuthStore = create((set, get) => ({
   user: null,
   profile: null,
+  token: localStorage.getItem('healthverse_token') || null,
   isAuthenticated: false,
   isLoading: true,
   language: localStorage.getItem('healthverse_language') || 'en',
@@ -43,12 +44,17 @@ export const useAuthStore = create((set, get) => ({
   checkAuth: async () => {
     try {
       set({ isLoading: true });
-      const res = await fetch('/api/v1/auth/me', { credentials: 'include' });
+      const token = get().token || localStorage.getItem('healthverse_token');
+      const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
+      const res = await fetch('/api/v1/auth/me', { credentials: 'include', headers });
       if (res.ok) {
         const data = await res.json();
+        const activeToken = data.token || get().token || localStorage.getItem('healthverse_token');
+        if (data.token) localStorage.setItem('healthverse_token', data.token);
         set({
           user: data.user,
           profile: data.profile,
+          token: activeToken,
           isAuthenticated: true,
           language: data.user.language || 'en',
           isLoading: false
@@ -93,9 +99,13 @@ export const useAuthStore = create((set, get) => ({
       throw new Error(data.message || 'Login failed');
     }
 
+    if (data.token) {
+      localStorage.setItem('healthverse_token', data.token);
+    }
     set({
       user: data.user,
       profile: data.profile,
+      token: data.token || null,
       isAuthenticated: true,
       language: data.user.language || 'en'
     });
@@ -116,7 +126,8 @@ export const useAuthStore = create((set, get) => ({
       await fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'include' });
     } catch (e) {}
     localStorage.removeItem('healthverse_cached_user');
-    set({ user: null, profile: null, isAuthenticated: false });
+    localStorage.removeItem('healthverse_token');
+    set({ user: null, profile: null, token: null, isAuthenticated: false });
   }
 }));
 

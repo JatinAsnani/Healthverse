@@ -3,16 +3,18 @@ import { User, Staff, Patient, Caregiver } from '../models/index.js';
 
 export async function authenticate(req, res, next) {
   try {
-    let token = req.cookies?.accessToken;
-    if (!token && req.headers.authorization?.startsWith('Bearer ')) {
+    let token = null;
+    if (req.headers.authorization?.startsWith('Bearer ')) {
       token = req.headers.authorization.split(' ')[1];
+    } else if (req.cookies?.accessToken) {
+      token = req.cookies.accessToken;
     }
 
     let decoded = token ? verifyAccessToken(token) : null;
 
     // Seamless refresh attempt if access token is expired or absent, but refresh token is present
     if (!decoded) {
-      const refreshToken = req.cookies?.refreshToken || req.headers['x-refresh-token'];
+      const refreshToken = req.headers['x-refresh-token'] || req.cookies?.refreshToken;
       if (refreshToken) {
         const refreshDecoded = verifyRefreshToken(refreshToken);
         if (refreshDecoded) {

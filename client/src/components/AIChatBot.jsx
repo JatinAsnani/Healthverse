@@ -116,7 +116,8 @@ function extractDateFromText(text = '') {
 
 export const AIChatBot = () => {
   const navigate = useNavigate();
-  const { user, profile } = useAuthStore();
+  const { user, profile, token } = useAuthStore();
+  const isClinician = ['doctor', 'nurse', 'chw', 'hospital_admin'].includes(user?.role);
 
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
@@ -376,11 +377,15 @@ export const AIChatBot = () => {
         content: m.text
       }));
 
+      const activeToken = token || localStorage.getItem('healthverse_token');
+      const reqHeaders = { 'Content-Type': 'application/json' };
+      if (activeToken) {
+        reqHeaders['Authorization'] = 'Bearer ' + activeToken;
+      }
+
       const res = await fetch('/api/v1/ai/chat', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: reqHeaders,
         credentials: 'include',
         body: JSON.stringify({
           message: textToSend.trim(),
@@ -451,8 +456,6 @@ export const AIChatBot = () => {
       setIsLoading(false);
     }
   };
-
-  const isClinician = ['doctor', 'nurse', 'chw', 'hospital_admin'].includes(user?.role);
 
   const quickPrompts = isClinician
     ? [

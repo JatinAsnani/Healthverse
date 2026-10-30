@@ -7,18 +7,21 @@ const router = Router();
 
 /**
  * Optional authentication middleware - reliably attaches user/patient/staff if present without rejecting guests
+ * Prioritizes Authorization: Bearer <token> over cookies to avoid stale cross-session bleeding
  */
 async function optionalAuth(req, res, next) {
   try {
-    let token = req.cookies?.accessToken;
-    if (!token && req.headers.authorization?.startsWith('Bearer ')) {
+    let token = null;
+    if (req.headers.authorization?.startsWith('Bearer ')) {
       token = req.headers.authorization.split(' ')[1];
+    } else if (req.cookies?.accessToken) {
+      token = req.cookies.accessToken;
     }
 
     let decoded = token ? verifyAccessToken(token) : null;
 
     if (!decoded) {
-      const refreshToken = req.cookies?.refreshToken || req.headers['x-refresh-token'];
+      const refreshToken = req.headers['x-refresh-token'] || req.cookies?.refreshToken;
       if (refreshToken) {
         decoded = verifyRefreshToken(refreshToken);
       }
@@ -77,7 +80,8 @@ router.post('/chat', optionalAuth, async (req, res, next) => {
       return res.status(400).json({ error: 'Message text is required.' });
     }
 
-    // Determine if the caller is a Clinician (Doctor, Nurse, CHW, Hospital Admin)
+    // Determine caller role and clinician vs patient status
+    // Trust authenticated req.user if available; otherwise use context.role
     const effectiveRole = req.user?.role || context.role || 'patient';
     const isClinician = ['doctor', 'nurse', 'chw', 'hospital_admin'].includes(effectiveRole);
     const clinicianName = isClinician
@@ -94,47 +98,88 @@ router.post('/chat', optionalAuth, async (req, res, next) => {
       .limit(8);
     const registeredPatientsList = allPatients.map(p => `${p.name} (${p.patientId})`);
 
+    // Identify current user's patient profile if they are a patient
+    let currentUserPatient = null;
+    if (req.patient) {
+      currentUserPatient = req.patient;
+    } else if (req.user?.role === 'patient') {
+      currentUserPatient = await Patient.findOne({ user: req.user._id }).populate('hospital');
+    } else if (context.patientId && !isClinician) {
+      currentUserPatient = await Patient.findById(context.patientId).populate('hospital');
+    }
+
     // Check if the user is asking about a specific patient by name or ID (e.g. "krishna ki report batana", "rajesh verma ki report")
     const targetPatientQuery = extractTargetPatientQuery(message);
     let resolvedPatient = null;
     let targetPatientNotFound = null;
+    let patientPrivacyBlocked = false;
+    let blockedPatientName = null;
 
-    if (targetPatientQuery) {
-      if (targetPatientQuery.type === 'id') {
-        resolvedPatient = await Patient.findOne({
-          patientId: new RegExp(`^${targetPatientQuery.query}$`, 'i')
-        }).populate('hospital');
+    if (isClinician) {
+      // Clinicians (Doctors, Nurses, Admins) CAN query any patient in the hospital database
+      if (targetPatientQuery) {
+        if (targetPatientQuery.type === 'id') {
+          resolvedPatient = await Patient.findOne({
+            patientId: new RegExp(`^${targetPatientQuery.query}$`, 'i')
+          }).populate('hospital');
+        } else {
+          // Search by name (case-insensitive regex)
+          resolvedPatient = await Patient.findOne({
+            name: new RegExp(targetPatientQuery.query, 'i')
+          }).populate('hospital');
+        }
+
+        if (!resolvedPatient) {
+          targetPatientNotFound = targetPatientQuery.query;
+        }
+      }
+    } else {
+      // Caller is a PATIENT (or caregiver for their own ward)
+      // STRICT PRIVACY & DPDP ACT 2023 RULE:
+      // A patient can ONLY view their OWN records. Never another patient's files!
+      if (targetPatientQuery) {
+        const myName = (currentUserPatient?.name || context.patientName || context.userName || '').toLowerCase().trim();
+        const myCode = (currentUserPatient?.patientId || context.patientCode || '').toUpperCase().trim();
+        const queryStr = (targetPatientQuery.query || '').trim();
+
+        let isSelf = false;
+        if (targetPatientQuery.type === 'id') {
+          isSelf = Boolean(myCode && myCode === queryStr.toUpperCase());
+        } else {
+          const queryLower = queryStr.toLowerCase();
+          if (myName && (myName.includes(queryLower) || queryLower.includes(myName))) {
+            isSelf = true;
+          }
+        }
+
+        if (isSelf) {
+          resolvedPatient = currentUserPatient;
+        } else {
+          // Cross-patient unauthorized lookup attempt: strictly refuse!
+          patientPrivacyBlocked = true;
+          blockedPatientName = targetPatientQuery.query;
+          resolvedPatient = null;
+        }
       } else {
-        // Search by name (case-insensitive regex)
-        resolvedPatient = await Patient.findOne({
-          name: new RegExp(targetPatientQuery.query, 'i')
-        }).populate('hospital');
-      }
-
-      if (!resolvedPatient) {
-        targetPatientNotFound = targetPatientQuery.query;
+        // Patient asking for their own medical report or continuity instructions
+        resolvedPatient = currentUserPatient;
       }
     }
 
-    // If no target patient was extracted from the message, and the user is a patient, resolve their own record
-    if (!resolvedPatient && !targetPatientQuery) {
-      if (req.patient) {
-        resolvedPatient = req.patient;
-      } else if (context.patientId && !isClinician) {
-        resolvedPatient = await Patient.findById(context.patientId).populate('hospital');
-      } else if (req.user?.role === 'patient') {
-        resolvedPatient = await Patient.findOne({ user: req.user._id }).populate('hospital');
-      }
-    }
-
-    let patientName = resolvedPatient ? resolvedPatient.name : (!isClinician ? (context.patientName || context.userName) : null);
-    let patientCode = resolvedPatient ? resolvedPatient.patientId : (!isClinician ? context.patientCode : null);
-    let patientId = resolvedPatient ? resolvedPatient._id.toString() : (!isClinician ? context.patientId : null);
+    let patientName = !isClinician
+      ? (resolvedPatient ? resolvedPatient.name : (context.patientName || context.userName || null))
+      : (resolvedPatient ? resolvedPatient.name : null);
+    let patientCode = !isClinician
+      ? (resolvedPatient ? resolvedPatient.patientId : context.patientCode)
+      : (resolvedPatient ? resolvedPatient.patientId : null);
+    let patientId = !isClinician
+      ? (resolvedPatient ? resolvedPatient._id.toString() : context.patientId)
+      : (resolvedPatient ? resolvedPatient._id.toString() : null);
     let diagnosis = context.diagnosis;
 
     let medicalReport = null;
 
-    if (resolvedPatient) {
+    if (resolvedPatient && !patientPrivacyBlocked) {
       const [latestDischarge, prescriptions] = await Promise.all([
         Discharge.findOne({ patient: resolvedPatient._id })
           .sort({ dischargeDate: -1 })
@@ -177,8 +222,8 @@ router.post('/chat', optionalAuth, async (req, res, next) => {
               { medicine: 'Tab. Pantoprazole 40mg', dosage: '1 tablet morning', timing: 'empty stomach', critical: false }
             ]
       };
-    } else if (!isClinician && patientName) {
-      // Only generate fallback sample report if caller is an actual patient
+    } else if (!isClinician && patientName && !patientPrivacyBlocked) {
+      // Only generate fallback sample report if caller is an actual patient and NOT privacy-blocked
       medicalReport = {
         patientName: patientName,
         patientId: patientCode || 'HV-PATIENT-01',
@@ -208,6 +253,8 @@ router.post('/chat', optionalAuth, async (req, res, next) => {
       patientName: patientName || null,
       patientCode: patientCode || null,
       patientId: patientId || null,
+      patientPrivacyBlocked,
+      blockedPatientName,
       targetPatientNotFound,
       registeredPatients: registeredPatientsList,
       diagnosis: diagnosis || null,

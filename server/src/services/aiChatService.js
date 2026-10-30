@@ -40,7 +40,11 @@ SAFETY AND ETHICAL PRINCIPLES (MANDATORY):
       * NEVER greet a clinician as a recovering patient, NEVER tell them they were admitted or discharged, and NEVER give them a personal medical discharge report!
       * When a clinician asks for a patient's report (e.g. "krishna ki report batana", "rajesh verma ki report"):
         - If the patient is found in context, provide that specific patient's verified clinical chart, diagnosis, and medications to the doctor.
-        - If the patient is NOT found in hospital database, inform the doctor respectfully that no patient with that name was found, and offer to look up any of the hospital's registered patients.`;
+        - If the patient is NOT found in hospital database, inform the doctor respectfully that no patient with that name was found, and offer to look up any of the hospital's registered patients.
+11. PATIENT PRIVACY & MEDICAL CONFIDENTIALITY (DPDP ACT 2023 - STRICT):
+    - When communicating with a PATIENT, they must ONLY have access to their OWN personal medical discharge and care plan.
+    - If a patient asks for someone else's medical records (e.g. "devendra ki report batana", "krishna ki report"): STRICTLY REFUSE citing medical confidentiality and the Digital Personal Data Protection (DPDP) Act 2023.
+    - NEVER reveal any other patient's diagnosis, medicines, or hospital record to a patient under any circumstances!`;
 
 /**
  * Extract requested date, time, and consultation mode from natural language message
@@ -58,24 +62,29 @@ export function extractTargetPatientQuery(text = '') {
     return { type: 'id', query: idMatch[1].toUpperCase() };
   }
 
-  // 2. "[Name] ki / ka / ke report / discharge / summary / record / status / chart"
-  const kiMatch = lower.match(/(?:patient\s+)?([a-z\s]{2,30}?)\s+(?:ki|ka|ke|ko)\s+(?:report|discharge|summary|record|history|status|file|chart|details|bimari)/i);
+  const selfKeywords = [
+    'meri', 'mera', 'mere', 'apni', 'apna', 'apne', 'khud ki', 'khud ka', 'khud ke',
+    'my', 'mine', 'own', 'me', 'iski', 'uski', 'kisi', 'patient'
+  ];
+
+  // 2. "[Name] ki / ka / ke report / discharge / summary / record / status / chart / dawai / bimari / tabiyat"
+  const kiMatch = lower.match(/(?:patient\s+)?([a-z\s]{2,30}?)\s+(?:ki|ka|ke|ko)\s+(?:report|discharge|summary|record|history|status|file|chart|details|bimari|dawai|prescription|tabiyat)/i);
   if (kiMatch) {
     const raw = kiMatch[1].trim()
-      .replace(/^(mujhe|hume|doctor|bhai|plz|please|kripya|zara)\s+/i, '')
+      .replace(/^(mujhe|hume|doctor|doctor sahab|dr|bhai|plz|please|kripya|zara|sir|madam|bhaiya)\s+/i, '')
       .trim();
-    if (raw && !['meri', 'mera', 'apni', 'apna', 'iski', 'uski', 'kisi', 'patient'].includes(raw)) {
+    if (raw && !selfKeywords.includes(raw)) {
       return { type: 'name', query: raw };
     }
   }
 
   // 3. "report / discharge / summary / chart / status of / for [Name]"
-  const ofMatch = lower.match(/(?:report|discharge|summary|chart|status|record|history|details)\s+(?:of|for|about)\s+([a-z\s]{2,30})/i);
+  const ofMatch = lower.match(/(?:report|discharge|summary|chart|status|record|history|details|prescription)\s+(?:of|for|about)\s+([a-z\s]{2,30})/i);
   if (ofMatch) {
     const raw = ofMatch[1].trim()
       .replace(/\s+(?:batao|batana|dikhao|show|please|plz).*$/i, '')
       .trim();
-    if (raw && !['me', 'mine', 'patient', 'him', 'her'].includes(raw)) {
+    if (raw && !selfKeywords.includes(raw)) {
       return { type: 'name', query: raw };
     }
   }
@@ -84,7 +93,7 @@ export function extractTargetPatientQuery(text = '') {
   const patientMatch = lower.match(/\bpatient\s+([a-z\s]{2,30}?)(?:\s+(?:ki|ka|report|record|chart)|$)/i);
   if (patientMatch) {
     const raw = patientMatch[1].trim();
-    if (raw && !['details', 'report', 'record', 'summary', 'chart'].includes(raw)) {
+    if (raw && !['details', 'report', 'record', 'summary', 'chart', 'prescription', ...selfKeywords].includes(raw)) {
       return { type: 'name', query: raw };
     }
   }
@@ -227,13 +236,15 @@ function buildSessionContextNote(context = {}) {
     const patientName = context.patientName || context.userName;
     const patientCode = context.patientCode || context.patientId;
 
-    if (patientName) {
+    if (context.patientPrivacyBlocked) {
+      note += `CRITICAL PRIVACY VIOLATION DETECTED: The user is a PATIENT (${patientName || 'Current Patient'}) who attempted to query another patient's confidential health records ("${context.blockedPatientName}"). Under India's Digital Personal Data Protection (DPDP) Act 2023 and medical confidentiality ethics, YOU MUST STRICTLY REFUSE TO REVEAL ANY OTHER PATIENT'S MEDICAL DETAILS! Firmly and respectfully remind them that hospital records are strictly confidential and each patient can only access their own records. Invite them to view their own report ("mera medical report batana"). `;
+    } else if (patientName) {
       note += `CURRENT VERIFIED LOGGED-IN PATIENT: Name="${patientName}", Patient ID="${patientCode || 'HV-PATIENT'}", Role="patient". `;
       note += `The person chatting with you IS ${patientName}. When they ask for their name ("whats my name", "who am i", "mera naam kya hai"), YOU MUST EXPLICITLY AND PROUDLY STATE THEIR REAL NAME (${patientName}) AND PATIENT ID (${patientCode || 'N/A'})! `;
       note += `When booking an appointment, this appointment is scheduled directly for ${patientName}. `;
     }
 
-    if (context.medicalReport) {
+    if (context.medicalReport && !context.patientPrivacyBlocked) {
       const mr = context.medicalReport;
       note += `VERIFIED PATIENT MEDICAL REPORT: Hospital="${mr.hospitalName}", Doctor="${mr.doctorName}", Admission="${mr.admissionDate}", Discharge="${mr.dischargeDate}", Diagnosis="${mr.diagnosis}", Summary="${mr.summary}", Diet="${mr.dietInstructions}", Activity="${mr.activityInstructions}", WarningSigns="${(mr.warningSigns || []).join(', ')}", PrescribedMedicines="${(mr.prescriptions || []).map(p => `${p.medicine} (${p.dosage}, ${p.timing})`).join('; ')}". When the user asks about their medical report ("mera medical report batana", "show my report", "meri bimari kya hai", "meri discharge summary"), explain and summarize these verified details clearly and warmly in the user's language! `;
     }
@@ -493,6 +504,22 @@ Your symptoms indicate a potentially serious medical emergency that requires imm
 - If having chest pain, rest in a comfortable seated position with support behind your back.
 
 *HealthVerse AI is an early-warning decision aid and does not replace emergency medical services.*`;
+  }
+
+  // 2. Patient Attempted Unauthorized Cross-Patient Lookup (DPDP Act 2023 Enforcement)
+  if (context.patientPrivacyBlocked) {
+    const patientName = context.patientName || context.userName || 'Patient';
+    const targetName = context.blockedPatientName || 'anya patient';
+    return `🔒 **Medical Data Privacy & Confidentiality Notice (DPDP Act 2023)**
+
+Namaste **${patientName}** ji! 
+
+Hospital safety protocols aur **Digital Personal Data Protection (DPDP) Act 2023** ke anusar, aap keval **apna khud ka verified hospital record** dekh sakte hain.
+
+Kisi dusre mareez (**${targetName}**) ka clinical record confidential hota hai aur keval unke treating doctors ya authorized hospital staff hi use access kar sakte hain.
+
+Aap apna khud ka medical discharge summary dekhne ke liye likhein:
+👉 *"Mera medical report batana"* ya niche **"Meri medical report"** button par tap karein.`;
   }
 
   // 2. Specific Patient Record Not Found (e.g. Doctor or user asked for "krishna ki report")
