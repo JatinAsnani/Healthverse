@@ -33,6 +33,7 @@ export function CHWView() {
     gender: 'female',
     language: 'gu',
     address: 'Sector 2, Village Mandvi',
+    password: '',
     medicalHistoryNotes: ''
   });
 
@@ -70,6 +71,7 @@ export function CHWView() {
             gender: newPatient.gender,
             language: newPatient.language,
             address: newPatient.address,
+            password: newPatient.password || undefined,
             medicalHistory: [newPatient.medicalHistoryNotes || 'Field registration']
           })
         });
@@ -262,6 +264,18 @@ export function CHWView() {
                   </select>
                 </div>
               </div>
+              <div>
+                <label className="font-bold uppercase block mb-1 text-slate-700 dark:text-slate-300">Password</label>
+                <input
+                  type="password"
+                  placeholder="Create patient password (min 6 chars)"
+                  value={newPatient.password || ''}
+                  onChange={(e) => setNewPatient({ ...newPatient, password: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-medium"
+                />
+              </div>
+
+
 
               <div>
                 <label className="font-bold uppercase block mb-1 text-slate-700 dark:text-slate-300">Village / Ward Address</label>

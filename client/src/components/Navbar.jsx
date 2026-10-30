@@ -178,7 +178,7 @@ export function Navbar() {
                 to="/login"
                 className="btn-touch bg-teal-600 hover:bg-teal-700 text-white text-xs py-2 px-4 shadow-sm"
               >
-                Sign In
+                Log In
               </Link>
             )}
           </div>
@@ -275,7 +275,7 @@ export function Navbar() {
               onClick={() => setMobileMenuOpen(false)}
               className="block w-full py-2.5 text-center font-bold bg-teal-600 text-white rounded-xl shadow"
             >
-              Sign In
+              Log In
             </Link>
           )}
         </div>

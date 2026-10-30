@@ -249,9 +249,32 @@ export function PatientDetailView() {
     }
   };
 
-  // Care Plan Milestone Toggle
-  const handleCarePlanToggle = (itemId, nextStatus) => {
-    console.log(`Care plan milestone ${itemId} marked as ${nextStatus}`);
+  // Care Plan Milestone Toggle (Live updates database)
+  const handleCarePlanToggle = async (itemId, nextStatus) => {
+    const isInv = data?.investigations?.some(i => i._id === itemId);
+    const isFup = data?.followups?.some(f => f._id === itemId);
+
+    try {
+      if (isInv) {
+        await fetch(`/api/v1/investigations/${itemId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ status: nextStatus === 'completed' ? 'resulted' : 'ordered' })
+        });
+        await fetchPatientChart();
+      } else if (isFup) {
+        await fetch(`/api/v1/followups/${itemId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ status: nextStatus === 'completed' ? 'completed' : 'scheduled' })
+        });
+        await fetchPatientChart();
+      }
+    } catch (e) {
+      console.error('Error updating milestone in database:', e);
+    }
   };
 
   // Clinical Note Submit
@@ -285,12 +308,16 @@ export function PatientDetailView() {
   }, [data?.recentSymptoms]);
 
   const medicationList = useMemo(() => {
-    return getMedicationAdherenceList(data?.prescriptions || []);
-  }, [data?.prescriptions]);
+    return getMedicationAdherenceList(data?.prescriptions || [], data?.adherenceLogs || []);
+  }, [data?.prescriptions, data?.adherenceLogs]);
 
   const carePlanItems = useMemo(() => {
-    return getCarePlanChecklist(activeDischarge?.diagnosis);
-  }, [activeDischarge]);
+    return getCarePlanChecklist(
+      activeDischarge?.diagnosis,
+      data?.investigations || [],
+      data?.followups || []
+    );
+  }, [activeDischarge, data?.investigations, data?.followups]);
 
   const timelineEvents = useMemo(() => {
     return getClinicalTimelineEvents({

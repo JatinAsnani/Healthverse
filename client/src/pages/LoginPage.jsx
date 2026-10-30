@@ -20,7 +20,7 @@ export function LoginPage() {
     name: '',
     phone: '',
     role: 'patient',
-    password: 'password123',
+    password: '',
     gender: 'male',
     dob: '1985-06-15',
     address: 'Rural Cluster 3, Taluka Mandvi'
@@ -109,7 +109,7 @@ export function LoginPage() {
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
-              Sign In
+              Log In
             </button>
             <button
               onClick={() => setActiveTab('register')}
@@ -166,7 +166,7 @@ export function LoginPage() {
                   disabled={isLoading}
                   className="w-full btn-touch bg-teal-600 hover:bg-teal-700 text-white shadow-md shadow-teal-600/30 text-sm font-bold tracking-wide mt-2"
                 >
-                  {isLoading ? 'Verifying...' : 'Sign In to HealthVerse'}
+                  {isLoading ? 'Verifying...' : 'Log In to HealthVerse'}
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </form>
@@ -374,7 +374,7 @@ export function LoginPage() {
                   placeholder="Create password (min 6 characters)"
                 />
                 <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block">
-                  Default: <span className="font-mono text-teal-600 dark:text-teal-400 font-semibold">password123</span> (or enter your custom password)
+                  Securely encrypted with bcrypt. Only this password can log in.
                 </span>
               </div>
 

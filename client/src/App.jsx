@@ -49,7 +49,7 @@ class ErrorBoundary extends React.Component {
               }}
               className="btn-touch bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold w-full py-2.5"
             >
-              Go to Sign In
+              Go to Log In
             </button>
           </div>
         </div>

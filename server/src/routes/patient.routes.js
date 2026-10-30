@@ -14,7 +14,8 @@ import {
   RiskAssessment,
   Alert,
   PatientCaregiver,
-  Consent
+  Consent,
+  AdherenceLog
 } from '../models/index.js';
 import { logAuditEvent } from '../utils/auditLogger.js';
 
@@ -141,7 +142,8 @@ router.get('/:id', authenticate, requirePatientAccess('id'), async (req, res, ne
       riskAssessments,
       alerts,
       caregivers,
-      consents
+      consents,
+      adherenceLogs
     ] = await Promise.all([
       Discharge.find({ patient: patient._id }).populate('treatingDoctor', 'name').sort({ dischargeDate: -1 }),
       Prescription.find({ patient: patient._id }).sort({ startDate: -1 }),
@@ -151,7 +153,8 @@ router.get('/:id', authenticate, requirePatientAccess('id'), async (req, res, ne
       RiskAssessment.find({ patient: patient._id }).sort({ createdAt: -1 }).limit(10),
       Alert.find({ patient: patient._id }).populate('reviewer', 'name').sort({ createdAt: -1 }),
       PatientCaregiver.find({ patient: patient._id }).populate('caregiver').lean(),
-      Consent.find({ patient: patient._id }).sort({ grantedAt: -1 })
+      Consent.find({ patient: patient._id }).sort({ grantedAt: -1 }),
+      AdherenceLog.find({ patient: patient._id }).populate('prescription').sort({ dueAt: -1 }).limit(100)
     ]);
 
     await logAuditEvent({
@@ -177,7 +180,8 @@ router.get('/:id', authenticate, requirePatientAccess('id'), async (req, res, ne
         riskAssessments,
         alerts,
         caregivers,
-        consents
+        consents,
+        adherenceLogs
       }
     });
   } catch (err) {
@@ -230,14 +234,21 @@ router.post(
 
       // Check if user account already exists with this phone
       let user = await User.findOne({ phone: phone.trim() });
+      const rawPassword = (req.body.password && typeof req.body.password === 'string' && req.body.password.trim().length >= 6)
+        ? req.body.password.trim()
+        : 'password123';
+      const passwordHash = await bcrypt.hash(rawPassword, 10);
+
       if (!user) {
-        const defaultPassword = await bcrypt.hash('password123', 10);
         user = await User.create({
           phone: phone.trim(),
-          passwordHash: defaultPassword,
+          passwordHash,
           role: 'patient',
           language
         });
+      } else if (req.body.password && typeof req.body.password === 'string' && req.body.password.trim().length >= 6) {
+        user.passwordHash = passwordHash;
+        await user.save();
       }
 
       const patientId = `HV-${Date.now().toString().slice(-6)}`;
