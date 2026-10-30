@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { processAIChat } from '../services/aiChatService.js';
+import { processAIChat, extractTargetPatientQuery } from '../services/aiChatService.js';
 import { verifyAccessToken, verifyRefreshToken } from '../utils/token.js';
 import { User, Staff, Patient, Caregiver, Discharge, Prescription } from '../models/index.js';
 
@@ -77,22 +77,59 @@ router.post('/chat', optionalAuth, async (req, res, next) => {
       return res.status(400).json({ error: 'Message text is required.' });
     }
 
+    // Determine if the caller is a Clinician (Doctor, Nurse, CHW, Hospital Admin)
+    const effectiveRole = req.user?.role || context.role || 'patient';
+    const isClinician = ['doctor', 'nurse', 'chw', 'hospital_admin'].includes(effectiveRole);
+    const clinicianName = isClinician
+      ? (req.staff?.name || req.user?.name || context.clinicianName || context.userName || 'Doctor')
+      : null;
+
     // Retrieve active doctors for context
     const doctors = await Staff.find({ role: 'doctor', active: true })
       .select('name specialization phone');
 
-    // Resolve patient details
-    let resolvedPatient = req.patient;
-    if (!resolvedPatient && context.patientId) {
-      resolvedPatient = await Patient.findById(context.patientId).populate('hospital');
-    }
-    if (!resolvedPatient && req.user?.role === 'patient') {
-      resolvedPatient = await Patient.findOne({ user: req.user._id }).populate('hospital');
+    // Fetch sample registered patients for suggestions if a patient is queried or not found
+    const allPatients = await Patient.find({ active: { $ne: false } })
+      .select('name patientId')
+      .limit(8);
+    const registeredPatientsList = allPatients.map(p => `${p.name} (${p.patientId})`);
+
+    // Check if the user is asking about a specific patient by name or ID (e.g. "krishna ki report batana", "rajesh verma ki report")
+    const targetPatientQuery = extractTargetPatientQuery(message);
+    let resolvedPatient = null;
+    let targetPatientNotFound = null;
+
+    if (targetPatientQuery) {
+      if (targetPatientQuery.type === 'id') {
+        resolvedPatient = await Patient.findOne({
+          patientId: new RegExp(`^${targetPatientQuery.query}$`, 'i')
+        }).populate('hospital');
+      } else {
+        // Search by name (case-insensitive regex)
+        resolvedPatient = await Patient.findOne({
+          name: new RegExp(targetPatientQuery.query, 'i')
+        }).populate('hospital');
+      }
+
+      if (!resolvedPatient) {
+        targetPatientNotFound = targetPatientQuery.query;
+      }
     }
 
-    let patientName = resolvedPatient?.name || context.patientName || context.userName;
-    let patientCode = resolvedPatient?.patientId || context.patientCode;
-    let patientId = resolvedPatient?._id?.toString() || context.patientId;
+    // If no target patient was extracted from the message, and the user is a patient, resolve their own record
+    if (!resolvedPatient && !targetPatientQuery) {
+      if (req.patient) {
+        resolvedPatient = req.patient;
+      } else if (context.patientId && !isClinician) {
+        resolvedPatient = await Patient.findById(context.patientId).populate('hospital');
+      } else if (req.user?.role === 'patient') {
+        resolvedPatient = await Patient.findOne({ user: req.user._id }).populate('hospital');
+      }
+    }
+
+    let patientName = resolvedPatient ? resolvedPatient.name : (!isClinician ? (context.patientName || context.userName) : null);
+    let patientCode = resolvedPatient ? resolvedPatient.patientId : (!isClinician ? context.patientCode : null);
+    let patientId = resolvedPatient ? resolvedPatient._id.toString() : (!isClinician ? context.patientId : null);
     let diagnosis = context.diagnosis;
 
     let medicalReport = null;
@@ -140,7 +177,8 @@ router.post('/chat', optionalAuth, async (req, res, next) => {
               { medicine: 'Tab. Pantoprazole 40mg', dosage: '1 tablet morning', timing: 'empty stomach', critical: false }
             ]
       };
-    } else if (patientName) {
+    } else if (!isClinician && patientName) {
+      // Only generate fallback sample report if caller is an actual patient
       medicalReport = {
         patientName: patientName,
         patientId: patientCode || 'HV-PATIENT-01',
@@ -160,15 +198,19 @@ router.post('/chat', optionalAuth, async (req, res, next) => {
       };
     }
 
-    // Merge session context if user is logged in
+    // Merge session context
     const sessionContext = {
       ...context,
-      role: req.user?.role || context.role || 'patient',
-      userName: patientName,
-      patientName: patientName,
-      patientCode: patientCode,
-      patientId: patientId,
-      diagnosis: diagnosis,
+      role: effectiveRole,
+      isClinician,
+      clinicianName,
+      userName: isClinician ? clinicianName : (patientName || 'User'),
+      patientName: patientName || null,
+      patientCode: patientCode || null,
+      patientId: patientId || null,
+      targetPatientNotFound,
+      registeredPatients: registeredPatientsList,
+      diagnosis: diagnosis || null,
       medicalReport: medicalReport,
       doctors: doctors.map(d => ({
         id: d._id.toString(),

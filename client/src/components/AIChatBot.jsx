@@ -387,11 +387,13 @@ export const AIChatBot = () => {
           history,
           context: {
             role: user?.role || 'patient',
+            isClinician,
+            clinicianName: isClinician ? (profile?.name || user?.name || user?.phone) : undefined,
             userName: profile?.name || user?.name || user?.phone,
-            patientName: profile?.name,
-            patientId: profile?._id,
-            patientCode: profile?.patientId,
-            diagnosis: profile?.medicalHistory?.[0] || profile?.diagnosis,
+            patientName: !isClinician ? profile?.name : undefined,
+            patientId: !isClinician ? profile?._id : undefined,
+            patientCode: !isClinician ? profile?.patientId : undefined,
+            diagnosis: !isClinician ? (profile?.medicalHistory?.[0] || profile?.diagnosis) : undefined,
             language: user?.preferredLanguage || profile?.language || 'en',
             doctors: doctorsList,
             requestedDate: localParsed.targetDate || undefined,
@@ -450,12 +452,22 @@ export const AIChatBot = () => {
     }
   };
 
-  const quickPrompts = [
-    { label: '💊 Medication help', prompt: 'Why is it dangerous to stop my heart and blood pressure medicines?' },
-    { label: '📋 PM-JAY documents', prompt: 'What documents are required to apply for PM-JAY Ayushman Bharat?' },
-    { label: '🩹 Wound care rules', prompt: 'What are the main rules for caring for my surgical wound at home?' },
-    { label: '🚨 Chest pain emergency', prompt: 'I feel sudden chest heaviness and breathlessness. What should I do?' }
-  ];
+  const isClinician = ['doctor', 'nurse', 'chw', 'hospital_admin'].includes(user?.role);
+
+  const quickPrompts = isClinician
+    ? [
+        { label: '📋 Rajesh Verma ki report', prompt: 'Rajesh Verma ki report batana' },
+        { label: '👥 Registered Patients', prompt: 'Hospital ke active registered patients ki list dikhao' },
+        { label: '⚠️ Active Alerts', prompt: 'Hospital ke active clinical alerts batao' },
+        { label: '📅 Today Appointments', prompt: 'Aaj ke scheduled patient followups dikhao' }
+      ]
+    : [
+        { label: '📋 Meri medical report', prompt: 'Mera medical report batana' },
+        { label: '💊 Medication help', prompt: 'Why is it dangerous to stop my heart and blood pressure medicines?' },
+        { label: '📋 PM-JAY documents', prompt: 'What documents are required to apply for PM-JAY Ayushman Bharat?' },
+        { label: '🩹 Wound care rules', prompt: 'What are the main rules for caring for my surgical wound at home?' },
+        { label: '🚨 Chest pain emergency', prompt: 'I feel sudden chest heaviness and breathlessness. What should I do?' }
+      ];
 
   return (
     <>
