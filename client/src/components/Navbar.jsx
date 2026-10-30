@@ -108,20 +108,20 @@ export function Navbar() {
 
   return (
     <>
-      <nav className="bg-white/95 dark:bg-slate-900/95 border-b border-slate-200 dark:border-slate-800/80 sticky top-0 z-40 shadow-sm dark:shadow-slate-950/40 backdrop-blur-md transition-colors duration-200">
+      <nav className="bg-white/80 dark:bg-slate-900/80 border-b border-slate-200/60 dark:border-slate-800/60 sticky top-0 z-40 backdrop-blur-md transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-14">
             {/* Brand Logo & Name */}
             <div className="flex items-center gap-3">
-              <Link to="/" className="flex items-center gap-2 group">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-teal-600 to-emerald-500 flex items-center justify-center text-white shadow-md shadow-teal-500/20 group-hover:scale-105 transition-transform">
-                  <HeartPulse className="w-6 h-6" />
+              <Link to="/" className="flex items-center gap-2.5 group">
+                <div className="w-8 h-8 rounded-lg bg-teal-600 dark:bg-teal-500 flex items-center justify-center text-white shadow-xs group-hover:scale-105 transition-transform">
+                  <HeartPulse className="w-4 h-4" />
                 </div>
                 <div>
-                  <span className="font-extrabold text-lg tracking-tight bg-gradient-to-r from-teal-600 to-emerald-500 dark:from-teal-400 dark:to-emerald-400 bg-clip-text text-transparent">
+                  <span className="font-bold text-base tracking-tight text-slate-900 dark:text-slate-100">
                     HealthVerse
                   </span>
-                  <span className="hidden sm:block text-[10px] uppercase tracking-wider font-semibold text-slate-500 dark:text-slate-400 -mt-1">
+                  <span className="hidden sm:block text-[9px] uppercase tracking-wider font-semibold text-slate-400 dark:text-slate-500 -mt-0.5">
                     Continuity of Care
                   </span>
                 </div>
@@ -129,34 +129,26 @@ export function Navbar() {
 
               {/* Role Badge */}
               {isAuthenticated && (
-                <span className="hidden md:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-800">
+                <span className="hidden md:inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 border border-teal-200/60 dark:border-teal-800/60">
                   {t(`roles.${role}`, role)}
                 </span>
               )}
             </div>
 
             {/* Desktop Controls */}
-            <div className="hidden md:flex items-center gap-3">
+            <div className="hidden md:flex items-center gap-2">
               {/* Online / Offline & Sync Drawer Button */}
               <div className="relative" ref={syncRef}>
                 <button
                   onClick={() => setIsSyncPopoverOpen(!isSyncPopoverOpen)}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
-                    isOnline
-                      ? 'bg-emerald-50/80 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/80 hover:bg-emerald-100/70'
-                      : 'bg-rose-50/80 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800/80 hover:bg-rose-100/70'
-                  }`}
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border border-slate-200/70 dark:border-slate-800/70 bg-slate-50/80 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all text-slate-700 dark:text-slate-300"
                   aria-label="Toggle sync status details"
                 >
-                  {isOnline ? (
-                    <Wifi className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                  ) : (
-                    <WifiOff className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
-                  )}
+                  <span className={`w-2 h-2 rounded-full ${isOnline ? 'bg-emerald-500' : 'bg-rose-500 animate-pulse'}`} />
                   <span>{isOnline ? t('online') : t('offline')}</span>
 
                   {pendingSyncCount > 0 && (
-                    <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-500 text-white animate-pulse">
+                    <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-500 text-white font-tabular">
                       {pendingSyncCount}
                     </span>
                   )}
@@ -200,7 +192,7 @@ export function Navbar() {
                     <button
                       onClick={handleSyncNow}
                       disabled={!isOnline || isSyncing}
-                      className="w-full btn-touch min-h-[40px] py-2 bg-teal-600 hover:bg-teal-700 disabled:opacity-50 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-2 transition-colors shadow-sm"
+                      className="w-full btn-touch min-h-[38px] py-2 bg-teal-600 hover:bg-teal-700 disabled:opacity-50 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-2 transition-colors shadow-xs"
                     >
                       <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
                       <span>{isSyncing ? 'Synchronising...' : 'Sync Now'}</span>
@@ -213,7 +205,7 @@ export function Navbar() {
               <div className="relative" ref={langRef}>
                 <button
                   onClick={() => setIsLangPopoverOpen(!isLangPopoverOpen)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-200 transition-colors"
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-slate-200/70 dark:border-slate-800/70 bg-slate-50/80 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 transition-colors"
                   aria-label="Select application language"
                 >
                   <Languages className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
@@ -248,54 +240,57 @@ export function Navbar() {
                 onClick={toggleTheme}
                 aria-label={theme === 'dark' ? 'Switch to Light mode' : 'Switch to Dark mode'}
                 title={theme === 'dark' ? 'Switch to Light mode' : 'Switch to Dark mode'}
-                className="p-2 rounded-xl border transition-all duration-200 flex items-center justify-center bg-slate-100 hover:bg-slate-200 border-slate-200 text-amber-500 dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-700 dark:text-cyan-300 focus:outline-none focus:ring-2 focus:ring-teal-500 shadow-sm"
+                className="p-1.5 rounded-lg border border-slate-200/70 dark:border-slate-800/70 bg-slate-50/80 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors"
               >
                 {theme === 'dark' ? (
-                  <Moon className="w-4 h-4 text-cyan-400" />
+                  <Moon className="w-3.5 h-3.5" />
                 ) : (
-                  <Sun className="w-4 h-4 text-amber-500" />
+                  <Sun className="w-3.5 h-3.5" />
                 )}
               </button>
 
               {/* Role Links & User Profile */}
               {isAuthenticated ? (
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 pl-1">
                   <Link
                     to="/education"
-                    className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${
+                    className={`text-xs font-semibold px-2.5 py-1 rounded-lg transition-colors ${
                       location.pathname === '/education'
                         ? 'bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300'
-                        : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                     }`}
                   >
                     {t('nav.education')}
                   </Link>
 
-                  <div className="h-4 w-px bg-slate-200 dark:bg-slate-700" />
+                  <div className="h-4 w-px bg-slate-200/70 dark:bg-slate-800/70" />
 
                   <div className="flex items-center gap-2">
-                    <div className="text-right">
-                      <div className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate max-w-[120px]">
+                    <div className="w-7 h-7 rounded-lg bg-teal-50 dark:bg-teal-950/70 text-teal-700 dark:text-teal-300 font-bold text-[11px] flex items-center justify-center border border-teal-200/60 dark:border-teal-800/60">
+                      {profile?.name ? profile.name.slice(0, 2).toUpperCase() : 'U'}
+                    </div>
+                    <div className="text-left hidden lg:block">
+                      <div className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate max-w-[110px] leading-tight">
                         {profile?.name || user?.phone}
                       </div>
-                      <div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase">
+                      <div className="text-[9px] text-slate-400 uppercase tracking-wider font-semibold">
                         {user?.role}
                       </div>
                     </div>
                     <button
                       onClick={handleLogout}
-                      className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
                       title={t('nav.logout')}
                       aria-label="Log Out"
                     >
-                      <LogOut className="w-4 h-4" />
+                      <LogOut className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>
               ) : (
                 <Link
                   to="/login"
-                  className="btn-touch bg-teal-600 hover:bg-teal-700 text-white text-xs py-2 px-4 shadow-sm"
+                  className="btn-touch min-h-[36px] bg-teal-600 hover:bg-teal-700 text-white text-xs py-1.5 px-3.5 rounded-xl shadow-xs"
                 >
                   Log In
                 </Link>
@@ -303,32 +298,32 @@ export function Navbar() {
             </div>
 
             {/* Mobile Header Controls */}
-            <div className="flex md:hidden items-center gap-2">
+            <div className="flex md:hidden items-center gap-1.5">
               <button
                 onClick={toggleTheme}
                 aria-label={theme === 'dark' ? 'Switch to Light mode' : 'Switch to Dark mode'}
-                className="p-2 rounded-xl border bg-slate-100 border-slate-200 dark:bg-slate-800 dark:border-slate-700 text-amber-500 dark:text-cyan-400"
+                className="p-1.5 rounded-lg border border-slate-200/70 dark:border-slate-800/70 bg-slate-50/80 dark:bg-slate-800/60 text-slate-600 dark:text-slate-300"
               >
-                {theme === 'dark' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+                {theme === 'dark' ? <Moon className="w-3.5 h-3.5" /> : <Sun className="w-3.5 h-3.5" />}
               </button>
 
               {pendingSyncCount > 0 && (
                 <button
                   onClick={handleSyncNow}
                   disabled={!isOnline || isSyncing}
-                  className="p-1.5 px-2 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 text-xs font-bold flex items-center gap-1"
+                  className="p-1 px-2 rounded-lg bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 text-xs font-bold flex items-center gap-1"
                 >
-                  <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+                  <RefreshCw className={`w-3 h-3 ${isSyncing ? 'animate-spin' : ''}`} />
                   <span className="font-tabular">{pendingSyncCount}</span>
                 </button>
               )}
 
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                className="p-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
                 aria-label="Toggle navigation menu"
               >
-                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
             </div>
           </div>
@@ -412,7 +407,7 @@ export function Navbar() {
 
       {/* Persistent Mobile Bottom Navigation Bar (Elevates Mobile PWA Experience) */}
       {isAuthenticated && (
-        <div className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-white/95 dark:bg-slate-900/95 border-t border-slate-200 dark:border-slate-800 backdrop-blur-lg px-2 py-1.5 flex items-center justify-around shadow-lg">
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-white/85 dark:bg-slate-900/85 border-t border-slate-200/60 dark:border-slate-800/60 backdrop-blur-md px-3 py-1.5 flex items-center justify-around shadow-xs">
           <Link
             to="/"
             className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl text-[10px] font-bold transition-colors ${

@@ -224,11 +224,11 @@ export function ClinicianDashboard() {
         </div>
 
         {/* View Switcher Tabs */}
-        <div className="flex rounded-xl bg-slate-100 dark:bg-slate-800 p-1 overflow-x-auto scrollbar-none whitespace-nowrap flex-nowrap w-full sm:w-auto text-xs">
+        <div className="pill-track w-full sm:w-auto">
           <button
             onClick={() => setActiveTab('roster')}
-            className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all ${
-              activeTab === 'roster' ? 'bg-white dark:bg-slate-700 text-teal-700 dark:text-teal-300 shadow-xs' : 'text-slate-600 dark:text-slate-400'
+            className={`pill-item flex items-center gap-1.5 ${
+              activeTab === 'roster' ? 'pill-item-active' : ''
             }`}
           >
             <Users className="w-3.5 h-3.5" />
@@ -237,8 +237,8 @@ export function ClinicianDashboard() {
 
           <button
             onClick={() => setActiveTab('appointments')}
-            className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all relative ${
-              activeTab === 'appointments' ? 'bg-white dark:bg-slate-700 text-teal-700 dark:text-teal-300 shadow-xs' : 'text-slate-600 dark:text-slate-400'
+            className={`pill-item flex items-center gap-1.5 relative ${
+              activeTab === 'appointments' ? 'pill-item-active' : ''
             }`}
           >
             <Calendar className="w-3.5 h-3.5" />
@@ -252,8 +252,8 @@ export function ClinicianDashboard() {
 
           <button
             onClick={() => setActiveTab('alerts')}
-            className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all relative ${
-              activeTab === 'alerts' ? 'bg-white dark:bg-slate-700 text-teal-700 dark:text-teal-300 shadow-xs' : 'text-slate-600 dark:text-slate-400'
+            className={`pill-item flex items-center gap-1.5 relative ${
+              activeTab === 'alerts' ? 'pill-item-active' : ''
             }`}
           >
             <ShieldAlert className="w-3.5 h-3.5 text-red-500" />
@@ -269,48 +269,48 @@ export function ClinicianDashboard() {
 
       {activeTab === 'appointments' ? (
         /* PATIENT APPOINTMENTS VIEW */
-        <div className="space-y-6 animate-in fade-in duration-150">
+        <div className="space-y-4 animate-in fade-in duration-150">
           {/* Quick Metrics Bar */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
-            <div className="card-premium p-3 sm:p-4 border-l-4 border-l-teal-600 flex items-center justify-between">
+            <div className="card-clean p-3 sm:p-3.5 flex items-center justify-between">
               <div>
-                <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Booked</p>
-                <p className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-slate-100 mt-0.5">{appointments.length}</p>
+                <p className="label-micro">Total Booked</p>
+                <p className="value-data text-xl sm:text-2xl mt-0.5">{appointments.length}</p>
               </div>
-              <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/60 flex items-center justify-center text-teal-600 dark:text-teal-400">
-                <Calendar className="w-5 h-5" />
+              <div className="icon-box bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400">
+                <Calendar className="w-4 h-4" />
               </div>
             </div>
 
-            <div className="card-premium p-4 border-l-4 border-l-sky-500 flex items-center justify-between">
+            <div className="card-clean p-3 sm:p-3.5 flex items-center justify-between">
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Scheduled / Upcoming</p>
-                <p className="text-2xl font-extrabold text-sky-600 dark:text-sky-400 mt-0.5">{scheduledCount}</p>
+                <p className="label-micro">Scheduled</p>
+                <p className="value-data text-xl sm:text-2xl mt-0.5">{scheduledCount}</p>
               </div>
-              <div className="w-10 h-10 rounded-xl bg-sky-50 dark:bg-sky-950/60 flex items-center justify-center text-sky-600 dark:text-sky-400">
-                <Clock className="w-5 h-5" />
+              <div className="icon-box bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400">
+                <Clock className="w-4 h-4" />
               </div>
             </div>
 
-            <div className="card-premium p-4 border-l-4 border-l-emerald-600 flex items-center justify-between">
+            <div className="card-clean p-3 sm:p-3.5 flex items-center justify-between">
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Completed</p>
-                <p className="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-0.5">{completedCount}</p>
+                <p className="label-micro">Completed</p>
+                <p className="value-data text-xl sm:text-2xl mt-0.5">{completedCount}</p>
               </div>
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-                <CheckCircle className="w-5 h-5" />
+              <div className="icon-box bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400">
+                <CheckCircle className="w-4 h-4" />
               </div>
             </div>
 
-            <div className="card-premium p-4 border-l-4 border-l-purple-500 flex items-center justify-between">
+            <div className="card-clean p-3 sm:p-3.5 flex items-center justify-between">
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Hospital Visits</p>
-                <p className="text-2xl font-extrabold text-purple-600 dark:text-purple-400 mt-0.5">
+                <p className="label-micro">Hospital Visits</p>
+                <p className="value-data text-xl sm:text-2xl mt-0.5">
                   {appointments.filter(a => a.type === 'in_person').length}
                 </p>
               </div>
-              <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950/60 flex items-center justify-center text-purple-600 dark:text-purple-400">
-                <MapPin className="w-5 h-5" />
+              <div className="icon-box bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400">
+                <MapPin className="w-4 h-4" />
               </div>
             </div>
           </div>
