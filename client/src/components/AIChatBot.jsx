@@ -14,7 +14,15 @@ import {
   ShieldAlert,
   Calendar,
   CheckCircle2,
-  Clock
+  Clock,
+  FileText,
+  Users,
+  AlertTriangle,
+  Pill,
+  Bandage,
+  AlertOctagon,
+  Building2,
+  Phone
 } from 'lucide-react';
 import useAuthStore from '../store/useAuthStore.js';
 
@@ -124,11 +132,11 @@ export const AIChatBot = () => {
     {
       id: 'init-1',
       sender: 'assistant',
-      text: `👋 **Namaste! I am your HealthVerse AI Health Assistant.**\n\nI can assist you with:\n- 📅 **Directly booking doctor appointments** with Dr. Ananya Sharma or Dr. Vikram Mehta\n- Understanding post-discharge recovery precautions\n- Explaining your medications & adherence importance\n- Checking PM-JAY (Ayushman Bharat) eligibility & required documents\n- Symptom triage guidance & warning signs\n\n*How can I help you today?*`,
+      text: `**Namaste! I am your HealthVerse AI Health Assistant.**\n\nI can assist you with:\n- **Directly booking doctor appointments** with Dr. Ananya Sharma or Dr. Vikram Mehta\n- Understanding post-discharge recovery precautions\n- Explaining your medications & adherence importance\n- Checking PM-JAY (Ayushman Bharat) eligibility & required documents\n- Symptom triage guidance & warning signs\n\n*How can I help you today?*`,
       suggestedActions: [
-        { label: '📅 Book Appointment', action: 'book_appointment' },
-        { label: '📋 Check PM-JAY', path: '/pmjay' },
-        { label: '📝 Report Symptoms', path: '/symptoms/report' }
+        { label: 'Book Appointment', action: 'book_appointment' },
+        { label: 'Check PM-JAY', path: '/pmjay' },
+        { label: 'Report Symptoms', path: '/symptoms/report' }
       ],
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
@@ -142,7 +150,7 @@ export const AIChatBot = () => {
           return [
             {
               ...prev[0],
-              text: `👋 **Namaste ${profile.name}! I am your HealthVerse AI Health Assistant.**\n\nI have loaded your patient profile (**${profile.patientId || 'Verified Patient'}**${profile.medicalHistory?.[0] ? ` • *${profile.medicalHistory[0]}*` : ''}).\n\nI can assist you with:\n- 📅 **Directly booking doctor appointments** with Dr. Ananya Sharma or Dr. Vikram Mehta\n- Understanding post-discharge recovery precautions\n- Explaining your medications & adherence importance\n- Checking PM-JAY (Ayushman Bharat) eligibility & required documents\n- Symptom triage guidance & warning signs\n\n*How can I help you today, ${profile.name.split(' ')[0]} ji?*`
+              text: `**Namaste ${profile.name}! I am your HealthVerse AI Health Assistant.**\n\nI have loaded your patient profile (**${profile.patientId || 'Verified Patient'}**${profile.medicalHistory?.[0] ? ` • *${profile.medicalHistory[0]}*` : ''}).\n\nI can assist you with:\n- **Directly booking doctor appointments** with Dr. Ananya Sharma or Dr. Vikram Mehta\n- Understanding post-discharge recovery precautions\n- Explaining your medications & adherence importance\n- Checking PM-JAY (Ayushman Bharat) eligibility & required documents\n- Symptom triage guidance & warning signs\n\n*How can I help you today, ${profile.name.split(' ')[0]} ji?*`
             }
           ];
         }
@@ -329,9 +337,9 @@ export const AIChatBot = () => {
       const confirmMsg = {
         id: `ai-confirm-${Date.now()}`,
         sender: 'assistant',
-        text: `🎉 **Appointment Confirmed for ${patientDisplayName}!**\n\n- **Patient:** ${patientDisplayName} (${bookingInfo?.patientCode || profile?.patientId || 'HV-PATIENT'})\n- **Doctor:** ${doctorName}\n- **Date:** ${new Date(isoDate).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}\n- **Time:** ${bookingTime}\n- **Mode:** ${bookingType === 'in_person' ? 'Hospital Visit' : 'Telephonic Consultation'}\n\nYour clinical team has been notified. You can review and manage this in your **Patient Follow-up Schedule**.`,
+        text: `**Appointment Confirmed for ${patientDisplayName}!**\n\n- **Patient:** ${patientDisplayName} (${bookingInfo?.patientCode || profile?.patientId || 'HV-PATIENT'})\n- **Doctor:** ${doctorName}\n- **Date:** ${new Date(isoDate).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}\n- **Time:** ${bookingTime}\n- **Mode:** ${bookingType === 'in_person' ? 'Hospital Visit' : 'Telephonic Consultation'}\n\nYour clinical team has been notified. You can review and manage this in your **Patient Follow-up Schedule**.`,
         suggestedActions: [
-          { label: '📅 View Patient Dashboard', path: '/patient' }
+          { label: 'View Patient Dashboard', path: '/patient' }
         ],
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
@@ -459,17 +467,17 @@ export const AIChatBot = () => {
 
   const quickPrompts = isClinician
     ? [
-        { label: '📋 Rajesh Verma ki report', prompt: 'Rajesh Verma ki report batana' },
-        { label: '👥 Registered Patients', prompt: 'Hospital ke active registered patients ki list dikhao' },
-        { label: '⚠️ Active Alerts', prompt: 'Hospital ke active clinical alerts batao' },
-        { label: '📅 Today Appointments', prompt: 'Aaj ke scheduled patient followups dikhao' }
+        { label: 'Rajesh Verma Report', icon: FileText, prompt: 'Rajesh Verma ki report batana' },
+        { label: 'Registered Patients', icon: Users, prompt: 'Hospital ke active registered patients ki list dikhao' },
+        { label: 'Active Alerts', icon: AlertTriangle, prompt: 'Hospital ke active clinical alerts batao' },
+        { label: 'Today Appointments', icon: Calendar, prompt: 'Aaj ke scheduled patient followups dikhao' }
       ]
     : [
-        { label: '📋 Meri medical report', prompt: 'Mera medical report batana' },
-        { label: '💊 Medication help', prompt: 'Why is it dangerous to stop my heart and blood pressure medicines?' },
-        { label: '📋 PM-JAY documents', prompt: 'What documents are required to apply for PM-JAY Ayushman Bharat?' },
-        { label: '🩹 Wound care rules', prompt: 'What are the main rules for caring for my surgical wound at home?' },
-        { label: '🚨 Chest pain emergency', prompt: 'I feel sudden chest heaviness and breathlessness. What should I do?' }
+        { label: 'My Medical Report', icon: FileText, prompt: 'Mera medical report batana' },
+        { label: 'Medication Help', icon: Pill, prompt: 'Why is it dangerous to stop my heart and blood pressure medicines?' },
+        { label: 'PM-JAY Documents', icon: FileText, prompt: 'What documents are required to apply for PM-JAY Ayushman Bharat?' },
+        { label: 'Wound Care Rules', icon: Bandage, prompt: 'What are the main rules for caring for my surgical wound at home?' },
+        { label: 'Emergency Guidance', icon: AlertOctagon, prompt: 'I feel sudden chest heaviness and breathlessness. What should I do?' }
       ];
 
   return (
@@ -643,6 +651,7 @@ export const AIChatBot = () => {
                                   onChange={() => setBookingType('in_person')}
                                   className="text-teal-600 focus:ring-teal-500"
                                 />
+                                <Building2 className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
                                 <span>Hospital Visit</span>
                               </label>
                               <label className="flex items-center gap-1.5 cursor-pointer">
@@ -654,6 +663,7 @@ export const AIChatBot = () => {
                                   onChange={() => setBookingType('telephonic')}
                                   className="text-teal-600 focus:ring-teal-500"
                                 />
+                                <Phone className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
                                 <span>Telephonic Call</span>
                               </label>
                             </div>
@@ -734,17 +744,43 @@ export const AIChatBot = () => {
           </div>
 
           {/* Quick Prompts Bar */}
-          <div className="bg-white dark:bg-slate-900 px-3 py-1.5 border-t border-slate-100 dark:border-slate-800 overflow-x-auto flex gap-1.5 no-scrollbar">
-            {quickPrompts.map((qp, idx) => (
-              <button
-                key={idx}
-                onClick={() => handleSendMessage(qp.prompt)}
-                className="whitespace-nowrap px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-teal-50 dark:hover:bg-teal-950 hover:text-teal-700 dark:hover:text-teal-300 text-slate-600 dark:text-slate-300 text-[10px] font-semibold transition-colors flex-shrink-0"
-              >
-                {qp.label}
-              </button>
-            ))}
+          <div className="bg-white dark:bg-slate-900 px-3 py-2 border-t border-slate-100 dark:border-slate-800 overflow-x-auto flex gap-1.5 no-scrollbar">
+            {quickPrompts.map((qp, idx) => {
+              const Icon = qp.icon;
+              return (
+                <button
+                  key={idx}
+                  onClick={() => handleSendMessage(qp.prompt)}
+                  className="whitespace-nowrap px-2.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-teal-50 dark:hover:bg-teal-950 hover:text-teal-700 dark:hover:text-teal-300 text-slate-700 dark:text-slate-200 text-[11px] font-semibold transition-colors flex-shrink-0 flex items-center gap-1.5 border border-slate-200 dark:border-slate-700"
+                >
+                  <Icon className="w-3 h-3 text-teal-600 dark:text-teal-400" />
+                  <span>{qp.label}</span>
+                </button>
+              );
+            })}
           </div>
+
+          {/* Voice Listening Active Soundwave Visualizer */}
+          {isListening && (
+            <div className="px-4 py-2 bg-rose-50 dark:bg-rose-950/70 border-t border-rose-200 dark:border-rose-800 flex items-center justify-between animate-in fade-in duration-150">
+              <div className="flex items-center gap-2 text-rose-700 dark:text-rose-300 text-xs font-bold">
+                <div className="flex items-center gap-1 h-4">
+                  <span className="w-1 bg-rose-500 rounded-full soundwave-bar" />
+                  <span className="w-1 bg-rose-500 rounded-full soundwave-bar" />
+                  <span className="w-1 bg-rose-500 rounded-full soundwave-bar" />
+                  <span className="w-1 bg-rose-500 rounded-full soundwave-bar" />
+                  <span className="w-1 bg-rose-500 rounded-full soundwave-bar" />
+                </div>
+                <span>Listening to your voice... Speak now</span>
+              </div>
+              <button
+                onClick={toggleListening}
+                className="text-xs font-bold text-rose-600 underline"
+              >
+                Stop
+              </button>
+            </div>
+          )}
 
           {/* Input Section */}
           <div className="p-3 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center gap-2">

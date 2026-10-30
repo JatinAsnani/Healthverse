@@ -320,23 +320,23 @@ function extractSuggestedActions(text = '', userMessage = '') {
   const combined = (text + ' ' + userMessage).toLowerCase();
 
   if (detectBookingIntent(combined)) {
-    actions.push({ label: '📅 Book Doctor Appointment', action: 'book_appointment' });
+    actions.push({ label: 'Book Doctor Appointment', action: 'book_appointment' });
   }
   if (combined.includes('report') || combined.includes('discharge') || combined.includes('bimari') || combined.includes('history')) {
-    actions.push({ label: '📅 Book Follow-up', action: 'book_appointment' });
-    actions.push({ label: '📝 Report Symptoms', path: '/symptoms/report' });
+    actions.push({ label: 'Book Follow-up', action: 'book_appointment' });
+    actions.push({ label: 'Report Symptoms', path: '/symptoms/report' });
   }
   if (combined.includes('symptom') || combined.includes('pain') || combined.includes('fever') || combined.includes('लक्षण')) {
-    actions.push({ label: '📝 Report Symptoms', path: '/symptoms/report' });
+    actions.push({ label: 'Report Symptoms', path: '/symptoms/report' });
   }
   if (combined.includes('pmjay') || combined.includes('ayushman') || combined.includes('scheme') || combined.includes('राशन') || combined.includes('યોજના')) {
-    actions.push({ label: '📋 Check PM-JAY Eligibility', path: '/pmjay' });
+    actions.push({ label: 'Check PM-JAY Eligibility', path: '/pmjay' });
   }
   if (combined.includes('education') || combined.includes('guide') || combined.includes('diet') || combined.includes('wound') || combined.includes('માર્ગદર્શન')) {
-    actions.push({ label: '📚 Health Education Library', path: '/education' });
+    actions.push({ label: 'Health Education Library', path: '/education' });
   }
   if (combined.includes('caregiver') || combined.includes('family') || combined.includes('consent') || combined.includes('સંમતિ')) {
-    actions.push({ label: '🤝 Manage Caregiver Consent', path: '/consent' });
+    actions.push({ label: 'Manage Caregiver Consent', path: '/consent' });
   }
 
   // Deduplicate suggested actions
@@ -495,7 +495,7 @@ function getRuleBasedResponse(message = '', context = {}) {
 
   // 1. Critical Red Flag Alert
   if (detectEmergencyRedFlags(lower)) {
-    return `🚨 **CRITICAL MEDICAL EMERGENCY ALERT**
+    return `**CRITICAL MEDICAL EMERGENCY ALERT**
 
 Your symptoms indicate a potentially serious medical emergency that requires immediate clinical care:
 - **Call 108 Ambulance right now** (Toll-Free).
@@ -510,7 +510,7 @@ Your symptoms indicate a potentially serious medical emergency that requires imm
   if (context.patientPrivacyBlocked) {
     const patientName = context.patientName || context.userName || 'Patient';
     const targetName = context.blockedPatientName || 'anya patient';
-    return `🔒 **Medical Data Privacy & Confidentiality Notice (DPDP Act 2023)**
+    return `**Medical Data Privacy & Confidentiality Notice (DPDP Act 2023)**
 
 Namaste **${patientName}** ji! 
 
@@ -519,7 +519,7 @@ Hospital safety protocols aur **Digital Personal Data Protection (DPDP) Act 2023
 Kisi dusre mareez (**${targetName}**) ka clinical record confidential hota hai aur keval unke treating doctors ya authorized hospital staff hi use access kar sakte hain.
 
 Aap apna khud ka medical discharge summary dekhne ke liye likhein:
-👉 *"Mera medical report batana"* ya niche **"Meri medical report"** button par tap karein.`;
+*"Mera medical report batana"* ya niche **"Meri medical report"** button par tap karein.`;
   }
 
   // 2. Specific Patient Record Not Found (e.g. Doctor or user asked for "krishna ki report")
@@ -530,7 +530,7 @@ Aap apna khud ka medical discharge summary dekhne ke liye likhein:
 
     if (context.isClinician) {
       const docGreeting = context.clinicianName ? (context.clinicianName.startsWith('Dr.') ? `**${context.clinicianName}**` : `Dr. **${context.clinicianName}**`) : 'Doctor';
-      return `🔍 **Patient Record Not Found**
+      return `**Patient Record Not Found**
 
 ${docGreeting} ji, hospital database mein **"${context.targetPatientNotFound}"** naam ka koi patient record nahi mila.
 
@@ -540,7 +540,7 @@ ${suggestions}
 *Kisi bhi patient ki report dekhne ke liye likhein: "[Patient Name] ki report batana"* (jaise *"Rajesh Verma ki report"*)`;
     }
 
-    return `🔍 **Record Not Found**
+    return `**Record Not Found**
 
 Maaf kijiye, hamare hospital records mein **"${context.targetPatientNotFound}"** naam ka koi patient register nahi mila.
 
@@ -578,25 +578,25 @@ Kripya sahi naam ya **Patient ID** (jaise *HV-2026-001*) likhein.`;
     if (context.medicalReport) {
       const mr = context.medicalReport;
       const medsList = mr.prescriptions && mr.prescriptions.length > 0
-        ? mr.prescriptions.map(p => `  • **${p.medicine}** — ${p.dosage} (${p.timing})${p.critical ? ' ⚠️ *Critical*' : ''}`).join('\n')
+        ? mr.prescriptions.map(p => `  • **${p.medicine}** — ${p.dosage} (${p.timing})${p.critical ? ' *[Critical]*' : ''}`).join('\n')
         : '  • Maintenance medicines logged in clinical chart.';
 
       // If clinician is reviewing a patient's chart
       if (context.isClinician) {
-        return `📋 **Patient Clinical Record — ${mr.patientName} (${mr.patientId})**
+        return `**Patient Clinical Record — ${mr.patientName} (${mr.patientId})**
 
 Doctor sahab, patient **${mr.patientName}** ka verified hospital clinical chart yeh hai:
 
-- 🏥 **Hospital:** ${mr.hospitalName}
-- 👨‍⚕️ **Primary Treating Doctor:** ${mr.doctorName}
-- 🩺 **Diagnosis (बीमारी / निदान):** **${mr.diagnosis}**
-- 📅 **Discharge Date:** ${mr.dischargeDate} (Admission: ${mr.admissionDate})
-- 📝 **Clinical Summary:** ${mr.summary}
+- **Hospital:** ${mr.hospitalName}
+- **Primary Treating Doctor:** ${mr.doctorName}
+- **Diagnosis (बीमारी / निदान):** **${mr.diagnosis}**
+- **Discharge Date:** ${mr.dischargeDate} (Admission: ${mr.admissionDate})
+- **Clinical Summary:** ${mr.summary}
 
-💊 **Prescribed Medicines (दवाइयाँ):**
+**Prescribed Medicines (दवाइयाँ):**
 ${medsList}
 
-⚠️ **Care Precautions & Monitoring:**
+**Care Precautions & Monitoring:**
 - **Diet:** ${mr.dietInstructions}
 - **Activity:** ${mr.activityInstructions}
 - **Monitored Warning Signs:** ${(mr.warningSigns || []).join(', ')}
@@ -605,20 +605,20 @@ ${medsList}
       }
 
       // If patient asking for their own discharge summary
-      return `📋 **Aapki Medical Discharge Report**
+      return `**Aapki Medical Discharge Report**
 
 Namaste **${mr.patientName}** ji, aapka verified hospital record yeh hai:
 
-- 🏥 **Hospital:** ${mr.hospitalName}
-- 👨‍⚕️ **Treating Doctor:** ${mr.doctorName}
-- 🩺 **Diagnosis (बीमारी / निदान):** **${mr.diagnosis}**
-- 📅 **Discharge Date:** ${mr.dischargeDate}
-- 📝 **Summary:** ${mr.summary}
+- **Hospital:** ${mr.hospitalName}
+- **Treating Doctor:** ${mr.doctorName}
+- **Diagnosis (बीमारी / निदान):** **${mr.diagnosis}**
+- **Discharge Date:** ${mr.dischargeDate}
+- **Summary:** ${mr.summary}
 
-💊 **Prescribed Medicines (दवाइयाँ):**
+**Prescribed Medicines (दवाइयाँ):**
 ${medsList}
 
-⚠️ **Care Precautions (सावधानियां):**
+**Care Precautions (सावधानियां):**
 - **Diet:** ${mr.dietInstructions}
 - **Activity:** ${mr.activityInstructions}
 - **Watch for:** ${(mr.warningSigns || []).join(', ')}
@@ -632,7 +632,7 @@ ${medsList}
         ? context.registeredPatients.map(p => `  • **${p}**`).join('\n')
         : '  • Rajesh Verma (HV-2026-001)\n  • Sunita Patel (HV-2026-002)\n  • Devendra Solanki (HV-2026-005)';
 
-      return `👨‍⚕️ **Hospital Clinical Records Portal**
+      return `**Hospital Clinical Records Portal**
 
 Namaste **${clinicianName || 'Doctor'}** ji! Aap clinician account se logged in hain.
 
@@ -644,7 +644,7 @@ ${suggestions}
 *Kisi bhi patient ki report dekhne ke liye likhein: "[Patient Name] ki report batana" (jaise: "Rajesh Verma ki report" ya "HV-2026-001")*`;
     }
 
-    return `📋 **Aapki Medical Report & Discharge Summary**
+    return `**Aapki Medical Report & Discharge Summary**
 
 Namaste! Aapka hospital medical record dekhne ke liye:
 - Yadi aap logged in hain, aapka discharge summary aur doctor prescriptions aapke **Home Timeline** par available hain.
@@ -658,7 +658,7 @@ Namaste! Aapka hospital medical record dekhne ke liye:
       ? context.registeredPatients.map(p => `  • **${p}**`).join('\n')
       : '  • Rajesh Verma (HV-2026-001)\n  • Sunita Patel (HV-2026-002)\n  • Devendra Solanki (HV-2026-005)';
 
-    return `👥 **Hospital Active Registered Patients**
+    return `**Hospital Active Registered Patients**
 
 Doctor sahab, aapke hospital ke active monitored patients yeh hain:
 
@@ -670,14 +670,14 @@ ${list}
   // 6. Appointment Booking Support
   if (detectBookingIntent(lower)) {
     if (context.isClinician) {
-      return `📅 **Schedule Patient Follow-up**
+      return `**Schedule Patient Follow-up**
 
 Doctor sahab, aap kisi bhi patient ke liye follow-up appointment schedule kar sakte hain.
 
 Maine niche **Appointment Booking Card** open kar diya hai. Kripya date aur format (Hospital Visit ya Telephonic) select karke **"Confirm Appointment"** par tap karein.`;
     }
 
-    return `📅 **Appointment Booking Support**
+    return `**Appointment Booking Support**
 
 Ji haan ${patientName ? `${patientName} ji, ` : ''}main aapki appointment book kar sakta hoon! 
 
@@ -689,7 +689,7 @@ Maine aapke liye niche **Appointment Booking Card** open kar diya hai. Aap apna 
   }
 
   if (lower.includes('pmjay') || lower.includes('pm-jay') || lower.includes('ayushman') || lower.includes('scheme') || lower.includes('ration') || lower.includes('योजना')) {
-    return `📋 **Ayushman Bharat PM-JAY Scheme Guidance**
+    return `**Ayushman Bharat PM-JAY Scheme Guidance**
 
 **Coverage:** Up to ₹5,00,000 per family per year for secondary and tertiary hospitalization across all empanelled public and private hospitals.
 
@@ -703,7 +703,7 @@ You can complete the self-assessment right here in HealthVerse by going to the *
   }
 
   if (lower.includes('wound') || lower.includes('stitch') || lower.includes('bandage') || lower.includes('घाव') || lower.includes('ટાંકા')) {
-    return `🩹 **Post-Surgical Wound Care Essentials**
+    return `**Post-Surgical Wound Care Essentials**
 
 1. **Keep it Dry & Clean:** Do not soak the surgical site in baths or buckets. Follow dressing change schedules given at discharge.
 2. **Never Apply Home Powders:** Avoid applying turmeric, powders, or non-prescribed herbal pastes to open incisions.
@@ -714,7 +714,7 @@ If any red flags appear, record them in the **Symptom Report** tab and contact y
   }
 
   if (lower.includes('medicine') || lower.includes('medication') || lower.includes('dose') || lower.includes('pill') || lower.includes('दवा') || lower.includes('દવા')) {
-    return `💊 **Medication Safety & Adherence**
+    return `**Medication Safety & Adherence**
 
 - **Never Skip Maintenance Medicines:** For heart conditions, diabetes, and blood pressure, stopping medications because you "feel fine" is the leading cause of emergency readmission.
 - **Missed a dose?** Take it as soon as remembered unless it is almost time for the next dose. Never double the dose.
@@ -733,15 +733,15 @@ If any red flags appear, record them in the **Symptom Report** tab and contact y
     lower.includes('majama')
   ) {
     if (context.isClinician) {
-      return `Namaste **${clinicianName}** ji! Main bilkul theek hoon, aapki seva mein hazir. 🙏\n\nAapko hospital ke kisi patient ka clinical chart, active alerts ya appointment status dekhna hai toh batayein!`;
+      return `Namaste **${clinicianName}** ji! Main bilkul theek hoon, aapki seva mein hazir.\n\nAapko hospital ke kisi patient ka clinical chart, active alerts ya appointment status dekhna hai toh batayein!`;
     }
-    return `Namaste${patientName ? ` **${patientName}** ji` : ''}! Main bilkul theek hoon, aapki seva ke liye hamesha taiyar. 🙏\n\nAapki tabiyat ab kaisi hai? Kya aapko dawaiyon, recovery precautions, doctor appointment ya medical report se judi koi jaankari chahiye?`;
+    return `Namaste${patientName ? ` **${patientName}** ji` : ''}! Main bilkul theek hoon, aapki seva ke liye hamesha taiyar.\n\nAapki tabiyat ab kaisi hai? Kya aapko dawaiyon, recovery precautions, doctor appointment ya medical report se judi koi jaankari chahiye?`;
   }
 
   if (lower.includes('hi') || lower.includes('hello') || lower.includes('hey') || lower.includes('namaste')) {
     if (context.isClinician) {
       const docGreeting = clinicianName ? (clinicianName.startsWith('Dr.') ? clinicianName : `Dr. ${clinicianName}`) : 'Doctor';
-      return `👋 **Namaste ${docGreeting} ji!**
+      return `**Namaste ${docGreeting} ji!**
 
 Main HealthVerse Clinical AI Assistant hoon. Main aapki in chizon mein madad kar sakta hoon:
 - Kisi bhi patient ki medical report aur discharge summary nikalna (jaise *"Rajesh Verma ki report"* ya *"HV-2026-001"*)
@@ -752,7 +752,7 @@ Main HealthVerse Clinical AI Assistant hoon. Main aapki in chizon mein madad kar
 Batayein, main aaj aapki kya madad karoon?`;
     }
 
-    return `👋 **Namaste! I am your HealthVerse AI Health Assistant.**
+    return `**Namaste! I am your HealthVerse AI Health Assistant.**
 
 I can help you with:
 - Checking your medical reports and diagnosis ("mera medical report batana")

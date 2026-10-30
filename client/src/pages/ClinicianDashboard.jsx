@@ -20,7 +20,9 @@ import {
   MapPin,
   CheckCircle,
   XCircle,
-  FileText
+  FileText,
+  Building2,
+  Home
 } from 'lucide-react';
 import useAuthStore from '../store/useAuthStore.js';
 import { RiskBadge } from '../components/RiskBadge.jsx';
@@ -472,10 +474,25 @@ export function ClinicianDashboard() {
                             <span>Doctor: <strong className="text-slate-800 dark:text-slate-200">{apt.staff?.name || 'Dr. Ananya Sharma'}</strong></span>
                           </span>
 
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300">
-                            {apt.type === 'in_person' && '🏥 In-Person at Hospital'}
-                            {apt.type === 'telephonic' && '📞 Telephonic Consultation'}
-                            {apt.type === 'home_visit_chw' && '🏡 Home Visit by CHW'}
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300">
+                            {apt.type === 'in_person' && (
+                              <>
+                                <Building2 className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
+                                <span>In-Person at Hospital</span>
+                              </>
+                            )}
+                            {apt.type === 'telephonic' && (
+                              <>
+                                <Phone className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
+                                <span>Telephonic Consultation</span>
+                              </>
+                            )}
+                            {apt.type === 'home_visit_chw' && (
+                              <>
+                                <Home className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
+                                <span>Home Visit by CHW</span>
+                              </>
+                            )}
                           </span>
                         </div>
                       </div>
