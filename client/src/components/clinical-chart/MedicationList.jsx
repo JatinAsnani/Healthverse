@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Pill,
   CheckCircle2,
@@ -6,8 +6,8 @@ import {
   Clock,
   Plus,
   Check,
-  X
-} from 'lucide-react';
+  X,
+} from "lucide-react";
 
 /**
  * Helper to get adherence badge styling & icon
@@ -15,22 +15,25 @@ import {
 function getAdherenceBadge(rate = 100) {
   if (rate >= 80) {
     return {
-      classes: 'bg-emerald-50 dark:bg-emerald-950/70 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300',
+      classes:
+        "bg-emerald-50 dark:bg-emerald-950/70 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300",
       icon: CheckCircle2,
-      label: `${rate}% Adherent`
+      label: `${rate}% Adherent`,
     };
   }
   if (rate >= 60) {
     return {
-      classes: 'bg-amber-50 dark:bg-amber-950/70 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300',
+      classes:
+        "bg-amber-50 dark:bg-amber-950/70 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300",
       icon: Clock,
-      label: `${rate}% Moderate`
+      label: `${rate}% Moderate`,
     };
   }
   return {
-    classes: 'bg-rose-50 dark:bg-rose-950/70 border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300',
+    classes:
+      "bg-rose-50 dark:bg-rose-950/70 border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300",
     icon: AlertTriangle,
-    label: `${rate}% At Risk`
+    label: `${rate}% At Risk`,
   };
 }
 
@@ -38,13 +41,14 @@ function getAdherenceBadge(rate = 100) {
  * MedicationList
  * Displays active post-discharge medications with 5-day adherence tracking dot strips
  */
-export function MedicationList({
-  medications = [],
-  onAddMedication
-}) {
-  const overallAdherence = medications.length > 0
-    ? Math.round(medications.reduce((sum, m) => sum + (m.adherenceRate || 100), 0) / medications.length)
-    : 100;
+export function MedicationList({ medications = [], onAddMedication }) {
+  const overallAdherence =
+    medications.length > 0
+      ? Math.round(
+          medications.reduce((sum, m) => sum + (m.adherenceRate || 100), 0) /
+            medications.length,
+        )
+      : 100;
 
   const overallBadge = getAdherenceBadge(overallAdherence);
   const OverallIcon = overallBadge.icon;
@@ -138,7 +142,9 @@ export function MedicationList({
                       )}
                     </div>
                     <div className="flex items-center gap-2 mt-0.5 text-[11px] text-slate-500 dark:text-slate-400 font-tabular">
-                      <span className="text-teal-600 dark:text-teal-400 font-medium">{med.dosage}</span>
+                      <span className="text-teal-600 dark:text-teal-400 font-medium">
+                        {med.dosage}
+                      </span>
                       <span>&bull;</span>
                       <span>{med.frequency}</span>
                     </div>
@@ -152,16 +158,24 @@ export function MedicationList({
                       role="group"
                       aria-label={`5-day adherence history for ${med.name}`}
                     >
-                      {(med.history || ['taken', 'taken', 'taken', 'taken', 'taken']).map((status, i) => (
+                      {(
+                        med.history || [
+                          "taken",
+                          "taken",
+                          "taken",
+                          "taken",
+                          "taken",
+                        ]
+                      ).map((status, i) => (
                         <span
                           key={i}
                           title={`Day ${i + 1}: ${status}`}
                           className={`w-2 h-2 rounded-full ${
-                            status === 'taken'
-                              ? 'bg-emerald-500'
-                              : status === 'late'
-                              ? 'bg-amber-500'
-                              : 'bg-rose-500'
+                            status === "taken"
+                              ? "bg-emerald-500"
+                              : status === "late"
+                                ? "bg-amber-500"
+                                : "bg-rose-500"
                           }`}
                         />
                       ))}

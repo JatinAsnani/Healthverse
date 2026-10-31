@@ -1,20 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   ClipboardCheck,
   CheckCircle2,
   Clock,
   CheckSquare,
-  Square
-} from 'lucide-react';
+  Square,
+} from "lucide-react";
 
 /**
  * CarePlanChecklist
  * Displays post-discharge clinical milestones with interactive completion toggles
  */
-export function CarePlanChecklist({
-  initialItems = [],
-  onItemToggle
-}) {
+export function CarePlanChecklist({ initialItems = [], onItemToggle }) {
   const [items, setItems] = useState(initialItems);
 
   React.useEffect(() => {
@@ -27,19 +24,21 @@ export function CarePlanChecklist({
     setItems((prev) =>
       prev.map((item) => {
         if (item.id === id) {
-          const nextStatus = item.status === 'completed' ? 'pending' : 'completed';
+          const nextStatus =
+            item.status === "completed" ? "pending" : "completed";
           if (onItemToggle) {
             onItemToggle(id, nextStatus);
           }
           return { ...item, status: nextStatus };
         }
         return item;
-      })
+      }),
     );
   };
 
-  const completedCount = items.filter((i) => i.status === 'completed').length;
-  const progressPercent = items.length > 0 ? Math.round((completedCount / items.length) * 100) : 0;
+  const completedCount = items.filter((i) => i.status === "completed").length;
+  const progressPercent =
+    items.length > 0 ? Math.round((completedCount / items.length) * 100) : 0;
 
   return (
     <div className="card-clean p-4 sm:p-5">
@@ -54,7 +53,8 @@ export function CarePlanChecklist({
               Care Plan Milestones
             </h3>
             <p className="text-[10px] text-slate-400">
-              Protocol checklist &bull; {completedCount} of {items.length} completed
+              Protocol checklist &bull; {completedCount} of {items.length}{" "}
+              completed
             </p>
           </div>
         </div>
@@ -82,7 +82,7 @@ export function CarePlanChecklist({
         /* Checklist items */
         <div className="space-y-2">
           {items.map((item) => {
-            const isDone = item.status === 'completed';
+            const isDone = item.status === "completed";
 
             return (
               <div
@@ -90,8 +90,8 @@ export function CarePlanChecklist({
                 onClick={() => handleToggle(item.id)}
                 className={`flex items-start gap-2.5 p-2.5 rounded-xl border transition-all cursor-pointer select-none ${
                   isDone
-                    ? 'bg-slate-50/50 dark:bg-slate-900/50 border-slate-200/60 dark:border-slate-800/60 opacity-70'
-                    : 'bg-white dark:bg-slate-850 border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
+                    ? "bg-slate-50/50 dark:bg-slate-900/50 border-slate-200/60 dark:border-slate-800/60 opacity-70"
+                    : "bg-white dark:bg-slate-850 border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
                 }`}
               >
                 {/* Interactive Checkbox */}
@@ -102,7 +102,7 @@ export function CarePlanChecklist({
                     handleToggle(item.id);
                   }}
                   className="mt-0.5 text-teal-600 dark:text-teal-400 focus:outline-none"
-                  aria-label={`Mark "${item.title}" as ${isDone ? 'pending' : 'completed'}`}
+                  aria-label={`Mark "${item.title}" as ${isDone ? "pending" : "completed"}`}
                 >
                   {isDone ? (
                     <CheckSquare className="w-4 h-4 text-teal-600" />
@@ -117,8 +117,8 @@ export function CarePlanChecklist({
                     <span
                       className={`text-xs font-semibold ${
                         isDone
-                          ? 'line-through text-slate-400 dark:text-slate-500'
-                          : 'text-slate-800 dark:text-slate-100'
+                          ? "line-through text-slate-400 dark:text-slate-500"
+                          : "text-slate-800 dark:text-slate-100"
                       }`}
                     >
                       {item.title}
@@ -126,14 +126,12 @@ export function CarePlanChecklist({
 
                     {/* Due Date & Category Pill */}
                     <div className="flex items-center gap-1.5">
-                      <span className="label-micro">
-                        {item.category}
-                      </span>
+                      <span className="label-micro">{item.category}</span>
                       <span
                         className={`text-[9px] font-bold px-1.5 py-0.2 rounded flex items-center gap-1 ${
                           isDone
-                            ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300'
-                            : 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300'
+                            ? "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300"
+                            : "bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300"
                         }`}
                       >
                         <Clock className="w-2.5 h-2.5" />

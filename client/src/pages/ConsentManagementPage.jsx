@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Shield,
   Lock,
@@ -10,9 +10,9 @@ import {
   XCircle,
   Plus,
   X,
-  FileCheck
-} from 'lucide-react';
-import useAuthStore from '../store/useAuthStore.js';
+  FileCheck,
+} from "lucide-react";
+import useAuthStore from "../store/useAuthStore.js";
 
 export function ConsentManagementPage() {
   const navigate = useNavigate();
@@ -23,8 +23,8 @@ export function ConsentManagementPage() {
   const [showGrantModal, setShowGrantModal] = useState(false);
 
   const [newConsent, setNewConsent] = useState({
-    purpose: 'caregiver_access',
-    caregiverPhone: ''
+    purpose: "caregiver_access",
+    caregiverPhone: "",
   });
 
   const patientId = profile?._id || user?.id;
@@ -37,7 +37,9 @@ export function ConsentManagementPage() {
     if (!patientId) return;
     try {
       setIsLoading(true);
-      const res = await fetch(`/api/v1/consent/patient/${patientId}`, { credentials: 'include' });
+      const res = await fetch(`/api/v1/consent/patient/${patientId}`, {
+        credentials: "include",
+      });
       if (res.ok) {
         const json = await res.json();
         setConsents(json.data || []);
@@ -50,16 +52,22 @@ export function ConsentManagementPage() {
   };
 
   const handleRevokeConsent = async (id) => {
-    if (!window.confirm('Are you sure you want to revoke this consent? Data access for this purpose will cease immediately.')) {
+    if (
+      !window.confirm(
+        "Are you sure you want to revoke this consent? Data access for this purpose will cease immediately.",
+      )
+    ) {
       return;
     }
 
     try {
       const res = await fetch(`/api/v1/consent/${id}/revoke`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ reason: 'Withdrawn by patient under DPDP Act 2023' })
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          reason: "Withdrawn by patient under DPDP Act 2023",
+        }),
       });
 
       if (res.ok) {
@@ -73,14 +81,14 @@ export function ConsentManagementPage() {
   const handleGrantConsentSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('/api/v1/consent', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+      const res = await fetch("/api/v1/consent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           patientId,
-          purpose: newConsent.purpose
-        })
+          purpose: newConsent.purpose,
+        }),
       });
 
       if (res.ok) {
@@ -119,7 +127,8 @@ export function ConsentManagementPage() {
               </span>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Transparent patient data sharing. You retain full control and the right to revoke consent anytime.
+              Transparent patient data sharing. You retain full control and the
+              right to revoke consent anytime.
             </p>
           </div>
         </div>
@@ -161,11 +170,12 @@ export function ConsentManagementPage() {
               Active & Historical Consents
             </h2>
             <p className="text-[11px] text-slate-400 dark:text-slate-500">
-              Records are preserved for legal accountability under health continuity regulations.
+              Records are preserved for legal accountability under health
+              continuity regulations.
             </p>
           </div>
           <span className="text-xs font-bold text-slate-400 font-tabular">
-            {consents.length} {consents.length === 1 ? 'record' : 'records'}
+            {consents.length} {consents.length === 1 ? "record" : "records"}
           </span>
         </div>
 
@@ -185,34 +195,46 @@ export function ConsentManagementPage() {
             {consents.map((c) => {
               const isRevoked = Boolean(c.revokedAt);
               return (
-                <div key={c._id} className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div
+                  key={c._id}
+                  className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className={`icon-box ${
-                      isRevoked
-                        ? 'bg-slate-100 dark:bg-slate-800 text-slate-400'
-                        : 'bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400'
-                    }`}>
+                    <div
+                      className={`icon-box ${
+                        isRevoked
+                          ? "bg-slate-100 dark:bg-slate-800 text-slate-400"
+                          : "bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400"
+                      }`}
+                    >
                       <Shield className="w-4 h-4" />
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-bold text-slate-900 dark:text-slate-100 capitalize">
-                          {c.purpose.replace(/_/g, ' ')}
+                          {c.purpose.replace(/_/g, " ")}
                         </span>
-                        <span className={`px-2 py-0.2 rounded-full text-[10px] font-bold uppercase ${
-                          isRevoked
-                            ? 'bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-900'
-                            : 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
-                        }`}>
-                          {isRevoked ? 'Revoked' : 'Active'}
+                        <span
+                          className={`px-2 py-0.2 rounded-full text-[10px] font-bold uppercase ${
+                            isRevoked
+                              ? "bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-900"
+                              : "bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"
+                          }`}
+                        >
+                          {isRevoked ? "Revoked" : "Active"}
                         </span>
                       </div>
                       <div className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 space-x-2">
-                        <span>Granted: {new Date(c.grantedAt).toLocaleDateString()}</span>
-                        <span>&bull; Notice: {c.noticeVersion || 'DPDP-2023-v1.0'}</span>
+                        <span>
+                          Granted: {new Date(c.grantedAt).toLocaleDateString()}
+                        </span>
+                        <span>
+                          &bull; Notice: {c.noticeVersion || "DPDP-2023-v1.0"}
+                        </span>
                         {isRevoked && (
                           <span className="text-rose-600 dark:text-rose-400 font-medium">
-                            &bull; Withdrawn: {new Date(c.revokedAt).toLocaleDateString()}
+                            &bull; Withdrawn:{" "}
+                            {new Date(c.revokedAt).toLocaleDateString()}
                           </span>
                         )}
                       </div>
@@ -240,7 +262,9 @@ export function ConsentManagementPage() {
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-100">
           <div className="card-clean max-w-md w-full p-5 shadow-2xl space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-              <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100">Grant Purpose Consent</h3>
+              <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100">
+                Grant Purpose Consent
+              </h3>
               <button
                 onClick={() => setShowGrantModal(false)}
                 className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
@@ -248,23 +272,39 @@ export function ConsentManagementPage() {
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <form onSubmit={handleGrantConsentSubmit} className="space-y-3.5 text-xs">
+            <form
+              onSubmit={handleGrantConsentSubmit}
+              className="space-y-3.5 text-xs"
+            >
               <div>
-                <label className="font-semibold block mb-1 text-slate-700 dark:text-slate-300">Select Specific Purpose</label>
+                <label className="font-semibold block mb-1 text-slate-700 dark:text-slate-300">
+                  Select Specific Purpose
+                </label>
                 <select
                   value={newConsent.purpose}
-                  onChange={(e) => setNewConsent({ ...newConsent, purpose: e.target.value })}
+                  onChange={(e) =>
+                    setNewConsent({ ...newConsent, purpose: e.target.value })
+                  }
                   className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-medium text-xs"
                 >
-                  <option value="caregiver_access">Caregiver Health Timeline & Alert Access</option>
-                  <option value="chw_home_monitoring">CHW (ASHA) Home Visit Monitoring</option>
-                  <option value="telephonic_followup">Telephonic Recovery Check-ins</option>
-                  <option value="emergency_sms_alerts">Emergency Red-Flag SMS to Caregivers</option>
+                  <option value="caregiver_access">
+                    Caregiver Health Timeline & Alert Access
+                  </option>
+                  <option value="chw_home_monitoring">
+                    CHW (ASHA) Home Visit Monitoring
+                  </option>
+                  <option value="telephonic_followup">
+                    Telephonic Recovery Check-ins
+                  </option>
+                  <option value="emergency_sms_alerts">
+                    Emergency Red-Flag SMS to Caregivers
+                  </option>
                 </select>
               </div>
 
               <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 leading-relaxed text-[11px]">
-                By granting, you authorize HealthVerse to share only the minimum required information for this designated care purpose.
+                By granting, you authorize HealthVerse to share only the minimum
+                required information for this designated care purpose.
               </div>
 
               <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">

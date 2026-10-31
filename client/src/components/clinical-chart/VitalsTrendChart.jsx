@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   ResponsiveContainer,
   LineChart,
@@ -8,9 +8,9 @@ import {
   Tooltip,
   Legend,
   ReferenceArea,
-  CartesianGrid
-} from 'recharts';
-import { Activity, ShieldCheck } from 'lucide-react';
+  CartesianGrid,
+} from "recharts";
+import { Activity, ShieldCheck } from "lucide-react";
 
 /**
  * Custom Accessible Tooltip for Recharts
@@ -32,7 +32,10 @@ function CustomChartTooltip({ active, payload, label }) {
       </div>
 
       {payload.map((entry, index) => (
-        <div key={`item-${index}`} className="flex items-center justify-between gap-3">
+        <div
+          key={`item-${index}`}
+          className="flex items-center justify-between gap-3"
+        >
           <span className="flex items-center gap-1.5 text-slate-500 text-[11px]">
             <span
               className="w-2 h-2 rounded-full shrink-0"
@@ -41,7 +44,7 @@ function CustomChartTooltip({ active, payload, label }) {
             <span>{entry.name}:</span>
           </span>
           <span className="font-tabular font-bold text-slate-900 dark:text-slate-100 text-xs">
-            {entry.value} {entry.dataKey === 'systolicBP' ? 'mmHg' : 'bpm'}
+            {entry.value} {entry.dataKey === "systolicBP" ? "mmHg" : "bpm"}
           </span>
         </div>
       ))}
@@ -61,13 +64,42 @@ function CustomizedDot(props) {
   const { cx, cy, stroke, payload } = props;
   if (payload.isLatest) {
     return (
-      <svg x={cx - 5} y={cy - 5} width={10} height={10} className="overflow-visible">
-        <circle cx="5" cy="5" r="5" fill={stroke} fillOpacity={0.3} className="animate-ping" />
-        <circle cx="5" cy="5" r="3.5" fill={stroke} stroke="#ffffff" strokeWidth="1.5" />
+      <svg
+        x={cx - 5}
+        y={cy - 5}
+        width={10}
+        height={10}
+        className="overflow-visible"
+      >
+        <circle
+          cx="5"
+          cy="5"
+          r="5"
+          fill={stroke}
+          fillOpacity={0.3}
+          className="animate-ping"
+        />
+        <circle
+          cx="5"
+          cy="5"
+          r="3.5"
+          fill={stroke}
+          stroke="#ffffff"
+          strokeWidth="1.5"
+        />
       </svg>
     );
   }
-  return <circle cx={cx} cy={cy} r="2.5" fill={stroke} stroke="#ffffff" strokeWidth="1" />;
+  return (
+    <circle
+      cx={cx}
+      cy={cy}
+      r="2.5"
+      fill={stroke}
+      stroke="#ffffff"
+      strokeWidth="1"
+    />
+  );
 }
 
 export function VitalsTrendChart({ trendData = [] }) {
@@ -110,22 +142,30 @@ export function VitalsTrendChart({ trendData = [] }) {
       {/* Recharts Chart Container */}
       <div className="w-full h-64 sm:h-72 pt-1">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={trendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#94a3b8" strokeOpacity={0.15} vertical={false} />
+          <LineChart
+            data={trendData}
+            margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+          >
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke="#94a3b8"
+              strokeOpacity={0.15}
+              vertical={false}
+            />
 
             <XAxis
               dataKey="date"
               stroke="#94a3b8"
               fontSize={10}
               tickLine={false}
-              axisLine={{ stroke: '#cbd5e1', strokeOpacity: 0.3 }}
+              axisLine={{ stroke: "#cbd5e1", strokeOpacity: 0.3 }}
             />
             <YAxis
               domain={[40, 180]}
               stroke="#94a3b8"
               fontSize={10}
               tickLine={false}
-              axisLine={{ stroke: '#cbd5e1', strokeOpacity: 0.3 }}
+              axisLine={{ stroke: "#cbd5e1", strokeOpacity: 0.3 }}
               tickFormatter={(v) => `${v}`}
             />
 
@@ -135,7 +175,7 @@ export function VitalsTrendChart({ trendData = [] }) {
               verticalAlign="top"
               align="right"
               iconType="circle"
-              wrapperStyle={{ paddingBottom: '8px', fontSize: '10px' }}
+              wrapperStyle={{ paddingBottom: "8px", fontSize: "10px" }}
             />
 
             {/* Shaded Green Clinical Target Window (Systolic 100-130 mmHg) */}
@@ -157,7 +197,12 @@ export function VitalsTrendChart({ trendData = [] }) {
               stroke="#0284c7"
               strokeWidth={2}
               dot={<CustomizedDot stroke="#0284c7" />}
-              activeDot={{ r: 5, fill: '#0284c7', stroke: '#ffffff', strokeWidth: 2 }}
+              activeDot={{
+                r: 5,
+                fill: "#0284c7",
+                stroke: "#ffffff",
+                strokeWidth: 2,
+              }}
             />
 
             {/* Heart Rate Line */}
@@ -168,7 +213,12 @@ export function VitalsTrendChart({ trendData = [] }) {
               stroke="#0d9488"
               strokeWidth={2}
               dot={<CustomizedDot stroke="#0d9488" />}
-              activeDot={{ r: 5, fill: '#0d9488', stroke: '#ffffff', strokeWidth: 2 }}
+              activeDot={{
+                r: 5,
+                fill: "#0d9488",
+                stroke: "#ffffff",
+                strokeWidth: 2,
+              }}
             />
           </LineChart>
         </ResponsiveContainer>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   AlertTriangle,
   Pill,
@@ -7,8 +7,8 @@ import {
   Calendar,
   Clock,
   CheckCircle2,
-  FileText
-} from 'lucide-react';
+  FileText,
+} from "lucide-react";
 
 /**
  * Maps timeline event types to corresponding visual styles and icons
@@ -16,58 +16,68 @@ import {
 const EVENT_CONFIG = {
   alert: {
     icon: AlertTriangle,
-    bgColor: 'bg-red-50 dark:bg-red-950/70 border-red-200 dark:border-red-800 text-red-600 dark:text-red-400',
-    dotColor: 'bg-red-500',
-    badgeClass: 'bg-red-50 dark:bg-red-950/80 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800',
-    badgeText: 'Alert'
+    bgColor:
+      "bg-red-50 dark:bg-red-950/70 border-red-200 dark:border-red-800 text-red-600 dark:text-red-400",
+    dotColor: "bg-red-500",
+    badgeClass:
+      "bg-red-50 dark:bg-red-950/80 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800",
+    badgeText: "Alert",
   },
   missed_dose: {
     icon: Pill,
-    bgColor: 'bg-amber-50 dark:bg-amber-950/70 border-amber-200 dark:border-amber-800 text-amber-600 dark:text-amber-400',
-    dotColor: 'bg-amber-500',
-    badgeClass: 'bg-amber-50 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800',
-    badgeText: 'Missed Dose'
+    bgColor:
+      "bg-amber-50 dark:bg-amber-950/70 border-amber-200 dark:border-amber-800 text-amber-600 dark:text-amber-400",
+    dotColor: "bg-amber-500",
+    badgeClass:
+      "bg-amber-50 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800",
+    badgeText: "Missed Dose",
   },
   check_in: {
     icon: Activity,
-    bgColor: 'bg-teal-50 dark:bg-teal-950/70 border-teal-200 dark:border-teal-800 text-teal-600 dark:text-teal-400',
-    dotColor: 'bg-teal-500',
-    badgeClass: 'bg-teal-50 dark:bg-teal-950/80 text-teal-700 dark:text-teal-300 border-teal-200 dark:border-teal-800',
-    badgeText: 'Check-In'
+    bgColor:
+      "bg-teal-50 dark:bg-teal-950/70 border-teal-200 dark:border-teal-800 text-teal-600 dark:text-teal-400",
+    dotColor: "bg-teal-500",
+    badgeClass:
+      "bg-teal-50 dark:bg-teal-950/80 text-teal-700 dark:text-teal-300 border-teal-200 dark:border-teal-800",
+    badgeText: "Check-In",
   },
   discharge: {
     icon: LogOut,
-    bgColor: 'bg-emerald-50 dark:bg-emerald-950/70 border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400',
-    dotColor: 'bg-emerald-500',
-    badgeClass: 'bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
-    badgeText: 'Discharge'
+    bgColor:
+      "bg-emerald-50 dark:bg-emerald-950/70 border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400",
+    dotColor: "bg-emerald-500",
+    badgeClass:
+      "bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800",
+    badgeText: "Discharge",
   },
   default: {
     icon: FileText,
-    bgColor: 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300',
-    dotColor: 'bg-slate-400',
-    badgeClass: 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700',
-    badgeText: 'Event'
-  }
+    bgColor:
+      "bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300",
+    dotColor: "bg-slate-400",
+    badgeClass:
+      "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700",
+    badgeText: "Event",
+  },
 };
 
 /**
  * Format timestamp into readable localized date and time
  */
 function formatEventTimestamp(isoString) {
-  if (!isoString) return 'Recent';
+  if (!isoString) return "Recent";
   try {
     const d = new Date(isoString);
-    if (isNaN(d.getTime())) return 'Recent';
+    if (isNaN(d.getTime())) return "Recent";
     return d.toLocaleString(undefined, {
-      month: 'short',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
     });
   } catch {
-    return 'Recent';
+    return "Recent";
   }
 }
 
@@ -106,9 +116,7 @@ export function ClinicalTimeline({ events = [] }) {
             </p>
           </div>
         </div>
-        <span className="label-micro">
-          Newest First
-        </span>
+        <span className="label-micro">Newest First</span>
       </div>
 
       <div className="relative pl-5 sm:pl-6 border-l border-slate-200 dark:border-slate-800 space-y-4">

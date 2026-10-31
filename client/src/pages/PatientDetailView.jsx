@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useMemo } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
   X,
@@ -8,20 +8,20 @@ import {
   Pill,
   Clock,
   AlertTriangle,
-  RefreshCw
-} from 'lucide-react';
-import useAuthStore from '../store/useAuthStore.js';
+  RefreshCw,
+} from "lucide-react";
+import useAuthStore from "../store/useAuthStore.js";
 
 // Modular Clinical Chart Sub-components
-import { ChartBreadcrumb } from '../components/clinical-chart/ChartBreadcrumb.jsx';
-import { PatientBannerCard } from '../components/clinical-chart/PatientBannerCard.jsx';
-import { AlertStrip } from '../components/clinical-chart/AlertStrip.jsx';
-import { VitalsRow } from '../components/clinical-chart/VitalsRow.jsx';
-import { VitalsTrendChart } from '../components/clinical-chart/VitalsTrendChart.jsx';
-import { ClinicalTimeline } from '../components/clinical-chart/ClinicalTimeline.jsx';
-import { MedicationList } from '../components/clinical-chart/MedicationList.jsx';
-import { CarePlanChecklist } from '../components/clinical-chart/CarePlanChecklist.jsx';
-import { ClinicalNotesPanel } from '../components/clinical-chart/ClinicalNotesPanel.jsx';
+import { ChartBreadcrumb } from "../components/clinical-chart/ChartBreadcrumb.jsx";
+import { PatientBannerCard } from "../components/clinical-chart/PatientBannerCard.jsx";
+import { AlertStrip } from "../components/clinical-chart/AlertStrip.jsx";
+import { VitalsRow } from "../components/clinical-chart/VitalsRow.jsx";
+import { VitalsTrendChart } from "../components/clinical-chart/VitalsTrendChart.jsx";
+import { ClinicalTimeline } from "../components/clinical-chart/ClinicalTimeline.jsx";
+import { MedicationList } from "../components/clinical-chart/MedicationList.jsx";
+import { CarePlanChecklist } from "../components/clinical-chart/CarePlanChecklist.jsx";
+import { ClinicalNotesPanel } from "../components/clinical-chart/ClinicalNotesPanel.jsx";
 
 // Typed Clinical Chart Mock & Helper Data
 import {
@@ -30,8 +30,8 @@ import {
   getMedicationAdherenceList,
   getCarePlanChecklist,
   getClinicalTimelineEvents,
-  getInitialClinicalNotes
-} from '../data/patientChartMockData.js';
+  getInitialClinicalNotes,
+} from "../data/patientChartMockData.js";
 
 /**
  * PatientDetailView
@@ -57,22 +57,22 @@ export function PatientDetailView() {
 
   // Form states
   const [newMed, setNewMed] = useState({
-    medicine: '',
-    dosage: '',
+    medicine: "",
+    dosage: "",
     critical: false,
     timesPerDay: 1,
-    timingLabel: 'Morning',
-    timingHour: '09:00',
-    foodTiming: 'after_food',
-    startDate: new Date().toISOString().split('T')[0],
-    endDate: new Date(Date.now() + 14 * 86400000).toISOString().split('T')[0],
-    instructions: ''
+    timingLabel: "Morning",
+    timingHour: "09:00",
+    foodTiming: "after_food",
+    startDate: new Date().toISOString().split("T")[0],
+    endDate: new Date(Date.now() + 14 * 86400000).toISOString().split("T")[0],
+    instructions: "",
   });
 
   const [newFollowup, setNewFollowup] = useState({
     scheduledAt: new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 16),
-    type: 'in_person',
-    notes: 'Routine clinical check-up'
+    type: "in_person",
+    notes: "Routine clinical check-up",
   });
 
   useEffect(() => {
@@ -83,17 +83,19 @@ export function PatientDetailView() {
     try {
       setIsLoading(true);
       setLoadError(null);
-      const res = await fetch(`/api/v1/patients/${id}`, { credentials: 'include' });
+      const res = await fetch(`/api/v1/patients/${id}`, {
+        credentials: "include",
+      });
       if (res.ok) {
         const json = await res.json();
         setData(json.data);
       } else {
         const errJson = await res.json().catch(() => ({}));
-        setLoadError(errJson.message || 'Failed to retrieve patient chart');
+        setLoadError(errJson.message || "Failed to retrieve patient chart");
       }
     } catch (e) {
       console.error(e);
-      setLoadError('Network error connecting to patient clinical service');
+      setLoadError("Network error connecting to patient clinical service");
     } finally {
       setIsLoading(false);
     }
@@ -103,45 +105,50 @@ export function PatientDetailView() {
   const handleAcknowledgeAlert = async (alertId) => {
     try {
       const res = await fetch(`/api/v1/alerts/${alertId}/acknowledge`, {
-        method: 'PATCH',
-        credentials: 'include'
+        method: "PATCH",
+        credentials: "include",
       });
       if (res.ok) {
         await fetchPatientChart();
       } else {
         const errData = await res.json().catch(() => ({}));
-        alert(errData.message || 'Failed to acknowledge alert');
+        alert(errData.message || "Failed to acknowledge alert");
       }
     } catch (err) {
       console.error(err);
-      alert('Network error acknowledging alert');
+      alert("Network error acknowledging alert");
     }
   };
 
   const handleSendToER = async (alertId) => {
-    if (!window.confirm('Confirm immediate Emergency Transfer (ER) escalation for this patient?')) {
+    if (
+      !window.confirm(
+        "Confirm immediate Emergency Transfer (ER) escalation for this patient?",
+      )
+    ) {
       return;
     }
     try {
       const res = await fetch(`/api/v1/alerts/${alertId}/resolve`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
-          actionTaken: 'emergency_transfer',
-          notes: 'Direct emergency transfer initiated from Clinical Chart by attending clinician'
-        })
+          actionTaken: "emergency_transfer",
+          notes:
+            "Direct emergency transfer initiated from Clinical Chart by attending clinician",
+        }),
       });
       if (res.ok) {
-        alert('Patient escalated to ER desk. Emergency protocol activated.');
+        alert("Patient escalated to ER desk. Emergency protocol activated.");
         await fetchPatientChart();
       } else {
         const errData = await res.json().catch(() => ({}));
-        alert(errData.message || 'Failed to process ER escalation');
+        alert(errData.message || "Failed to process ER escalation");
       }
     } catch (err) {
       console.error(err);
-      alert('Network error sending ER referral');
+      alert("Network error sending ER referral");
     }
   };
 
@@ -150,19 +157,22 @@ export function PatientDetailView() {
     if (data?.patient?.phone) {
       window.location.href = `tel:${data.patient.phone}`;
     } else {
-      alert('No verified phone number on record for this patient.');
+      alert("No verified phone number on record for this patient.");
     }
   };
 
   const handleMessage = () => {
     if (data?.patient?.phone) {
-      const cleanPhone = data.patient.phone.replace(/[^0-9]/g, '');
+      const cleanPhone = data.patient.phone.replace(/[^0-9]/g, "");
       const defaultText = encodeURIComponent(
-        `Namaste ${data.patient.name}, this is Dr. Ananya Sharma from District Sub-Divisional Hospital & Trauma Centre Mandvi regarding your post-discharge continuity follow-up.`
+        `Namaste ${data.patient.name}, this is Dr. Ananya Sharma from District Sub-Divisional Hospital & Trauma Centre Mandvi regarding your post-discharge continuity follow-up.`,
       );
-      window.open(`https://wa.me/91${cleanPhone}?text=${defaultText}`, '_blank');
+      window.open(
+        `https://wa.me/91${cleanPhone}?text=${defaultText}`,
+        "_blank",
+      );
     } else {
-      alert('No verified phone number on record for this patient.');
+      alert("No verified phone number on record for this patient.");
     }
   };
 
@@ -172,10 +182,10 @@ export function PatientDetailView() {
     const activeDischarge = data?.discharges?.[0];
 
     try {
-      const res = await fetch('/api/v1/prescriptions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+      const res = await fetch("/api/v1/prescriptions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           dischargeId: activeDischarge?._id || undefined,
           patientId: id,
@@ -184,37 +194,50 @@ export function PatientDetailView() {
           critical: newMed.critical,
           schedule: {
             timesPerDay: Number(newMed.timesPerDay) || 1,
-            timings: [{ time: newMed.timingHour || '09:00', label: newMed.timingLabel || 'Morning' }],
-            foodTiming: newMed.foodTiming || 'after_food'
+            timings: [
+              {
+                time: newMed.timingHour || "09:00",
+                label: newMed.timingLabel || "Morning",
+              },
+            ],
+            foodTiming: newMed.foodTiming || "after_food",
           },
-          startDate: newMed.startDate || new Date().toISOString().split('T')[0],
-          endDate: newMed.endDate || new Date(Date.now() + 14 * 86400000).toISOString().split('T')[0],
-          instructions: newMed.instructions || 'Take as advised by doctor'
-        })
+          startDate: newMed.startDate || new Date().toISOString().split("T")[0],
+          endDate:
+            newMed.endDate ||
+            new Date(Date.now() + 14 * 86400000).toISOString().split("T")[0],
+          instructions: newMed.instructions || "Take as advised by doctor",
+        }),
       });
 
       if (res.ok) {
         setShowAddMedModal(false);
         setNewMed({
-          medicine: '',
-          dosage: '',
+          medicine: "",
+          dosage: "",
           critical: false,
           timesPerDay: 1,
-          timingLabel: 'Morning',
-          timingHour: '09:00',
-          foodTiming: 'after_food',
-          startDate: new Date().toISOString().split('T')[0],
-          endDate: new Date(Date.now() + 14 * 86400000).toISOString().split('T')[0],
-          instructions: ''
+          timingLabel: "Morning",
+          timingHour: "09:00",
+          foodTiming: "after_food",
+          startDate: new Date().toISOString().split("T")[0],
+          endDate: new Date(Date.now() + 14 * 86400000)
+            .toISOString()
+            .split("T")[0],
+          instructions: "",
         });
         await fetchPatientChart();
       } else {
         const errData = await res.json().catch(() => ({}));
-        alert(errData.message || errData.errors?.[0]?.msg || 'Failed to add medication');
+        alert(
+          errData.message ||
+            errData.errors?.[0]?.msg ||
+            "Failed to add medication",
+        );
       }
     } catch (err) {
       console.error(err);
-      alert('Network error while adding medication');
+      alert("Network error while adding medication");
     }
   };
 
@@ -223,17 +246,17 @@ export function PatientDetailView() {
     e.preventDefault();
     const activeDischarge = data?.discharges?.[0];
     try {
-      const res = await fetch('/api/v1/followups', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+      const res = await fetch("/api/v1/followups", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           patientId: id,
           dischargeId: activeDischarge?._id || undefined,
           scheduledAt: newFollowup.scheduledAt,
           type: newFollowup.type,
-          notes: newFollowup.notes
-        })
+          notes: newFollowup.notes,
+        }),
       });
 
       if (res.ok) {
@@ -241,52 +264,62 @@ export function PatientDetailView() {
         await fetchPatientChart();
       } else {
         const errData = await res.json().catch(() => ({}));
-        alert(errData.message || errData.errors?.[0]?.msg || 'Failed to schedule visit');
+        alert(
+          errData.message ||
+            errData.errors?.[0]?.msg ||
+            "Failed to schedule visit",
+        );
       }
     } catch (err) {
       console.error(err);
-      alert('Network error while scheduling visit');
+      alert("Network error while scheduling visit");
     }
   };
 
   // Care Plan Milestone Toggle (Live updates database)
   const handleCarePlanToggle = async (itemId, nextStatus) => {
-    const isInv = data?.investigations?.some(i => i._id === itemId);
-    const isFup = data?.followups?.some(f => f._id === itemId);
+    const isInv = data?.investigations?.some((i) => i._id === itemId);
+    const isFup = data?.followups?.some((f) => f._id === itemId);
 
     try {
       if (isInv) {
         await fetch(`/api/v1/investigations/${itemId}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ status: nextStatus === 'completed' ? 'resulted' : 'ordered' })
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            status: nextStatus === "completed" ? "resulted" : "ordered",
+          }),
         });
         await fetchPatientChart();
       } else if (isFup) {
         await fetch(`/api/v1/followups/${itemId}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ status: nextStatus === 'completed' ? 'completed' : 'scheduled' })
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            status: nextStatus === "completed" ? "completed" : "scheduled",
+          }),
         });
         await fetchPatientChart();
       }
     } catch (e) {
-      console.error('Error updating milestone in database:', e);
+      console.error("Error updating milestone in database:", e);
     }
   };
 
   // Clinical Note Submit
   const handleNewClinicalNote = (note) => {
-    console.log('New clinical note logged:', note);
+    console.log("New clinical note logged:", note);
   };
 
   // Data processing with useMemo
   const patient = data?.patient;
   const activeDischarge = data?.discharges?.[0];
   const latestRisk = data?.riskAssessments?.[0];
-  const openAlert = data?.alerts?.find((a) => a.status === 'open' || a.status === 'escalated');
+  const openAlert = data?.alerts?.find(
+    (a) => a.status === "open" || a.status === "escalated",
+  );
 
   // Recovery Day Calculation
   const dischargeDateObj = activeDischarge?.dischargeDate
@@ -295,7 +328,10 @@ export function PatientDetailView() {
   const totalDays = activeDischarge?.expectedRecoveryDays || 14;
   const elapsedDays = Math.max(
     1,
-    Math.min(totalDays, Math.floor((Date.now() - dischargeDateObj.getTime()) / 86400000) + 1)
+    Math.min(
+      totalDays,
+      Math.floor((Date.now() - dischargeDateObj.getTime()) / 86400000) + 1,
+    ),
   );
 
   const vitalsSummary = useMemo(() => {
@@ -308,14 +344,17 @@ export function PatientDetailView() {
   }, [data?.recentSymptoms]);
 
   const medicationList = useMemo(() => {
-    return getMedicationAdherenceList(data?.prescriptions || [], data?.adherenceLogs || []);
+    return getMedicationAdherenceList(
+      data?.prescriptions || [],
+      data?.adherenceLogs || [],
+    );
   }, [data?.prescriptions, data?.adherenceLogs]);
 
   const carePlanItems = useMemo(() => {
     return getCarePlanChecklist(
       activeDischarge?.diagnosis,
       data?.investigations || [],
-      data?.followups || []
+      data?.followups || [],
     );
   }, [activeDischarge, data?.investigations, data?.followups]);
 
@@ -323,7 +362,7 @@ export function PatientDetailView() {
     return getClinicalTimelineEvents({
       alerts: data?.alerts || [],
       symptoms: data?.recentSymptoms || [],
-      discharges: data?.discharges || []
+      discharges: data?.discharges || [],
     });
   }, [data?.alerts, data?.recentSymptoms, data?.discharges]);
 
@@ -362,11 +401,12 @@ export function PatientDetailView() {
           Unable to Load Clinical Chart
         </h2>
         <p className="text-xs text-slate-400 max-w-md mx-auto">
-          {loadError || 'The requested patient record could not be found or has been archived.'}
+          {loadError ||
+            "The requested patient record could not be found or has been archived."}
         </p>
         <div className="pt-2 flex justify-center gap-3">
           <button
-            onClick={() => navigate('/clinician')}
+            onClick={() => navigate("/clinician")}
             className="btn-touch bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700"
           >
             Return to Roster
@@ -392,7 +432,7 @@ export function PatientDetailView() {
       <PatientBannerCard
         patient={patient}
         discharge={activeDischarge}
-        riskLevel={latestRisk?.riskLevel || 'low'}
+        riskLevel={latestRisk?.riskLevel || "low"}
         onBookVisit={() => setShowFollowupModal(true)}
         onCall={handleCall}
         onMessage={handleMessage}
@@ -454,15 +494,15 @@ export function PatientDetailView() {
 
             <form onSubmit={handleAddMedSubmit} className="space-y-3 text-xs">
               <div>
-                <label className="label-micro block mb-1">
-                  Medicine Name
-                </label>
+                <label className="label-micro block mb-1">Medicine Name</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Aspirin 75mg / Atorvastatin"
                   value={newMed.medicine}
-                  onChange={(e) => setNewMed({ ...newMed, medicine: e.target.value })}
+                  onChange={(e) =>
+                    setNewMed({ ...newMed, medicine: e.target.value })
+                  }
                   className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs"
                 />
               </div>
@@ -476,7 +516,9 @@ export function PatientDetailView() {
                   required
                   placeholder="e.g. 75mg once daily"
                   value={newMed.dosage}
-                  onChange={(e) => setNewMed({ ...newMed, dosage: e.target.value })}
+                  onChange={(e) =>
+                    setNewMed({ ...newMed, dosage: e.target.value })
+                  }
                   className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs"
                 />
               </div>
@@ -486,10 +528,15 @@ export function PatientDetailView() {
                   type="checkbox"
                   id="critCheck"
                   checked={newMed.critical}
-                  onChange={(e) => setNewMed({ ...newMed, critical: e.target.checked })}
+                  onChange={(e) =>
+                    setNewMed({ ...newMed, critical: e.target.checked })
+                  }
                   className="w-4 h-4 rounded text-red-600 focus:ring-red-500"
                 />
-                <label htmlFor="critCheck" className="font-semibold text-xs text-red-700 dark:text-red-300 cursor-pointer select-none">
+                <label
+                  htmlFor="critCheck"
+                  className="font-semibold text-xs text-red-700 dark:text-red-300 cursor-pointer select-none"
+                >
                   Critical Medication (Triggers alerts if missed)
                 </label>
               </div>
@@ -532,7 +579,10 @@ export function PatientDetailView() {
               </button>
             </div>
 
-            <form onSubmit={handleScheduleFollowupSubmit} className="space-y-3 text-xs">
+            <form
+              onSubmit={handleScheduleFollowupSubmit}
+              className="space-y-3 text-xs"
+            >
               <div>
                 <label className="label-micro block mb-1">
                   Date &amp; Time
@@ -541,34 +591,41 @@ export function PatientDetailView() {
                   type="datetime-local"
                   required
                   value={newFollowup.scheduledAt}
-                  onChange={(e) => setNewFollowup({ ...newFollowup, scheduledAt: e.target.value })}
+                  onChange={(e) =>
+                    setNewFollowup({
+                      ...newFollowup,
+                      scheduledAt: e.target.value,
+                    })
+                  }
                   className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-tabular text-xs"
                 />
               </div>
 
               <div>
-                <label className="label-micro block mb-1">
-                  Visit Type
-                </label>
+                <label className="label-micro block mb-1">Visit Type</label>
                 <select
                   value={newFollowup.type}
-                  onChange={(e) => setNewFollowup({ ...newFollowup, type: e.target.value })}
+                  onChange={(e) =>
+                    setNewFollowup({ ...newFollowup, type: e.target.value })
+                  }
                   className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs"
                 >
                   <option value="in_person">In-Person at Hospital</option>
-                  <option value="home_visit_chw">Home Visit by CHW (ASHA)</option>
+                  <option value="home_visit_chw">
+                    Home Visit by CHW (ASHA)
+                  </option>
                   <option value="telephonic">Telephonic Consultation</option>
                 </select>
               </div>
 
               <div>
-                <label className="label-micro block mb-1">
-                  Clinical Notes
-                </label>
+                <label className="label-micro block mb-1">Clinical Notes</label>
                 <textarea
                   rows="2"
                   value={newFollowup.notes}
-                  onChange={(e) => setNewFollowup({ ...newFollowup, notes: e.target.value })}
+                  onChange={(e) =>
+                    setNewFollowup({ ...newFollowup, notes: e.target.value })
+                  }
                   className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs resize-none"
                 />
               </div>

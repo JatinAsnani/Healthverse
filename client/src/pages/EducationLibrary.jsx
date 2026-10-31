@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import {
   BookOpen,
   Bandage,
@@ -12,17 +12,17 @@ import {
   Globe,
   ChevronRight,
   X,
-  FileText
-} from 'lucide-react';
-import useAuthStore from '../store/useAuthStore.js';
+  FileText,
+} from "lucide-react";
+import useAuthStore from "../store/useAuthStore.js";
 
 export function EducationLibrary() {
   const { t } = useTranslation();
   const { language, setLanguage } = useAuthStore();
 
   const [articles, setArticles] = useState([]);
-  const [activeTopic, setActiveTopic] = useState('all');
-  const [search, setSearch] = useState('');
+  const [activeTopic, setActiveTopic] = useState("all");
+  const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [selectedArticle, setSelectedArticle] = useState(null);
 
@@ -33,14 +33,14 @@ export function EducationLibrary() {
   const fetchArticles = async () => {
     try {
       setIsLoading(true);
-      const url = `/api/v1/education?language=${language}${activeTopic !== 'all' ? `&topic=${activeTopic}` : ''}`;
+      const url = `/api/v1/education?language=${language}${activeTopic !== "all" ? `&topic=${activeTopic}` : ""}`;
       const res = await fetch(url);
       if (res.ok) {
         const json = await res.json();
         setArticles(json.data || []);
       }
     } catch (e) {
-      console.warn('Network error loading education articles:', e);
+      console.warn("Network error loading education articles:", e);
     } finally {
       setIsLoading(false);
     }
@@ -48,26 +48,33 @@ export function EducationLibrary() {
 
   const getTopicIcon = (topic) => {
     switch (topic) {
-      case 'wound_care': return Bandage;
-      case 'medication_adherence': return Pill;
-      case 'warning_signs': return AlertTriangle;
-      case 'pmjay_benefits': return ShieldCheck;
-      default: return HeartPulse;
+      case "wound_care":
+        return Bandage;
+      case "medication_adherence":
+        return Pill;
+      case "warning_signs":
+        return AlertTriangle;
+      case "pmjay_benefits":
+        return ShieldCheck;
+      default:
+        return HeartPulse;
     }
   };
 
   const filteredArticles = articles.filter((a) => {
     if (!search) return true;
     const q = search.toLowerCase();
-    return a.title?.toLowerCase().includes(q) || a.summary?.toLowerCase().includes(q);
+    return (
+      a.title?.toLowerCase().includes(q) || a.summary?.toLowerCase().includes(q)
+    );
   });
 
   const topicOptions = [
-    { id: 'all', label: 'All Guides' },
-    { id: 'wound_care', label: 'Wound Care' },
-    { id: 'medication_adherence', label: 'Medicines' },
-    { id: 'warning_signs', label: 'Warning Signs (108)' },
-    { id: 'pmjay_benefits', label: 'PM-JAY Scheme' }
+    { id: "all", label: "All Guides" },
+    { id: "wound_care", label: "Wound Care" },
+    { id: "medication_adherence", label: "Medicines" },
+    { id: "warning_signs", label: "Warning Signs (108)" },
+    { id: "pmjay_benefits", label: "PM-JAY Scheme" },
   ];
 
   return (
@@ -83,20 +90,21 @@ export function EducationLibrary() {
               Post-Discharge Recovery Guides
             </h1>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Practical care instructions in English, Hindi, and Gujarati. Offline accessible.
+              Practical care instructions in English, Hindi, and Gujarati.
+              Offline accessible.
             </p>
           </div>
         </div>
 
         {/* Minimal Language Switcher */}
         <div className="pill-track self-start sm:self-auto">
-          {['en', 'hi', 'gu'].map((lng) => (
+          {["en", "hi", "gu"].map((lng) => (
             <button
               key={lng}
               onClick={() => setLanguage(lng)}
-              className={`pill-item ${language === lng ? 'pill-item-active' : ''}`}
+              className={`pill-item ${language === lng ? "pill-item-active" : ""}`}
             >
-              {lng === 'en' ? 'EN' : lng === 'hi' ? 'हिंदी' : 'ગુજ'}
+              {lng === "en" ? "EN" : lng === "hi" ? "हिंदी" : "ગુજ"}
             </button>
           ))}
         </div>
@@ -110,7 +118,7 @@ export function EducationLibrary() {
               key={opt.id}
               onClick={() => setActiveTopic(opt.id)}
               className={`pill-item whitespace-nowrap ${
-                activeTopic === opt.id ? 'pill-item-active' : ''
+                activeTopic === opt.id ? "pill-item-active" : ""
               }`}
             >
               {opt.label}
@@ -134,7 +142,10 @@ export function EducationLibrary() {
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="card-clean p-5 h-40 skeleton-shimmer space-y-3" />
+            <div
+              key={i}
+              className="card-clean p-5 h-40 skeleton-shimmer space-y-3"
+            />
           ))}
         </div>
       ) : filteredArticles.length === 0 ? (
@@ -144,7 +155,10 @@ export function EducationLibrary() {
             No recovery guides match your current filter.
           </p>
           <button
-            onClick={() => { setActiveTopic('all'); setSearch(''); }}
+            onClick={() => {
+              setActiveTopic("all");
+              setSearch("");
+            }}
             className="text-xs text-teal-600 dark:text-teal-400 font-bold hover:underline"
           >
             Clear filters
@@ -164,7 +178,9 @@ export function EducationLibrary() {
                   <div className="flex items-center justify-between gap-2 mb-2">
                     <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-bold bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 border border-teal-200/60 dark:border-teal-800/60">
                       <Icon className="w-3 h-3 text-teal-600 dark:text-teal-400" />
-                      <span className="capitalize">{article.topic.replace('_', ' ')}</span>
+                      <span className="capitalize">
+                        {article.topic.replace("_", " ")}
+                      </span>
                     </span>
                     <span className="label-micro flex items-center gap-1">
                       <Clock className="w-3 h-3" />
@@ -210,11 +226,15 @@ export function EducationLibrary() {
             <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-teal-50 dark:bg-teal-950 text-teal-700 dark:text-teal-300">
-                  <span className="capitalize">{selectedArticle.topic.replace('_', ' ')}</span>
+                  <span className="capitalize">
+                    {selectedArticle.topic.replace("_", " ")}
+                  </span>
                 </span>
                 <span className="label-micro flex items-center gap-1">
                   <Clock className="w-3 h-3" />
-                  <span>{selectedArticle.readingTimeMinutes || 3} min read</span>
+                  <span>
+                    {selectedArticle.readingTimeMinutes || 3} min read
+                  </span>
                 </span>
               </div>
               <button

@@ -1,30 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   FileText,
   Plus,
   Send,
   Clock,
   ChevronDown,
-  ChevronUp
-} from 'lucide-react';
+  ChevronUp,
+} from "lucide-react";
 
 /**
  * Format ISO timestamp into clean relative/readable time
  */
 function formatNoteTime(isoString) {
-  if (!isoString) return 'Just now';
+  if (!isoString) return "Just now";
   try {
     const d = new Date(isoString);
-    if (isNaN(d.getTime())) return 'Just now';
+    if (isNaN(d.getTime())) return "Just now";
     return d.toLocaleString(undefined, {
-      month: 'short',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
     });
   } catch {
-    return 'Just now';
+    return "Just now";
   }
 }
 
@@ -32,14 +32,11 @@ function formatNoteTime(isoString) {
  * ClinicalNotesPanel
  * Previews recent clinical continuity notes with an inline "Add note" form
  */
-export function ClinicalNotesPanel({
-  initialNotes = [],
-  onAddNote
-}) {
+export function ClinicalNotesPanel({ initialNotes = [], onAddNote }) {
   const [notes, setNotes] = useState(initialNotes);
   const [isAdding, setIsAdding] = useState(false);
-  const [newContent, setNewContent] = useState('');
-  const [newTag, setNewTag] = useState('Progress Note');
+  const [newContent, setNewContent] = useState("");
+  const [newTag, setNewTag] = useState("Progress Note");
   const [showAll, setShowAll] = useState(false);
 
   React.useEffect(() => {
@@ -54,18 +51,18 @@ export function ClinicalNotesPanel({
 
     const newNote = {
       id: `note-${Date.now()}`,
-      author: 'Dr. Ananya Sharma',
-      role: 'Internal Medicine Clinician',
+      author: "Dr. Ananya Sharma",
+      role: "Internal Medicine Clinician",
       timestamp: new Date().toISOString(),
       content: newContent.trim(),
-      tags: [newTag, 'Chart Update']
+      tags: [newTag, "Chart Update"],
     };
 
     setNotes((prev) => [newNote, ...prev]);
     if (onAddNote) {
       onAddNote(newNote);
     }
-    setNewContent('');
+    setNewContent("");
     setIsAdding(false);
   };
 
@@ -84,7 +81,8 @@ export function ClinicalNotesPanel({
               Progress Notes
             </h3>
             <p className="text-[10px] text-slate-400">
-              Continuity-of-care observations &bull; {notes.length} {notes.length === 1 ? 'entry' : 'entries'}
+              Continuity-of-care observations &bull; {notes.length}{" "}
+              {notes.length === 1 ? "entry" : "entries"}
             </p>
           </div>
         </div>
@@ -95,15 +93,20 @@ export function ClinicalNotesPanel({
           className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition-colors shadow-xs"
         >
           <Plus className="w-3 h-3" />
-          <span>{isAdding ? 'Cancel' : 'Add Note'}</span>
+          <span>{isAdding ? "Cancel" : "Add Note"}</span>
         </button>
       </div>
 
       {/* Inline Add Note Form */}
       {isAdding && (
-        <form onSubmit={handleSubmit} className="mb-3.5 p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-teal-500/30 space-y-2.5 text-xs">
+        <form
+          onSubmit={handleSubmit}
+          className="mb-3.5 p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-teal-500/30 space-y-2.5 text-xs"
+        >
           <div className="flex items-center justify-between">
-            <span className="font-bold text-teal-700 dark:text-teal-300 text-xs">New Observation</span>
+            <span className="font-bold text-teal-700 dark:text-teal-300 text-xs">
+              New Observation
+            </span>
             <select
               value={newTag}
               onChange={(e) => setNewTag(e.target.value)}
@@ -158,12 +161,14 @@ export function ClinicalNotesPanel({
               <div className="flex flex-wrap items-center justify-between gap-1 mb-1.5 pb-1.5 border-b border-slate-100 dark:border-slate-800">
                 <div className="flex items-center gap-1.5">
                   <div className="w-5 h-5 rounded-full bg-teal-50 dark:bg-teal-950 text-teal-700 dark:text-teal-300 font-bold text-[10px] flex items-center justify-center border border-teal-200 dark:border-teal-800">
-                    {note.author?.charAt(0) || 'D'}
+                    {note.author?.charAt(0) || "D"}
                   </div>
                   <span className="text-xs font-bold text-slate-900 dark:text-slate-100">
                     {note.author}
                   </span>
-                  <span className="text-[10px] text-slate-400">({note.role})</span>
+                  <span className="text-[10px] text-slate-400">
+                    ({note.role})
+                  </span>
                 </div>
 
                 <div className="flex items-center gap-1 text-[10px] text-slate-400 font-tabular">
@@ -200,8 +205,16 @@ export function ClinicalNotesPanel({
               onClick={() => setShowAll(!showAll)}
               className="w-full py-1 text-center text-xs font-semibold text-teal-600 dark:text-teal-400 hover:underline flex items-center justify-center gap-1 transition-colors"
             >
-              <span>{showAll ? 'Show latest note only' : `View ${notes.length - 1} older notes`}</span>
-              {showAll ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+              <span>
+                {showAll
+                  ? "Show latest note only"
+                  : `View ${notes.length - 1} older notes`}
+              </span>
+              {showAll ? (
+                <ChevronUp className="w-3 h-3" />
+              ) : (
+                <ChevronDown className="w-3 h-3" />
+              )}
             </button>
           )}
         </div>

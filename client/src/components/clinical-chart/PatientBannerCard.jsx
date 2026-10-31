@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Phone,
   Calendar,
@@ -6,53 +6,64 @@ import {
   User,
   Stethoscope,
   Clock,
-  HeartHandshake
-} from 'lucide-react';
-import { RiskBadge } from '../RiskBadge.jsx';
+  HeartHandshake,
+} from "lucide-react";
+import { RiskBadge } from "../RiskBadge.jsx";
 
 export function PatientBannerCard({
   patient,
   discharge,
-  riskLevel = 'low',
+  riskLevel = "low",
   onBookVisit,
   onCall,
-  onMessage
+  onMessage,
 }) {
   if (!patient) return null;
 
   // Format initials
   const initials = patient.name
     ? patient.name
-        .split(' ')
+        .split(" ")
         .map((n) => n[0])
-        .join('')
+        .join("")
         .slice(0, 2)
         .toUpperCase()
-    : 'PT';
+    : "PT";
 
   // Age & Sex
   const age = patient.age || patient.demographics?.age || 58;
-  const gender = patient.gender || patient.demographics?.gender || 'M';
-  const sexFormatted = gender.toLowerCase().startsWith('m')
-    ? 'M'
-    : gender.toLowerCase().startsWith('f')
-    ? 'F'
-    : 'O';
+  const gender = patient.gender || patient.demographics?.gender || "M";
+  const sexFormatted = gender.toLowerCase().startsWith("m")
+    ? "M"
+    : gender.toLowerCase().startsWith("f")
+      ? "F"
+      : "O";
 
   // Attending Doctor
   const treatingDoctor =
     discharge?.treatingDoctor?.name ||
     discharge?.treatingDoctor ||
     patient.attendingDoctor ||
-    'Dr. Ananya Sharma';
+    "Dr. Ananya Sharma";
 
   // Diagnosis
-  const diagnosis = discharge?.diagnosis || patient.medicalHistory?.primaryDiagnosis || 'Post-Discharge Recovery Care';
+  const diagnosis =
+    discharge?.diagnosis ||
+    patient.medicalHistory?.primaryDiagnosis ||
+    "Post-Discharge Recovery Care";
 
   // Discharge Date & Recovery Day
-  const dischargeDateObj = discharge?.dischargeDate ? new Date(discharge.dischargeDate) : new Date(Date.now() - 5 * 86400000);
+  const dischargeDateObj = discharge?.dischargeDate
+    ? new Date(discharge.dischargeDate)
+    : new Date(Date.now() - 5 * 86400000);
   const totalDays = discharge?.expectedRecoveryDays || 14;
-  const elapsedDays = Math.max(1, Math.min(totalDays, Math.floor((Date.now() - dischargeDateObj.getTime()) / 86400000) + 1));
+  const elapsedDays = Math.max(
+    1,
+    Math.min(
+      totalDays,
+      Math.floor((Date.now() - dischargeDateObj.getTime()) / 86400000) + 1,
+    ),
+  );
 
   return (
     <div className="card-clean p-4 sm:p-5">
@@ -73,12 +84,14 @@ export function PatientBannerCard({
 
             <div className="flex flex-wrap items-center gap-y-0.5 gap-x-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
               <span className="font-mono text-slate-600 dark:text-slate-300 font-semibold bg-slate-100 dark:bg-slate-800 px-1.5 py-0.2 rounded text-[11px]">
-                {patient.patientId || 'HV-2026'}
+                {patient.patientId || "HV-2026"}
               </span>
               <span>&bull;</span>
-              <span>{age} {sexFormatted}</span>
+              <span>
+                {age} {sexFormatted}
+              </span>
               <span>&bull;</span>
-              <span className="font-mono">{patient.phone || 'N/A'}</span>
+              <span className="font-mono">{patient.phone || "N/A"}</span>
               <span>&bull;</span>
               <span className="inline-flex items-center gap-1 text-slate-600 dark:text-slate-300">
                 <Stethoscope className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
@@ -128,19 +141,32 @@ export function PatientBannerCard({
           <HeartHandshake className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 shrink-0" />
           <span>
             <strong className="label-micro mr-1">Diagnosis:</strong>
-            <span className="font-semibold text-slate-900 dark:text-slate-100">{diagnosis}</span>
+            <span className="font-semibold text-slate-900 dark:text-slate-100">
+              {diagnosis}
+            </span>
           </span>
         </div>
 
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-slate-500 dark:text-slate-400 font-medium">
           <span className="inline-flex items-center gap-1">
             <Clock className="w-3.5 h-3.5 text-slate-400" />
-            <span>Discharged: <strong className="font-tabular font-semibold text-slate-700 dark:text-slate-200">{dischargeDateObj.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</strong></span>
+            <span>
+              Discharged:{" "}
+              <strong className="font-tabular font-semibold text-slate-700 dark:text-slate-200">
+                {dischargeDateObj.toLocaleDateString(undefined, {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })}
+              </strong>
+            </span>
           </span>
 
           <span className="inline-flex items-center gap-1.5 bg-teal-50 dark:bg-teal-950/60 px-2 py-0.5 rounded-md border border-teal-200/60 dark:border-teal-800/60 text-teal-700 dark:text-teal-300 font-bold text-[11px]">
             <span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse" />
-            <span>Day {elapsedDays} of {totalDays}</span>
+            <span>
+              Day {elapsedDays} of {totalDays}
+            </span>
           </span>
         </div>
       </div>
