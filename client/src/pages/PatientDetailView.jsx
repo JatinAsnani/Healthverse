@@ -334,18 +334,18 @@ export function PatientDetailView() {
   // Loading State
   if (isLoading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-        <div className="h-6 w-56 bg-slate-800 rounded animate-pulse" />
-        <div className="h-44 bg-slate-900 border border-slate-800 rounded-2xl animate-pulse" />
-        <div className="h-14 bg-slate-900 border border-slate-800 rounded-xl animate-pulse" />
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-4">
+        <div className="h-5 w-48 rounded-lg skeleton-shimmer" />
+        <div className="h-32 rounded-2xl skeleton-shimmer" />
+        <div className="h-12 rounded-xl skeleton-shimmer" />
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-28 bg-slate-900 border border-slate-800 rounded-2xl animate-pulse" />
+            <div key={i} className="h-24 rounded-xl skeleton-shimmer" />
           ))}
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="h-80 bg-slate-900 border border-slate-800 rounded-2xl animate-pulse" />
-          <div className="h-80 bg-slate-900 border border-slate-800 rounded-2xl animate-pulse" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="h-72 rounded-2xl skeleton-shimmer" />
+          <div className="h-72 rounded-2xl skeleton-shimmer" />
         </div>
       </div>
     );
@@ -384,7 +384,7 @@ export function PatientDetailView() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-4">
       {/* 1. Breadcrumb: "Discharged patient roster / [Patient name]" */}
       <ChartBreadcrumb patientName={patient.name} />
 
@@ -410,15 +410,15 @@ export function PatientDetailView() {
       <VitalsRow vitalsSummary={vitalsSummary} />
 
       {/* 5. Two-Column Section (Stacks to one column below 768px) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
         {/* Left Column: Vitals Trend Chart & Clinical Timeline */}
-        <div className="space-y-6">
+        <div className="space-y-4">
           <VitalsTrendChart trendData={trendData} />
           <ClinicalTimeline events={timelineEvents} />
         </div>
 
         {/* Right Column: Medications, Care Plan Checklist, Clinical Notes */}
-        <div className="space-y-6">
+        <div className="space-y-4">
           <MedicationList
             medications={medicationList}
             onAddMedication={() => setShowAddMedModal(true)}
@@ -436,25 +436,25 @@ export function PatientDetailView() {
 
       {/* ADD MEDICATION MODAL */}
       {showAddMedModal && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-150">
-          <div className="bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-800 space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-              <h3 className="font-extrabold text-base text-slate-100 flex items-center gap-2">
-                <Pill className="w-4 h-4 text-teal-400" />
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-100">
+          <div className="card-clean max-w-md w-full p-5 space-y-3.5 shadow-2xl">
+            <div className="flex items-center justify-between pb-2.5 border-b border-slate-100 dark:border-slate-800">
+              <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                <Pill className="w-4 h-4 text-teal-600 dark:text-teal-400" />
                 <span>Add Post-Discharge Prescription</span>
               </h3>
               <button
                 onClick={() => setShowAddMedModal(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors"
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                 aria-label="Close modal"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <form onSubmit={handleAddMedSubmit} className="space-y-4 text-xs">
+            <form onSubmit={handleAddMedSubmit} className="space-y-3 text-xs">
               <div>
-                <label className="font-bold uppercase block mb-1 text-slate-300">
+                <label className="label-micro block mb-1">
                   Medicine Name
                 </label>
                 <input
@@ -463,12 +463,12 @@ export function PatientDetailView() {
                   placeholder="e.g. Aspirin 75mg / Atorvastatin"
                   value={newMed.medicine}
                   onChange={(e) => setNewMed({ ...newMed, medicine: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-700 bg-slate-800 text-slate-100 font-medium focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs"
                 />
               </div>
 
               <div>
-                <label className="font-bold uppercase block mb-1 text-slate-300">
+                <label className="label-micro block mb-1">
                   Dosage &amp; Frequency
                 </label>
                 <input
@@ -477,11 +477,11 @@ export function PatientDetailView() {
                   placeholder="e.g. 75mg once daily"
                   value={newMed.dosage}
                   onChange={(e) => setNewMed({ ...newMed, dosage: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-700 bg-slate-800 text-slate-100 font-medium focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs"
                 />
               </div>
 
-              <div className="flex items-center gap-2 p-3 rounded-xl bg-red-950/30 border border-red-900/50">
+              <div className="flex items-center gap-2 p-2.5 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50">
                 <input
                   type="checkbox"
                   id="critCheck"
@@ -489,22 +489,22 @@ export function PatientDetailView() {
                   onChange={(e) => setNewMed({ ...newMed, critical: e.target.checked })}
                   className="w-4 h-4 rounded text-red-600 focus:ring-red-500"
                 />
-                <label htmlFor="critCheck" className="font-bold text-red-300 cursor-pointer select-none">
-                  Critical Medication (Triggers clinician alerts if missed)
+                <label htmlFor="critCheck" className="font-semibold text-xs text-red-700 dark:text-red-300 cursor-pointer select-none">
+                  Critical Medication (Triggers alerts if missed)
                 </label>
               </div>
 
-              <div className="flex justify-end gap-2 pt-2">
+              <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={() => setShowAddMedModal(false)}
-                  className="btn-touch bg-slate-800 hover:bg-slate-700 text-slate-300 py-2 px-4 font-bold rounded-xl transition-colors"
+                  className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-semibold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="btn-touch bg-teal-600 hover:bg-teal-500 text-white py-2 px-4 font-bold rounded-xl shadow-md shadow-teal-600/30"
+                  className="px-4 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-bold"
                 >
                   Save Prescription
                 </button>
@@ -516,25 +516,25 @@ export function PatientDetailView() {
 
       {/* SCHEDULE FOLLOWUP MODAL */}
       {showFollowupModal && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-150">
-          <div className="bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-800 space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-              <h3 className="font-extrabold text-base text-slate-100 flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-teal-400" />
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-100">
+          <div className="card-clean max-w-md w-full p-5 space-y-3.5 shadow-2xl">
+            <div className="flex items-center justify-between pb-2.5 border-b border-slate-100 dark:border-slate-800">
+              <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-teal-600 dark:text-teal-400" />
                 <span>Book Follow-up Appointment</span>
               </h3>
               <button
                 onClick={() => setShowFollowupModal(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors"
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                 aria-label="Close modal"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <form onSubmit={handleScheduleFollowupSubmit} className="space-y-4 text-xs">
+            <form onSubmit={handleScheduleFollowupSubmit} className="space-y-3 text-xs">
               <div>
-                <label className="font-bold uppercase block mb-1 text-slate-300">
+                <label className="label-micro block mb-1">
                   Date &amp; Time
                 </label>
                 <input
@@ -542,18 +542,18 @@ export function PatientDetailView() {
                   required
                   value={newFollowup.scheduledAt}
                   onChange={(e) => setNewFollowup({ ...newFollowup, scheduledAt: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-700 bg-slate-800 text-slate-100 font-medium focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-tabular text-xs"
                 />
               </div>
 
               <div>
-                <label className="font-bold uppercase block mb-1 text-slate-300">
+                <label className="label-micro block mb-1">
                   Visit Type
                 </label>
                 <select
                   value={newFollowup.type}
                   onChange={(e) => setNewFollowup({ ...newFollowup, type: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-700 bg-slate-800 text-slate-100 font-medium focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs"
                 >
                   <option value="in_person">In-Person at Hospital</option>
                   <option value="home_visit_chw">Home Visit by CHW (ASHA)</option>
@@ -562,28 +562,28 @@ export function PatientDetailView() {
               </div>
 
               <div>
-                <label className="font-bold uppercase block mb-1 text-slate-300">
+                <label className="label-micro block mb-1">
                   Clinical Notes
                 </label>
                 <textarea
                   rows="2"
                   value={newFollowup.notes}
                   onChange={(e) => setNewFollowup({ ...newFollowup, notes: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-700 bg-slate-800 text-slate-100 font-medium focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs resize-none"
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-2">
+              <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={() => setShowFollowupModal(false)}
-                  className="btn-touch bg-slate-800 hover:bg-slate-700 text-slate-300 py-2 px-4 font-bold rounded-xl transition-colors"
+                  className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-semibold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="btn-touch bg-teal-600 hover:bg-teal-500 text-white py-2 px-4 font-bold rounded-xl shadow-md shadow-teal-600/30"
+                  className="px-4 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-bold"
                 >
                   Confirm Appointment
                 </button>

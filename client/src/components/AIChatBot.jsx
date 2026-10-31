@@ -487,25 +487,28 @@ export const AIChatBot = () => {
         <button
           onClick={() => setIsOpen(!isOpen)}
           aria-label="Open HealthVerse AI Health Assistant"
-          className="flex items-center gap-2 px-3 py-2 rounded-full bg-teal-600 hover:bg-teal-700 text-white shadow-lg transition-transform hover:scale-105 active:scale-95 text-xs font-bold"
+          className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-teal-600 hover:bg-teal-700 text-white shadow-md shadow-teal-700/20 transition-all hover:scale-[1.02] active:scale-95 text-xs font-semibold"
         >
-          <Bot className="w-4 h-4" />
+          <div className="relative">
+            <Bot className="w-4 h-4" />
+            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-300 animate-pulse" />
+          </div>
           <span>AI Assistant</span>
         </button>
       </div>
 
       {/* Chat Window Flyout */}
       {isOpen && (
-        <div className="fixed bottom-16 sm:bottom-20 left-2 right-2 sm:left-auto sm:right-6 w-auto sm:w-[400px] h-[calc(100dvh-120px)] sm:h-[520px] max-h-[80vh] bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 flex flex-col z-50 overflow-hidden animate-in fade-in duration-150">
+        <div className="fixed bottom-16 sm:bottom-20 left-2 right-2 sm:left-auto sm:right-6 w-auto sm:w-[400px] h-[calc(100dvh-120px)] sm:h-[520px] max-h-[80vh] card-clean flex flex-col z-50 overflow-hidden shadow-2xl animate-in fade-in duration-150">
           {/* Header */}
-          <div className="bg-slate-900 text-white px-4 py-3 flex items-center justify-between">
+          <div className="bg-slate-900/95 dark:bg-slate-950 text-white px-4 py-3 flex items-center justify-between border-b border-slate-800 backdrop-blur-md">
             <div className="flex items-center gap-2">
               <div className="w-7 h-7 rounded-lg bg-teal-500/20 text-teal-400 flex items-center justify-center">
                 <Bot className="w-4 h-4" />
               </div>
               <div>
                 <h3 className="font-bold text-xs tracking-tight">HealthVerse AI</h3>
-                <span className="text-[10px] text-slate-400">Decision-Support Assistant</span>
+                <span className="text-[10px] text-slate-400">Clinical Decision Support</span>
               </div>
             </div>
 
@@ -729,14 +732,14 @@ export const AIChatBot = () => {
       </div>
 
       {/* Quick Prompts Bar */}
-      <div className="bg-white dark:bg-slate-900 px-3 py-2 border-t border-slate-100 dark:border-slate-800 overflow-x-auto flex gap-1.5 no-scrollbar">
+      <div className="bg-slate-50/50 dark:bg-slate-900/60 px-3 py-1.5 border-t border-slate-100 dark:border-slate-800 overflow-x-auto flex gap-1.5 no-scrollbar">
         {quickPrompts.map((qp, idx) => {
           const Icon = qp.icon;
           return (
             <button
               key={idx}
               onClick={() => handleSendMessage(qp.prompt)}
-              className="whitespace-nowrap px-2.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-teal-50 dark:hover:bg-teal-950 hover:text-teal-700 dark:hover:text-teal-300 text-slate-700 dark:text-slate-200 text-[11px] font-semibold transition-colors flex-shrink-0 flex items-center gap-1.5 border border-slate-200 dark:border-slate-700"
+              className="pill-item whitespace-nowrap bg-white dark:bg-slate-800 hover:text-teal-700 dark:hover:text-teal-300 text-slate-700 dark:text-slate-300 text-[11px] font-medium flex-shrink-0 flex items-center gap-1.5 border border-slate-200/70 dark:border-slate-700 shadow-xs"
             >
               <Icon className="w-3 h-3 text-teal-600 dark:text-teal-400" />
               <span>{qp.label}</span>
