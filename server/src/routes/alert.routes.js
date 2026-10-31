@@ -28,28 +28,30 @@ router.get('/', authenticate, requireRole('doctor', 'nurse', 'hospital_admin'), 
       filter.riskLevel = riskLevel;
     }
 
-    const alerts = await Alert.find(filter)
-      .populate({
-        path: 'patient',
-        select: 'name patientId phone dob gender address primaryDoctor',
-        populate: { path: 'primaryDoctor', select: 'name' }
-      })
-      .populate('assessment')
-      .populate('reviewer', 'name role')
-      .populate('assignedTo', 'name role')
-      .sort({ createdAt: -1 });
+    const [alerts, openCount, criticalCount] = await Promise.all([
+      Alert.find(filter)
+        .populate({
+          path: 'patient',
+          select: 'name patientId phone dob gender address primaryDoctor',
+          populate: { path: 'primaryDoctor', select: 'name' }
+        })
+        .populate('assessment')
+        .populate('reviewer', 'name role')
+        .populate('assignedTo', 'name role')
+        .sort({ createdAt: -1 })
+        .lean(),
+      Alert.countDocuments({ hospital: hospitalId, status: { $in: ['open', 'escalated'] } }),
+      Alert.countDocuments({ hospital: hospitalId, riskLevel: 'critical', status: { $in: ['open', 'escalated'] } })
+    ]);
 
-    const openCount = await Alert.countDocuments({ hospital: hospitalId, status: { $in: ['open', 'escalated'] } });
-    const criticalCount = await Alert.countDocuments({ hospital: hospitalId, riskLevel: 'critical', status: { $in: ['open', 'escalated'] } });
-
-    await logAuditEvent({
+    logAuditEvent({
       userId: req.user._id,
       action: 'read',
       resourceType: 'Alert',
       ip: req.ip,
       userAgent: req.headers['user-agent'],
       details: `Clinician alert inbox viewed (Found: ${alerts.length}, Open: ${openCount})`
-    });
+    }).catch(() => {});
 
     res.json({
       success: true,

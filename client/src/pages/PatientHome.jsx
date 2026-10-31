@@ -29,6 +29,7 @@ import {
 import useAuthStore from '../store/useAuthStore.js';
 import { RiskBadge } from '../components/RiskBadge.jsx';
 import { saveAdherenceOffline } from '../db/offlineDb.js';
+import { fetchWithTimeout } from '../utils/api.js';
 
 export function PatientHome() {
   const { t, i18n } = useTranslation();
@@ -72,15 +73,30 @@ export function PatientHome() {
 
   const fetchPatientData = async () => {
     if (!profile?._id) return;
-    try {
+
+    const cacheKey = `healthverse_patient_${profile._id}`;
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      try {
+        setPatientData(JSON.parse(cached));
+        setIsLoading(false);
+      } catch (e) {}
+    } else {
       setIsLoading(true);
-      const res = await fetch(`/api/v1/patients/${profile._id}`, { credentials: 'include' });
+    }
+
+    try {
+      const res = await fetchWithTimeout(`/api/v1/patients/${profile._id}`, {
+        credentials: 'include',
+        timeout: 3500
+      });
       if (res.ok) {
         const json = await res.json();
         setPatientData(json.data);
+        localStorage.setItem(cacheKey, JSON.stringify(json.data));
       }
     } catch (err) {
-      console.warn('Network fetch failed, loading offline state');
+      console.warn('Network fetch timed out or offline, keeping cached state');
     } finally {
       setIsLoading(false);
     }

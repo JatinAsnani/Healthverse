@@ -46,5 +46,8 @@ const dischargeSchema = new mongoose.Schema({
   timestamps: true
 });
 
+dischargeSchema.index({ patient: 1, status: 1 });
+dischargeSchema.index({ hospital: 1, dischargeDate: -1 });
+
 export const Discharge = mongoose.model('Discharge', dischargeSchema);
 export default Discharge;

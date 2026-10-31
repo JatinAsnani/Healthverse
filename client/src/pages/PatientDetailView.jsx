@@ -8,6 +8,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import useAuthStore from "../store/useAuthStore.js";
+import { fetchWithTimeout } from "../utils/api.js";
 
 import { ChartBreadcrumb } from "../components/clinical-chart/ChartBreadcrumb.jsx";
 import { PatientBannerCard } from "../components/clinical-chart/PatientBannerCard.jsx";
@@ -73,22 +74,38 @@ export function PatientDetailView() {
   }, [id]);
 
   const fetchPatientChart = async () => {
-    try {
+    const cacheKey = `healthverse_chart_${id}`;
+    const cached = sessionStorage.getItem(cacheKey);
+    if (cached) {
+      try {
+        setData(JSON.parse(cached));
+        setIsLoading(false);
+      } catch (e) {}
+    } else {
       setIsLoading(true);
-      setLoadError(null);
-      const res = await fetch(`/api/v1/patients/${id}`, {
+    }
+    setLoadError(null);
+
+    try {
+      const res = await fetchWithTimeout(`/api/v1/patients/${id}`, {
         credentials: "include",
+        timeout: 4000
       });
       if (res.ok) {
         const json = await res.json();
         setData(json.data);
+        try {
+          sessionStorage.setItem(cacheKey, JSON.stringify(json.data));
+        } catch (e) {}
       } else {
         const errJson = await res.json().catch(() => ({}));
         setLoadError(errJson.message || "Failed to retrieve patient chart");
       }
     } catch (e) {
       console.error(e);
-      setLoadError("Network error connecting to patient clinical service");
+      if (!data && !cached) {
+        setLoadError("Network error connecting to patient clinical service");
+      }
     } finally {
       setIsLoading(false);
     }

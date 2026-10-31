@@ -58,5 +58,9 @@ const followupSchema = new mongoose.Schema({
   timestamps: true
 });
 
+followupSchema.index({ patient: 1, scheduledAt: 1 });
+followupSchema.index({ staff: 1, status: 1, scheduledAt: 1 });
+followupSchema.index({ status: 1, scheduledAt: 1 });
+
 export const Followup = mongoose.model('Followup', followupSchema);
 export default Followup;

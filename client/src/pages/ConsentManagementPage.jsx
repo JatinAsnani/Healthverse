@@ -11,6 +11,7 @@ import {
   FileCheck,
 } from "lucide-react";
 import useAuthStore from "../store/useAuthStore.js";
+import { fetchWithTimeout } from "../utils/api.js";
 
 export function ConsentManagementPage() {
   const navigate = useNavigate();
@@ -34,9 +35,10 @@ export function ConsentManagementPage() {
   const fetchConsents = async () => {
     if (!patientId) return;
     try {
-      setIsLoading(true);
-      const res = await fetch(`/api/v1/consent/patient/${patientId}`, {
+      if (consents.length === 0) setIsLoading(true);
+      const res = await fetchWithTimeout(`/api/v1/consent/patient/${patientId}`, {
         credentials: "include",
+        timeout: 3500
       });
       if (res.ok) {
         const json = await res.json();

@@ -57,7 +57,8 @@ router.get(
         .populate('patient', 'name patientId phone gender dob address hospital')
         .populate('staff', 'name specialization phone role')
         .populate('discharge', 'diagnosis dischargeDate hospital')
-        .sort({ scheduledAt: 1 });
+        .sort({ scheduledAt: 1 })
+        .lean();
 
       res.json({
         success: true,

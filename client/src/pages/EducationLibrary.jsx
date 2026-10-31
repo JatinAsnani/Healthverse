@@ -14,6 +14,9 @@ import {
   FileText,
 } from "lucide-react";
 import useAuthStore from "../store/useAuthStore.js";
+import { fetchWithTimeout } from "../utils/api.js";
+
+const articleCache = new Map();
 
 export function EducationLibrary() {
   const { t } = useTranslation();
@@ -30,13 +33,22 @@ export function EducationLibrary() {
   }, [language, activeTopic]);
 
   const fetchArticles = async () => {
-    try {
+    const cacheKey = `${language}_${activeTopic}`;
+    if (articleCache.has(cacheKey)) {
+      setArticles(articleCache.get(cacheKey));
+      setIsLoading(false);
+    } else {
       setIsLoading(true);
+    }
+
+    try {
       const url = `/api/v1/education?language=${language}${activeTopic !== "all" ? `&topic=${activeTopic}` : ""}`;
-      const res = await fetch(url);
+      const res = await fetchWithTimeout(url, { timeout: 3500 });
       if (res.ok) {
         const json = await res.json();
-        setArticles(json.data || []);
+        const data = json.data || [];
+        articleCache.set(cacheKey, data);
+        setArticles(data);
       }
     } catch (e) {
       console.warn("Network error loading education articles:", e);

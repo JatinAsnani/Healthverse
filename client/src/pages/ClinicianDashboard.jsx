@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import useAuthStore from '../store/useAuthStore.js';
 import { RiskBadge } from '../components/RiskBadge.jsx';
+import { fetchWithTimeout } from '../utils/api.js';
 
 export function ClinicianDashboard() {
   const { t } = useTranslation();
@@ -56,11 +57,13 @@ export function ClinicianDashboard() {
 
   const fetchData = async () => {
     try {
-      setIsLoading(true);
+      if (patients.length === 0) {
+        setIsLoading(true);
+      }
       const [patientsRes, alertsRes, followupsRes] = await Promise.all([
-        fetch(`/api/v1/patients?riskLevel=${riskFilter}`, { credentials: 'include' }),
-        fetch('/api/v1/alerts', { credentials: 'include' }),
-        fetch('/api/v1/followups', { credentials: 'include' })
+        fetchWithTimeout(`/api/v1/patients?riskLevel=${riskFilter}`, { credentials: 'include', timeout: 4000 }),
+        fetchWithTimeout('/api/v1/alerts', { credentials: 'include', timeout: 4000 }),
+        fetchWithTimeout('/api/v1/followups', { credentials: 'include', timeout: 4000 })
       ]);
 
       if (patientsRes.ok) {

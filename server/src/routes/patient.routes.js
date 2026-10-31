@@ -80,25 +80,64 @@ router.get('/', authenticate, async (req, res, next) => {
       .sort({ updatedAt: -1 })
       .lean();
 
-    // Attach latest risk assessment and open alerts for clinical quick-glance
-    const enrichedPatients = await Promise.all(
-      patients.map(async (p) => {
-        const [latestRisk, openAlert, activeDischarge] = await Promise.all([
-          RiskAssessment.findOne({ patient: p._id }).sort({ createdAt: -1 }).lean(),
-          Alert.findOne({ patient: p._id, status: { $in: ['open', 'acknowledged', 'escalated'] } })
-            .sort({ createdAt: -1 })
-            .lean(),
-          Discharge.findOne({ patient: p._id, status: 'active' }).sort({ dischargeDate: -1 }).lean()
-        ]);
+    const patientIds = patients.map((p) => p._id);
 
-        return {
-          ...p,
-          latestRisk: latestRisk || { riskLevel: 'low', explanation: 'Baseline' },
-          openAlert: openAlert || null,
-          activeDischarge: activeDischarge || null
-        };
+    // High-performance batched fetch: 3 queries total instead of 3xN sequential queries
+    const [openAlerts, activeDischarges, latestRisks] = await Promise.all([
+      Alert.find({
+        patient: { $in: patientIds },
+        status: { $in: ['open', 'acknowledged', 'escalated'] }
       })
-    );
+        .sort({ createdAt: -1 })
+        .lean(),
+      Discharge.find({
+        patient: { $in: patientIds },
+        status: 'active'
+      })
+        .sort({ dischargeDate: -1 })
+        .lean(),
+      RiskAssessment.aggregate([
+        { $match: { patient: { $in: patientIds } } },
+        { $sort: { createdAt: -1 } },
+        {
+          $group: {
+            _id: '$patient',
+            riskLevel: { $first: '$riskLevel' },
+            explanation: { $first: '$explanation' },
+            rulesFired: { $first: '$rulesFired' },
+            redFlags: { $first: '$redFlags' },
+            createdAt: { $first: '$createdAt' }
+          }
+        }
+      ])
+    ]);
+
+    const alertMap = new Map();
+    for (const a of openAlerts) {
+      const pKey = String(a.patient);
+      if (!alertMap.has(pKey)) alertMap.set(pKey, a);
+    }
+
+    const dischargeMap = new Map();
+    for (const d of activeDischarges) {
+      const pKey = String(d.patient);
+      if (!dischargeMap.has(pKey)) dischargeMap.set(pKey, d);
+    }
+
+    const riskMap = new Map();
+    for (const r of latestRisks) {
+      riskMap.set(String(r._id), r);
+    }
+
+    const enrichedPatients = patients.map((p) => {
+      const pKey = String(p._id);
+      return {
+        ...p,
+        latestRisk: riskMap.get(pKey) || { riskLevel: 'low', explanation: 'Baseline' },
+        openAlert: alertMap.get(pKey) || null,
+        activeDischarge: dischargeMap.get(pKey) || null
+      };
+    });
 
     // Optional risk filter
     let finalResults = enrichedPatients;
@@ -106,14 +145,15 @@ router.get('/', authenticate, async (req, res, next) => {
       finalResults = enrichedPatients.filter(p => p.latestRisk?.riskLevel === riskLevel);
     }
 
-    await logAuditEvent({
+    // Non-blocking audit log to prevent slowing down read responses
+    logAuditEvent({
       userId: req.user._id,
       action: 'read',
       resourceType: 'Patient',
       ip: req.ip,
       userAgent: req.headers['user-agent'],
       details: `Scoped patient list requested (Returned: ${finalResults.length} records)`
-    });
+    }).catch(() => {});
 
     res.json({
       success: true,
@@ -157,7 +197,8 @@ router.get('/:id', authenticate, requirePatientAccess('id'), async (req, res, ne
       AdherenceLog.find({ patient: patient._id }).populate('prescription').sort({ dueAt: -1 }).limit(100)
     ]);
 
-    await logAuditEvent({
+    // Non-blocking audit logging on read
+    logAuditEvent({
       userId: req.user._id,
       action: 'read',
       resourceType: 'Patient',
@@ -166,7 +207,7 @@ router.get('/:id', authenticate, requirePatientAccess('id'), async (req, res, ne
       ip: req.ip,
       userAgent: req.headers['user-agent'],
       details: `Full clinical chart viewed for patient ${patient.patientId}`
-    });
+    }).catch(() => {});
 
     res.json({
       success: true,
