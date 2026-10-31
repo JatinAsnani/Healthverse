@@ -7,9 +7,6 @@ import {
   AlertOctagon,
   AlertTriangle,
   CheckCircle2,
-  TrendingUp,
-  TrendingDown,
-  Minus,
 } from "lucide-react";
 
 /**

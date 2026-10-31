@@ -4,9 +4,7 @@ import {
   Pill,
   Activity,
   LogOut,
-  Calendar,
   Clock,
-  CheckCircle2,
   FileText,
 } from "lucide-react";
 

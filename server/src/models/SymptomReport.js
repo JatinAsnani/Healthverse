@@ -60,7 +60,6 @@ const symptomReportSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  // Offline sync fields
   clientUuid: {
     type: String,
     unique: true,

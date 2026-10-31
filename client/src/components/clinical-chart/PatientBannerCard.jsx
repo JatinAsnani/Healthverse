@@ -3,7 +3,6 @@ import {
   Phone,
   Calendar,
   MessageSquare,
-  User,
   Stethoscope,
   Clock,
   HeartHandshake,
@@ -20,7 +19,6 @@ export function PatientBannerCard({
 }) {
   if (!patient) return null;
 
-  // Format initials
   const initials = patient.name
     ? patient.name
         .split(" ")
@@ -30,7 +28,6 @@ export function PatientBannerCard({
         .toUpperCase()
     : "PT";
 
-  // Age & Sex
   const age = patient.age || patient.demographics?.age || 58;
   const gender = patient.gender || patient.demographics?.gender || "M";
   const sexFormatted = gender.toLowerCase().startsWith("m")
@@ -39,20 +36,17 @@ export function PatientBannerCard({
       ? "F"
       : "O";
 
-  // Attending Doctor
   const treatingDoctor =
     discharge?.treatingDoctor?.name ||
     discharge?.treatingDoctor ||
     patient.attendingDoctor ||
     "Dr. Ananya Sharma";
 
-  // Diagnosis
   const diagnosis =
     discharge?.diagnosis ||
     patient.medicalHistory?.primaryDiagnosis ||
     "Post-Discharge Recovery Care";
 
-  // Discharge Date & Recovery Day
   const dischargeDateObj = discharge?.dischargeDate
     ? new Date(discharge.dischargeDate)
     : new Date(Date.now() - 5 * 86400000);

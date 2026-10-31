@@ -4,7 +4,6 @@ import useAuthStore from './store/useAuthStore.js';
 import useThemeStore from './store/useThemeStore.js';
 import { initAutoSync } from './services/syncEngine.js';
 
-// Components & Pages
 import Navbar from './components/Navbar.jsx';
 import SafetyBanner from './components/SafetyBanner.jsx';
 import LoginPage from './pages/LoginPage.jsx';

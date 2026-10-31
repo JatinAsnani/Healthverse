@@ -20,7 +20,6 @@ import {
   Plus,
   RefreshCw,
   Sunrise,
-  Sun,
   Moon,
   Volume2,
   VolumeX,
@@ -28,7 +27,7 @@ import {
   Check
 } from 'lucide-react';
 import useAuthStore from '../store/useAuthStore.js';
-import { RiskBadge, SyncStatusBadge } from '../components/RiskBadge.jsx';
+import { RiskBadge } from '../components/RiskBadge.jsx';
 import { saveAdherenceOffline } from '../db/offlineDb.js';
 
 export function PatientHome() {
@@ -39,9 +38,8 @@ export function PatientHome() {
   const [isLoading, setIsLoading] = useState(true);
   const [loggedDoses, setLoggedDoses] = useState({});
   const [isSpeakingId, setIsSpeakingId] = useState(null);
-  const [activeBucket, setActiveBucket] = useState('all'); // 'all' | 'morning' | 'night'
+  const [activeBucket, setActiveBucket] = useState('all');
 
-  // Appointment Booking State
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [doctors, setDoctors] = useState([
     { _id: '6ae19a8e4da8f1c7c8827f9a', name: 'Dr. Ananya Sharma', specialization: 'Internal Medicine' },

@@ -1,18 +1,14 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
-  ArrowLeft,
   X,
-  Plus,
   Calendar,
   Pill,
-  Clock,
   AlertTriangle,
   RefreshCw,
 } from "lucide-react";
 import useAuthStore from "../store/useAuthStore.js";
 
-// Modular Clinical Chart Sub-components
 import { ChartBreadcrumb } from "../components/clinical-chart/ChartBreadcrumb.jsx";
 import { PatientBannerCard } from "../components/clinical-chart/PatientBannerCard.jsx";
 import { AlertStrip } from "../components/clinical-chart/AlertStrip.jsx";
@@ -23,7 +19,6 @@ import { MedicationList } from "../components/clinical-chart/MedicationList.jsx"
 import { CarePlanChecklist } from "../components/clinical-chart/CarePlanChecklist.jsx";
 import { ClinicalNotesPanel } from "../components/clinical-chart/ClinicalNotesPanel.jsx";
 
-// Typed Clinical Chart Mock & Helper Data
 import {
   getVitalsTrendData,
   getLatestVitalsSummary,
@@ -51,11 +46,9 @@ export function PatientDetailView() {
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState(null);
 
-  // Modals state
   const [showAddMedModal, setShowAddMedModal] = useState(false);
   const [showFollowupModal, setShowFollowupModal] = useState(false);
 
-  // Form states
   const [newMed, setNewMed] = useState({
     medicine: "",
     dosage: "",

@@ -3,26 +3,19 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   HeartPulse,
-  Wifi,
-  WifiOff,
   RefreshCw,
   Languages,
   LogOut,
   User,
   Shield,
-  ShieldAlert,
-  Bell,
   Menu,
   X,
   Sun,
   Moon,
   Home,
-  Pill,
   Activity,
   FileText,
-  Calendar,
   Users,
-  AlertTriangle,
   CheckCircle2,
   Database
 } from 'lucide-react';

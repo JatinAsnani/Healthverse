@@ -170,6 +170,14 @@ router.post(
         specialization: specialization?.trim()
       });
 
+      await logAuditEvent({
+        action: 'create',
+        resourceType: 'staff',
+        resourceId: staff._id,
+        user: req.user._id,
+        details: `Registered new staff member ${name} (${role})`
+      });
+
       res.status(201).json({
         success: true,
         message: 'Staff member registered successfully',

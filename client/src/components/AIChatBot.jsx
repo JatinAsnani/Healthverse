@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Bot,
-  Sparkles,
   Send,
   X,
   Volume2,
@@ -14,7 +13,6 @@ import {
   ShieldAlert,
   Calendar,
   CheckCircle2,
-  Clock,
   FileText,
   Users,
   AlertTriangle,
@@ -223,7 +221,6 @@ export const AIChatBot = () => {
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // Appointment Booking State
   const [doctorsList, setDoctorsList] = useState([
     {
       _id: "6ae19a8e4da8f1c7c8827f9a",
@@ -247,7 +244,6 @@ export const AIChatBot = () => {
   const [isBookingSubmitting, setIsBookingSubmitting] = useState(false);
   const [bookedAppointments, setBookedAppointments] = useState({});
 
-  // Audio / Speech State
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(false);

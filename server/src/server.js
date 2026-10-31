@@ -12,7 +12,6 @@ import { apiLimiter } from './middleware/rateLimiter.js';
 import { errorHandler, notFound } from './middleware/errorHandler.js';
 import initializeScheduler from './services/scheduler.js';
 
-// Route imports
 import authRoutes from './routes/auth.routes.js';
 import patientRoutes from './routes/patient.routes.js';
 import dischargeRoutes from './routes/discharge.routes.js';
@@ -35,7 +34,6 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Security Middlewares
 app.use(helmet({
   contentSecurityPolicy: false // Allow Swagger UI and API assets
 }));

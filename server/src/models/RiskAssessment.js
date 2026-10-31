@@ -49,7 +49,6 @@ const riskAssessmentSchema = new mongoose.Schema({
     explanation: String,
     assessedAt: Date
   },
-  // Offline sync fields
   clientUuid: {
     type: String,
     unique: true,

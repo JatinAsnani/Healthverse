@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import {
   ClipboardCheck,
-  CheckCircle2,
   Clock,
   CheckSquare,
   Square,

@@ -2,19 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  HeartHandshake,
   UserPlus,
-  Users,
-  Activity,
-  CheckCircle,
-  AlertTriangle,
   ChevronRight,
-  ShieldAlert,
   Search,
   X
 } from 'lucide-react';
 import useAuthStore from '../store/useAuthStore.js';
-import { RiskBadge, SyncStatusBadge } from '../components/RiskBadge.jsx';
+import { RiskBadge } from '../components/RiskBadge.jsx';
 import { savePatientOffline } from '../db/offlineDb.js';
 
 export function CHWView() {

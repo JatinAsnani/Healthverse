@@ -9,7 +9,6 @@ import {
   HeartPulse,
   Clock,
   Search,
-  Globe,
   ChevronRight,
   X,
   FileText,

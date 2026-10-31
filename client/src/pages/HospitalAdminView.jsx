@@ -4,12 +4,7 @@ import {
   Users,
   ShieldCheck,
   UserPlus,
-  RefreshCw,
   Building,
-  CheckCircle,
-  AlertTriangle,
-  FileText,
-  Clock,
   Lock,
   X,
   Search,
@@ -27,15 +22,12 @@ export function HospitalAdminView() {
   const [audits, setAudits] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Search & Filter state for DPDP Audit Logs
   const [searchAudit, setSearchAudit] = useState('');
   const [auditActionFilter, setAuditActionFilter] = useState('all');
 
-  // Search & Filter state for Staff Management
   const [searchStaff, setSearchStaff] = useState('');
   const [staffRoleFilter, setStaffRoleFilter] = useState('all');
 
-  // New staff modal
   const [showAddStaffModal, setShowAddStaffModal] = useState(false);
   const [newStaff, setNewStaff] = useState({
     name: '',
@@ -97,7 +89,6 @@ export function HospitalAdminView() {
     }
   };
 
-  // Filtered DPDP Audit Logs
   const filteredAudits = audits.filter((a) => {
     if (auditActionFilter !== 'all' && a.action !== auditActionFilter) {
       return false;
@@ -124,7 +115,6 @@ export function HospitalAdminView() {
     );
   });
 
-  // Filtered Staff Members
   const filteredStaff = staffList.filter((st) => {
     if (staffRoleFilter !== 'all' && st.role !== staffRoleFilter) {
       return false;

@@ -2,7 +2,7 @@ import express from 'express';
 import { body, validationResult } from 'express-validator';
 import { authenticate } from '../middleware/auth.js';
 import { requireRole } from '../middleware/rbac.js';
-import { Alert, Patient, Staff } from '../models/index.js';
+import { Alert } from '../models/index.js';
 import { logAuditEvent } from '../utils/auditLogger.js';
 
 const router = express.Router();

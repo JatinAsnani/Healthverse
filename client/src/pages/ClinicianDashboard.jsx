@@ -6,8 +6,6 @@ import {
   ShieldAlert,
   Search,
   Filter,
-  CheckCircle2,
-  AlertTriangle,
   Clock,
   Phone,
   ChevronRight,
@@ -16,11 +14,8 @@ import {
   Send,
   X,
   Calendar,
-  Video,
   MapPin,
   CheckCircle,
-  XCircle,
-  FileText,
   Building2,
   Home
 } from 'lucide-react';
@@ -38,22 +33,18 @@ export function ClinicianDashboard() {
   const [appointments, setAppointments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Roster Filters
   const [search, setSearch] = useState('');
   const [riskFilter, setRiskFilter] = useState('all');
 
-  // Appointments Filters
   const [appointmentSearch, setAppointmentSearch] = useState('');
-  const [appointmentScope, setAppointmentScope] = useState('all'); // 'all' | 'my'
-  const [appointmentStatusFilter, setAppointmentStatusFilter] = useState('all'); // 'all' | 'scheduled' | 'completed' | 'missed'
-  const [appointmentTypeFilter, setAppointmentTypeFilter] = useState('all'); // 'all' | 'in_person' | 'telephonic' | 'home_visit_chw'
+  const [appointmentScope, setAppointmentScope] = useState('all');
+  const [appointmentStatusFilter, setAppointmentStatusFilter] = useState('all');
+  const [appointmentTypeFilter, setAppointmentTypeFilter] = useState('all');
 
-  // Complete Appointment Modal
   const [completingApt, setCompletingApt] = useState(null);
   const [completionNotes, setCompletionNotes] = useState('');
   const [isUpdatingApt, setIsUpdatingApt] = useState(false);
 
-  // Resolve Alert Modal
   const [resolvingAlert, setResolvingAlert] = useState(null);
   const [actionTaken, setActionTaken] = useState('medication_adjusted');
   const [decisionNotes, setDecisionNotes] = useState('');

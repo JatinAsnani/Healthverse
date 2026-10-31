@@ -1,5 +1,5 @@
 import Dexie from 'dexie';
-import { encryptAtRest, decryptAtRest } from '../utils/webCrypto.js';
+import { encryptAtRest } from '../utils/webCrypto.js';
 
 export const db = new Dexie('HealthVerseOfflineDB');
 

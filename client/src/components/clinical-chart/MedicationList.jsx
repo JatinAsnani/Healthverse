@@ -5,8 +5,6 @@ import {
   AlertTriangle,
   Clock,
   Plus,
-  Check,
-  X,
 } from "lucide-react";
 
 /**

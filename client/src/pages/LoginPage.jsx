@@ -71,7 +71,6 @@ export function LoginPage() {
 
   const selectedDemo = demoRoles.find((d) => d.id === selectedDemoRole);
 
-  // Registration state
   const [regData, setRegData] = useState({
     name: "",
     phone: "",
@@ -127,7 +126,6 @@ export function LoginPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Registration failed");
 
-      // Auto login
       await login(regData.phone, regData.password);
       navigate("/");
     } catch (err) {

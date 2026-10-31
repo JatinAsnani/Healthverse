@@ -4,8 +4,6 @@ import {
   Shield,
   Lock,
   ArrowLeft,
-  UserCheck,
-  AlertTriangle,
   CheckCircle2,
   XCircle,
   Plus,

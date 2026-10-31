@@ -32,7 +32,6 @@ const adherenceLogSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
-  // Offline sync fields
   clientUuid: {
     type: String,
     unique: true,

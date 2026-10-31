@@ -1,6 +1,5 @@
 import cron from 'node-cron';
-import { Alert, Staff, Notification, Prescription, Followup, PatientCaregiver } from '../models/index.js';
-import smsAdapter from './smsAdapter.js';
+import { Alert, Staff, Notification, Followup } from '../models/index.js';
 import logger from '../config/logger.js';
 
 const CRITICAL_ESCALATION_MINS = Number(process.env.ESCALATION_CRITICAL_MINUTES || 15);

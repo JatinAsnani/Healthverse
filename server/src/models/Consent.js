@@ -38,7 +38,6 @@ const consentSchema = new mongoose.Schema({
     type: String,
     default: 'DPDP-2023-v1.0'
   },
-  // Offline sync fields
   clientUuid: {
     type: String,
     unique: true,

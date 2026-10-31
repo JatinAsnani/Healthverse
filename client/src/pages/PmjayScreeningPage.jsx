@@ -3,12 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   ShieldCheck,
-  CheckCircle2,
-  AlertCircle,
-  HelpCircle,
   ArrowLeft,
-  FileText,
-  Building,
   Info,
   Send,
   Check,

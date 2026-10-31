@@ -12,15 +12,9 @@ import {
   Activity,
   Zap,
   PhoneCall,
-  CheckCircle2,
-  AlertTriangle,
   AlertOctagon,
   ArrowLeft,
-  ShieldCheck,
-  Plus,
-  Minus,
   Layers,
-  X,
   Check,
 } from "lucide-react";
 import { evaluateRisk } from "@healthverse/shared";
